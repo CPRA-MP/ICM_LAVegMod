@@ -7,7 +7,7 @@
 # that is easy to use.
 
 # STD Python modules
-import exceptions
+from builtins import Exception as exceptions
 import re
 import sys
 
@@ -22,19 +22,19 @@ class Config(dict):
         elif type(argv) == list:
             if len(argv) != 2:
                 errorString = 'Config: Error: There should be exactly one commandline argument, the name of the config file.'
-                raise exceptions.RuntimeError(errorString)
+                raise RuntimeError(errorString)
 
             filename = argv[1]
         else:
             errorString = 'Config: Error: unknown type passed to Config.'
-            raise exceptions.RuntimeError(errorString)
+            raise RuntimeError(errorString)
 
 
         try:
             strm = open(filename, 'r')
-        except exceptions.IOError as error:
+        except IOError as error:
             errorString = 'Config: Error: could not open configuration file named ' + filename
-            raise exceptions.RuntimeError(errorString)
+            raise RuntimeError(errorString)
 
         for line in strm:
             line = re.sub(r'//.*', '', line )
@@ -54,18 +54,17 @@ class Config(dict):
             key, value  = line.split('=')
             dict.__setitem__(self, key, value)
 
+
         strm.close()
 
-        if dict.has_key(self, 'XFile'):
-            print 'Params: Msg: XFile requested. You don\'t have clearance.'
-
+        if 'Xfile' in dict(self):
+           print ('Params: Msg: XFile requested. You don\'t have clearance.')
         return
 
 
 
     def __str__(self):
         ret = ''
-        for (key,value) in self.iteritems():
+        for (key,value) in list(self.items()):
             ret += str(key) + ' = ' + str(value) + '\n'
         return ret
-

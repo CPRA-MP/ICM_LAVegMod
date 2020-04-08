@@ -2,11 +2,12 @@
 
 # STD Python modules
 import copy
-import exceptions
+from builtins import Exception as exceptions
 import itertools
 import numpy
 import re
-import StringIO
+import io
+#import StringIO
 import sys
 
 # Third party modules
@@ -15,9 +16,9 @@ import pandas
 # Model modules
 import event
 
-class NoDataValueException(exceptions.RuntimeError):
+class NoDataValueException(RuntimeError):
     def __init__(self):
-        exceptions.RuntimeError.__init__(self)
+        RuntimeError.__init__(self)
 
 class Landscape(object):
     def __init__(self, nrow=0, ncol=0, yllcorner=0, xllcorner=0, cellsize=0, nodata_value=-9999):
@@ -47,7 +48,7 @@ class Landscape(object):
         self.xllcorner    = copy.copy(xllcorner)
         self.cellsize     = copy.copy(cellsize)
         self.nodata_value = copy.copy(nodata_value)
-        self.data         = numpy.zeros( shape=(nrow, ncol ));
+        self.data         = numpy.zeros( shape=(int(nrow), int(ncol) ));
 
     def copy(self,orig):
         self.nrow         = copy.copy(orig.nrow);
@@ -67,7 +68,7 @@ class Landscape(object):
         stream.write('nodata_value ' + str(self.nodata_value)      + '\n')
 
     def data_to_stream(self, stream = sys.stdout, dataFormat = '{}'):
-        for row,col in itertools.product(range(0,int(self.nrow)), range(0,int(self.ncol)) ):
+        for row,col in itertools.product(list(range(0,int(self.nrow))), list(range(0,int(self.ncol))) ):
                 stream.write(dataFormat.format(self.data[row,col]))
                 stream.write( [' ','\n'][col+1 == self.ncol])
 
@@ -77,7 +78,7 @@ class Landscape(object):
 
 
     def __str__(self):
-        ret = StringIO.StringIO()
+        ret = io.StringIO()
         self.copy_to_stream(ret)
         return ret
 
@@ -95,10 +96,10 @@ class LandscapePlus(Landscape):
             ret = self.table[ self.table['CELLID'] == address].to_dict('record')[0]
             del ret['CELLID']
             return(ret)
-        except exceptions.KeyError as error:
+        except KeyError as error:
             msg = 'LandscapePlus: Error: CELLID column not defined in initial conditions. This is odd\n'
             msg += str(error)
-            raise exceptions.RuntimeError(msg)
+            raise RuntimeError(msg)
 
     def resize(self, nrow=0, ncol=0, yllcorner=0, xllcorner=0, cellsize=0, nodata_value=-9999):
         Landscape.resize(self, nrow, ncol, yllcorner, xllcorner, cellsize, nodata_value)
@@ -111,7 +112,7 @@ class LandscapePlus(Landscape):
         return Landscape.__str__(self)
 
     def table_to_stream(self, stream=sys.stdout):
-        keyNames = self.table.itervalues().next().keys()
+        keyNames = iter(self.table.values()).next().keys()
 
         header = 'CELLID'
         for name in keyNames:
@@ -121,36 +122,36 @@ class LandscapePlus(Landscape):
 
         errorMessage = ''
         try:
-            for key,value in itertools.ifilter(lambda (k,v): k!= self.nodata_value, self.table.iteritems()):
+            for key,value in filter(lambda k,v: k!= self.nodata_value, iter(self.table.items())):
                 line = '{:.0f}'.format(key)
                 for elt in keyNames:
                     try:
                         line += ', ' + '{:.5f}'.format(float(value[elt]))
-                    except exceptions.TypeError as error:
-                        print('Class type                = ' + str(    value[elt].__class__    ) )
-                        print('cover                     = ' + str(    value[elt].cover        ) )
-                        print('modelType                 = ' + str(    value[elt].modelType    ) )
-                        print('name()                    = ' + str(    value[elt].name()       ) )
-                        print('Class float_v1_0() fn id  = ' + str( id(value[elt].float_v1_0)  ) )
-                        print('Class float_v2_0() fn id  = ' + str( id(value[elt].float_v2_0)  ) )
-                        print('Class __float__()  fn id  = ' + str( id(value[elt].__float__)   ) )
-                        print('Class floater()    fn id  = ' + str( id(value[elt].floater)     ) )
-                        print('Class float_v1_0() fn val = ' + str(    value[elt].float_v1_0() ) )
-                        print('Class float_v2_0() fn val = ' + str(    value[elt].float_v2_0() ) )
-                        print('Class __float__()  fn val = ' + str(    value[elt].__float__()  ) )
-                        print('Class floater()    fn val = ' + str(    value[elt].floater()    ) )
+                    except TypeError as error:
+                        print(('Class type                = ' + str(    value[elt].__class__    ) ))
+                        print(('cover                     = ' + str(    value[elt].cover        ) ))
+                        print(('modelType                 = ' + str(    value[elt].modelType    ) ))
+                        print(('name()                    = ' + str(    value[elt].name()       ) ))
+                        print(('Class float_v1_0() fn id  = ' + str( id(value[elt].float_v1_0)  ) ))
+                        print(('Class float_v2_0() fn id  = ' + str( id(value[elt].float_v2_0)  ) ))
+                        print(('Class __float__()  fn id  = ' + str( id(value[elt].__float__)   ) ))
+                        print(('Class floater()    fn id  = ' + str( id(value[elt].floater)     ) ))
+                        print(('Class float_v1_0() fn val = ' + str(    value[elt].float_v1_0() ) ))
+                        print(('Class float_v2_0() fn val = ' + str(    value[elt].float_v2_0() ) ))
+                        print(('Class __float__()  fn val = ' + str(    value[elt].__float__()  ) ))
+                        print(('Class floater()    fn val = ' + str(    value[elt].floater()    ) ))
                         raise error
 
                 line += '\n'
                 stream.write(line)
-        except exceptions.KeyError as error:
+        except KeyError as error:
             errorMessage += 'LandscapePlus.table_to_stream(): Error: A species key does not appear to be defined. Additional info follows.\n'
             errorMessage += str(error)
 
 
         if len(errorMessage):
             errorMessage += 'LandscapePlus.table_to_stream(): Error: We\'re hosed, time to crash.\n'
-            raise exceptions.RuntimeError(errorMessage)
+            raise RuntimeError(errorMessage)
 
     def copy_to_stream(self, stream = sys.stdout, dataFormat='{}'):
         Landscape.copy_to_stream(self, stream, dataFormat='{:.0f}')
@@ -160,11 +161,11 @@ class LandscapePlus(Landscape):
         try:
             ret = Landscape()
             ret.copy(self)
-            for row,col in itertools.ifilter( lambda (r,c): self.has_data_at(r,c), itertools.product(   range(int(ret.nrow)), range(int(ret.ncol))    ) ):
+            for row,col in filter( lambda r,c: self.has_data_at(r,c), itertools.product(   list(range(int(ret.nrow))), list(range(int(ret.ncol)))    ) ):
                 ret[row,col] = self[row,col][layerName]
-        except exceptions.KeyError as error:
+        except KeyError as error:
             errorMessage = 'LandscapePlus.extract_layer(): Error: Requested layer name does not exist: ' + str(error) + '\n'
-            raise exceptions.RuntimeError(errorMessage)
+            raise RuntimeError(errorMessage)
 
         return ret
 
@@ -191,12 +192,12 @@ class ReadASCIIGrid(event.Event):
 
             key, value      = line.split(' ')
             key             = key.lower()
-
             metadata[key]   = float(value)
 
             try:
                 symbols.remove(key)
-            except exceptions.ValueError as error:
+
+            except ValueError as error:
                 errorMessage += 'ReadASCIIGrid: Error: Got an unknown or repeated key from metadata: ' + str(key) +'\n'
                 errorMessage += str(error) + '\n'
 
@@ -207,12 +208,11 @@ class ReadASCIIGrid(event.Event):
                 errorMessage += 'ReadASCIIGrid: Error: Expected six lines of metadata but got more\n'
 
         if len(errorMessage) != 0:
-            raise exceptions.RuntimeError(errorMessage);
+            raise RuntimeError(errorMessage);
 
         landscape.resize(metadata['nrows'], metadata['ncols'], metadata['yllcorner'], metadata['xllcorner'], metadata['cellsize'], metadata['nodata_value'] )
-
         count   = metadata['nrows']
-        strStrm = StringIO.StringIO()
+        strStrm = io.StringIO()
         for line in stream:
             strStrm.write(line)
             count -= 1
@@ -236,7 +236,7 @@ class ReadASCIIGrid(event.Event):
         #        break
 
     def act(self):
-        print self.name
+        print((self.name))
         self.read(self.stream, self.landscape)
 
 class ReadASCIIGridPlus(event.Event):
@@ -249,7 +249,7 @@ class ReadASCIIGridPlus(event.Event):
         reader          = ReadASCIIGrid()
         reader.read(strm, landscape)
 
-        strStrm = StringIO.StringIO()
+        strStrm = io.StringIO()
         for line in strm:
             strStrm.write(line)
 

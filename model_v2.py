@@ -30,7 +30,8 @@
 # STD Python modules
 import collections
 import copy
-import exceptions
+from builtins import Exception as exceptions
+#import exceptions
 import glob
 import itertools
 import math
@@ -212,10 +213,10 @@ class UplandForestModel(SpeciesModel):
 
             return self.D[elv]
 
-        except exceptions.RuntimeError as error:
+        except RuntimeError as error:
             msg = 'UplandForestModel.senescence(): Error: location out of range. Additional info follows\n'
             msg += str(error)
-            raise exceptions.RuntimeError(msg)
+            raise RuntimeError(msg)
 
     ## Growth function
     # This function determines the probability that an upland forest species will become
@@ -244,10 +245,10 @@ class UplandForestModel(SpeciesModel):
                 return 0
 
             return self.P[elv] * dsp * est
-        except exceptions.RuntimeError as error:
+        except RuntimeError as error:
             msg = 'UplandForestModel.growth(): Error: location out of range. Additional info follows\n'
             msg += str(error)
-            raise exceptions.RuntimeError(msg)
+            raise RuntimeError(msg)
 
 ##\class EmergentWetlandModel
 ##\brief This class handles the ecology for the emergent wetland species.
@@ -354,7 +355,7 @@ class SAVModel(SpeciesModel):
 
         if SAVData == None:
             errorMessage = 'SAVModel: Error: No SAVData object passed to constructor (i.e. __init__() )\n'
-            raise exceptions.RuntimeError(errorMessage)
+            raise RuntimeError(errorMessage)
 
         self.betaIntercept = SAVData['Intercept']
         self.betaTemp      = SAVData['Temp']
@@ -468,7 +469,7 @@ class SpeciesModelList(dict):
 
         try:
             estData = pandas.read_excel(estFilename, 'VegTypeNames', index_col=None)
-        except exceptions.IOError as error:
+        except IOError as error:
             errorMessage += 'SpeciesModelList: Error: Could not open file for reading: ' + str(estFilename) + '\n'
             errorMessage += 'SpeciesModelList: Error: Additional error info: ' + str(error) + '\n';
         except xlrd.biffh.XLRDError as error:
@@ -477,7 +478,7 @@ class SpeciesModelList(dict):
 
         try:
             mortData = pandas.read_excel(mortFilename, 'VegTypeNames', index_col=None)
-        except exceptions.IOError as error:
+        except IOError as error:
             errorMessage += 'SpeciesModelList: Error: Could not open file for reading: ' + str(estFilename) + '\n'
             errorMessage += 'SpeciesModelList: Error: Additional error info: ' + str(error) + '\n';
         except xlrd.biffh.XLRDError as error:
@@ -485,7 +486,7 @@ class SpeciesModelList(dict):
             errorMessage += 'SpeciesModelList: Error: Additional error info: ' + str(error) + '\n';
 
         if len(errorMessage):
-            raise exceptions.RuntimeError(errorMessage);
+            raise RuntimeError(errorMessage);
 
         ###################################################
         ##
@@ -495,9 +496,9 @@ class SpeciesModelList(dict):
         ###################################################
         try:
             speciesList = estData['Symbol']
-        except exceptions.KeyError as error:
+        except KeyError as error:
             errorMessage += 'SpeciesModelList: Error: Symbol column not defined in establishment tables \n'
-            raise exceptions.RuntimeError(errorMessage);
+            raise RuntimeError(errorMessage);
 
         ###################################################
         ##
@@ -516,7 +517,7 @@ class SpeciesModelList(dict):
             spName      = spInfo['Common Name']
             spModelType = spInfo['ModelType']
 
-            print 'SpeciesModelList: Msg: Configuring model for species ' + str(spSymbol) + ', model type is ' + spModelType + '.'
+            print(('SpeciesModelList: Msg: Configuring model for species ' + str(spSymbol) + ', model type is ' + spModelType + '.'))
 
             ###########################################
             # Upland Forest Model
@@ -529,20 +530,20 @@ class SpeciesModelList(dict):
 
                 try:
                     Pdata = reader.read(estFilename, 'UplandForest', spSymbol)
-                except exceptions.RuntimeError as error:
+                except RuntimeError as error:
                     errorMessage += str(error) + '\n'
                     errorMessage += 'SpeciesModelList: Error: error while working on species ' + str(spSymbol) + '\n'
-                except exceptions.ValueError as error:
+                except ValueError as error:
                     errorMessage += str(error) + '\n'
                     errorMessage += 'SpeciesModelList: Error: error while working on species ' + str(spSymbol) + '\n'
 
 
                 try:
                     Ddata = reader.read(mortFilename, 'UplandForest', spSymbol)
-                except exceptions.RuntimeError as error:
+                except RuntimeError as error:
                     errorMessage += str(error) + '\n'
                     errorMessage += 'SpeciesModelList: Error: error while working on species ' + str(spSymbol) + '\n'
-                except exceptions.ValueError as error:
+                except ValueError as error:
                     errorMessage += str(error) + '\n'
                     errorMessage += 'SpeciesModelList: Error: error while working on species ' + str(spSymbol) + '\n'
 
@@ -559,19 +560,19 @@ class SpeciesModelList(dict):
                 Ddata = None
                 try:
                     Pdata = reader.read(estFilename, spSymbol)
-                except exceptions.RuntimeError as error:
+                except RuntimeError as error:
                     errorMessage += str(error) + '\n';
                     errorMessage += 'SpeciesModelList: Error: error while working on species ' + str(spSymbol) + '\n'
-                except exceptions.ValueError as error:
+                except ValueError as error:
                     errorMessage += str(error) + '\n'
                     errorMessage += 'SpeciesModelList: Error: error while working on species ' + str(spSymbol) + '\n'
 
                 try:
                     Ddata = reader.read(mortFilename, spSymbol)
-                except exceptions.RuntimeError as error:
+                except RuntimeError as error:
                     errorMessage += str(error) + '\n'
                     errorMessage += 'SpeciesModelList: Error: error while working on species ' + str(spSymbol) + '\n'
-                except exceptions.ValueError as error:
+                except ValueError as error:
                     errorMessage += str(error) + '\n'
                     errorMessage += 'SpeciesModelList: Error: error while working on species ' + str(spSymbol) + '\n'
 
@@ -589,19 +590,19 @@ class SpeciesModelList(dict):
                 Ddata  = None
                 try:
                     Pdata = reader.read(estFilename, spSymbol)
-                except exceptions.RuntimeError as error:
+                except RuntimeError as error:
                     errorMessage += str(error) + '\n';
                     errorMessage += 'SpeciesModelList: Error: error while working on species ' + str(spSymbol) + '\n'
-                except exceptions.ValueError as error:
+                except ValueError as error:
                     errorMessage += str(error) + '\n'
                     errorMessage += 'SpeciesModelList: Error: error while working on species ' + str(spSymbol) + '\n'
 
                 try:
                     Ddata = reader.read(mortFilename, spSymbol)
-                except exceptions.RuntimeError as error:
+                except RuntimeError as error:
                     errorMessage += str(error) + '\n'
                     errorMessage += 'SpeciesModelList: Error: error while working on species ' + str(spSymbol) + '\n'
-                except exceptions.ValueError as error:
+                except ValueError as error:
                     errorMessage += str(error) + '\n'
                     errorMessage += 'SpeciesModelList: Error: error while working on species ' + str(spSymbol) + '\n'
 
@@ -619,19 +620,19 @@ class SpeciesModelList(dict):
                 Ddata = None
                 try:
                     Pdata = reader.read(estFilename, spSymbol)
-                except exceptions.RuntimeError as error:
+                except RuntimeError as error:
                     errorMessage += str(error) + '\n';
                     errorMessage += 'SpeciesModelList: Error: error while working on species ' + str(spSymbol) + '\n'
-                except exceptions.ValueError as error:
+                except ValueError as error:
                     errorMessage += str(error) + '\n'
                     errorMessage += 'SpeciesModelList: Error: error while working on species ' + str(spSymbol) + '\n'
 
                 try:
                     Ddata = reader.read(mortFilename, spSymbol)
-                except exceptions.RuntimeError as error:
+                except RuntimeError as error:
                     errorMessage += str(error) + '\n'
                     errorMessage += 'SpeciesModelList: Error: error while working on species ' + str(spSymbol) + '\n'
-                except exceptions.ValueError as error:
+                except ValueError as error:
                     errorMessage += str(error) + '\n'
                     errorMessage += 'SpeciesModelList: Error: error while working on species ' + str(spSymbol) + '\n'
 
@@ -648,13 +649,13 @@ class SpeciesModelList(dict):
                 savData = None
                 try:
                     savData = pandas.read_excel(estFilename, spSymbol, index_col=0 ).to_dict('dict')['Value']
-                except exceptions.IOError as error:
+                except IOError as error:
                     errorMessage += 'SpeciesModelList: Error : Could not open file for reading : ' + estFilename + '\n'
                     errorMessage += 'SpeciesModelList: Extra error info: ' + str(error) + '\n'
                 except xlrd.biffh.XLRDError as error:
                     errorMessage += 'SpeciesModelList: Error : Could not find sheet name ' + spSymbol + ' in file ' + estFilename + '\n'
                     errorMessage += 'SpeciesModelList: Extra error info: ' + str(error) + '\n'
-                except exceptions.KeyError as error:
+                except KeyError as error:
                     errorMessage += 'SpeciesModelList: Error : Dictionary key error. SAV table probably has wrong column headings\n'
                     errorMessage += 'SpeciesModelList: Error : '
 
@@ -672,20 +673,20 @@ class SpeciesModelList(dict):
 
                 try:
                     Pdata = reader.read(estFilename, 'BarrierIsland', spSymbol)
-                except exceptions.RuntimeError as error:
+                except RuntimeError as error:
                     errorMessage += str(error) + '\n'
                     errorMessage += 'SpeciesModelList: Error: error while working on species ' + str(spSymbol) + '\n'
-                except exceptions.ValueError as error:
+                except ValueError as error:
                     errorMessage += str(error) + '\n'
                     errorMessage += 'SpeciesModelList: Error: error while working on species ' + str(spSymbol) + '\n'
 
 
                 try:
                     Ddata = reader.read(mortFilename, 'BarrierIsland', spSymbol)
-                except exceptions.RuntimeError as error:
+                except RuntimeError as error:
                     errorMessage += str(error) + '\n'
                     errorMessage += 'SpeciesModelList: Error: error while working on species ' + str(spSymbol) + '\n'
-                except exceptions.ValueError as error:
+                except ValueError as error:
                     errorMessage += str(error) + '\n'
                     errorMessage += 'SpeciesModelList: Error: error while working on species ' + str(spSymbol) + '\n'
 
@@ -708,7 +709,7 @@ class SpeciesModelList(dict):
                 errorMessage += 'SpeciesModelList: Error: Unknown model type specified : ' + spModelType + '\n'
 
         if len(errorMessage):
-            raise exceptions.RuntimeError(errorMessage)
+            raise RuntimeError(errorMessage)
 
 ##\class Params
 ##\brief This class is the interface between the outside world and the model.
@@ -801,17 +802,17 @@ class Params(object):
     def open_file(self, key, mode):
         try:
             filename = self.configDict[key];
-        except exceptions.KeyError as error:
+        except KeyError as error:
             errorMessage  = 'Params: Error: ' + str(key) + ' is not defined in the configuration file.\n'
             errorMessage += 'Params: Error: Additional error info : ' + str(error) + '\n'
-            raise exceptions.RuntimeError(errorMessage);
+            raise RuntimeError(errorMessage);
 
         try:
             strm = open(filename, mode)
-        except exceptions.IOError as error:
+        except IOError as error:
             errorMessage  = 'Params: Error: Could not open the file ' + filename + (' for reading' if mode == 'r' else ' for writing') +'\n'
             errorMessage += 'Params: Error: Additional error info : ' + str(error) + '\n'
-            raise exceptions.RuntimeError(errorMessage);
+            raise RuntimeError(errorMessage);
 
         return strm
 
@@ -836,18 +837,18 @@ class Params(object):
         ###################################################
         try:
             self.configDict.config(argv);
-        except exceptions.RuntimeError as error:
+        except RuntimeError as error:
             errorMessage = 'Params: Error: An error occurred reading the configuration file.\n' + str(error)
-            raise exceptions.RuntimeError(errorMessage)
+            raise RuntimeError(errorMessage)
 
         ###################################################
         ##
         # - __Step 1.5__: Get/set some detail assets for the model
         #
         ###################################################
-        if self.configDict.has_key('YearFormatString'):
+        if 'YearFormatString' in self.configDict:
             self.yearFormatString = self.configDict['YearFormatString']
-            print 'Params: Msg: Using user defined year format string : ' + self.yearFormatString
+            print(('Params: Msg: Using user defined year format string : ' + self.yearFormatString))
 
         ###################################################
         ##
@@ -856,14 +857,14 @@ class Params(object):
         ###################################################
         try:
             self.startYear = int( self.configDict['StartYear'] )
-            print 'Params: Msg: StartYear = ' + str(self.startYear)
-        except exceptions.KeyError as error:
+            print(('Params: Msg: StartYear = ' + str(self.startYear)))
+        except KeyError as error:
             errorMessage += 'Params: Error: StartYear is not defined in the configuration file\n'
 
         try:
             self.endYear = int( self.configDict['EndYear'])
-            print 'Params: Msg: EndYear = ' + str(self.endYear)
-        except exceptions.KeyError as error:
+            print(('Params: Msg: EndYear = ' + str(self.endYear)))
+        except KeyError as error:
             errorMessage += 'Params: Error: EndYear is not defined in the configuration file\n'
 
         ###################################################
@@ -872,7 +873,7 @@ class Params(object):
         #
         ###################################################
         try:
-            print 'Params: Msg: Reading initial conditions from ' + self.configDict['InitialConditionFile']
+            print(('Params: Msg: Reading initial conditions from ' + self.configDict['InitialConditionFile']))
             initCondStrm = self.open_file('InitialConditionFile','r')
             reader = landscape.ReadASCIIGridPlus()
             reader.read(initCondStrm, self.initCond)
@@ -881,10 +882,10 @@ class Params(object):
             # Check to see if the input file contains a DEAD_Flt class.
             # If there isn't one, the add it to the initial conditions.
             if not('DEAD_Flt' in self.initCond.table):
-                print 'Params: Msg: Adding DEAD_Flt class to the initial conditions because the type was not defined.'
+                print ('Params: Msg: Adding DEAD_Flt class to the initial conditions because the type was not defined.')
                 self.initCond.table['DEAD_Flt'] = 0.0
 
-        except exceptions.RuntimeError as error:
+        except RuntimeError as error:
             errorMessage += str(error)
 
         #self.make_lon_lat_file(self.initCond)
@@ -896,23 +897,23 @@ class Params(object):
         ###################################################
         try:
             estFilename = self.configDict['EstFilename']
-        except exceptions.KeyError as error:
+        except KeyError as error:
             errorMessage += 'Params: Error: KeyError in EstFilename : ' + str(error) + '\n'
-        except exceptions.RuntimeError as error:
+        except RuntimeError as error:
             errorMessage += 'Params: Error: RuntimeError in EstFilename : ' + str(error)
 
         try:
             mortFilename = self.configDict['MortFilename']
-        except exceptions.KeyError as error:
+        except KeyError as error:
             errorMessage += 'Params: Error: KeyError in MortFilename : ' + str(error) + '\n'
-        except exceptions.RuntimeError as error:
+        except RuntimeError as error:
             errorMessage += 'Params: Error: RuntimeError in MortFilename : ' + str(error)
 
         try:
             self.spModelList.config(estFilename, mortFilename)
-        except exceptions.KeyError as error:
+        except KeyError as error:
             errorMessage += 'Params: Error: KeyError in spModelList.config(): ' + str(error) + '\n'
-        except exceptions.RuntimeError as error:
+        except RuntimeError as error:
             errorMessage += 'Params: Error: RuntimeError in spModelList.config(): ' + str(error)
 
         ###################################################
@@ -920,11 +921,11 @@ class Params(object):
         # - __Step 5__: Open all the input files for reading.
         #
         ###################################################
-        for key in self.inputStrm.iterkeys():
+        for key in self.inputStrm.keys():
             try:
                 self.inputStrm[key] = self.open_file(key, 'r')
-                print 'Params: Msg: Opened file for reading: ' + str(key) + ' = ' + self.configDict[key]
-            except exceptions.RuntimeError as error:
+                print(('Params: Msg: Opened file for reading: ' + str(key) + ' = ' + self.configDict[key]))
+            except RuntimeError as error:
                 errorMessage += str(error)
 
         ###################################################
@@ -943,8 +944,8 @@ class Params(object):
                     for y in range( int(start),int(end)+1 ):
                         yearList.append(str(y))
             self.wetlandMorphYears = [ int(x) for x in yearList ]
-            print 'Params: Msg: Wetland Morph land/water read years = ' + str(self.wetlandMorphYears)
-        except exceptions.KeyError as error:
+            print(('Params: Msg: Wetland Morph land/water read years = ' + str(self.wetlandMorphYears)))
+        except KeyError as error:
             errorMessage += 'Params: Error: WetlandMorphYears not defined in the configuration file\n'
 
 
@@ -959,8 +960,8 @@ class Params(object):
         try:
             outputTemplate = None
             outputTemplate = self.configDict['OutputTemplate']
-            print 'Params: Msg: OutputTemplate = ' + self.configDict['OutputTemplate']
-        except exceptions.KeyError as error:
+            print(('Params: Msg: OutputTemplate = ' + self.configDict['OutputTemplate']))
+        except KeyError as error:
             errorMessage += 'Params: Error: OutputTemplate is not defined in the configuration file\n'
             errorMessage += 'Params: Error: Additional error info: ' + str(error)
 
@@ -969,8 +970,8 @@ class Params(object):
             outputYear = None
             outputYear = self.configDict['OutputYears']
             outputYear = [ int(x) for x in outputYear.split(',')]
-            print 'Params: Msg: OutputYears = ' + str(outputYear)
-        except exceptions.KeyError as error:
+            print(('Params: Msg: OutputYears = ' + str(outputYear)))
+        except KeyError as error:
             errorMessage += 'Params: Error: OutputYears is not defined in the configuration file\n'
             errorMessage += 'Params: Error: Additional error info: ' + str(error)
 
@@ -988,8 +989,8 @@ class Params(object):
         try:
             outputTemplate = None
             outputTemplate = self.configDict['DeadFloatingTemplate']
-            print 'Params: Msg: DeadFloatingTemplate = ' + self.configDict['DeadFloatingTemplate']
-        except exceptions.KeyError as error:
+            print(('Params: Msg: DeadFloatingTemplate = ' + self.configDict['DeadFloatingTemplate']))
+        except KeyError as error:
             errorMessage += 'Params: Error: DeadFloatingTemplate is not defined in the configuration file\n'
             errorMessage += 'Params: Error: Additional error info: ' + str(error)
 
@@ -998,8 +999,8 @@ class Params(object):
             outputYear = None
             outputYear = self.configDict['DeadFloatingYears']
             outputYear = [ int(x) for x in outputYear.split(',')]
-            print 'Params: Msg: DeadFloatingYears = ' + str(outputYear)
-        except exceptions.KeyError as error:
+            print(('Params: Msg: DeadFloatingYears = ' + str(outputYear)))
+        except KeyError as error:
             errorMessage += 'Params: Error: DeadFloatingYears is not defined in the configuration file\n'
             errorMessage += 'Params: Error: Additional error info: ' + str(error)
 
@@ -1011,11 +1012,11 @@ class Params(object):
                 self.outputStrm['__DeadFloating_'+str(year)] = None
 
         # Step 6.7: Open all the output files.
-        for key in self.outputStrm.iterkeys():
+        for key in self.outputStrm.keys():
             try:
                 self.outputStrm[key] = self.open_file(key, 'w')
-                print 'Params: Msg: Output file opened ' + str(self.configDict[key])
-            except exceptions.RuntimeError as error:
+                print(('Params: Msg: Output file opened ' + str(self.configDict[key])))
+            except RuntimeError as error:
                 errorMessage += str(error)
                 errorMessage += 'Params: Error: This is very odd\n'
 
@@ -1048,10 +1049,10 @@ class Params(object):
 
         try:
             self.plantingsStrm = self.open_file('PlantingTextFile','r')
-            print 'Params: Msg: Reading planting infomration from ' + self.configDict['PlantingTextFile']
-        except exceptions.RuntimeError as error:
-            print 'Params: Warning: Plantings will not be used in this run. More information follows.'
-            print error
+            print(('Params: Msg: Reading planting infomration from ' + self.configDict['PlantingTextFile']))
+        except RuntimeError as error:
+            print ('Params: Warning: Plantings will not be used in this run. More information follows.')
+            print (error)
             self.plantingsStrm = None
 
 
@@ -1062,14 +1063,14 @@ class Params(object):
         #
         ###################################################
         if len(errorMessage):
-            raise exceptions.RuntimeError(errorMessage)
+            raise RuntimeError(errorMessage)
 
         ###################################################
         ##
         # - __Step 9__: Give all of the landscape objects their
         #  correct size
         ###################################################
-        print 'Params: Msg: Giving all data layers their proper size'
+        print ('Params: Msg: Giving all data layers their proper size')
         reader = landscape.ReadASCIIGrid()
         reader.read(self.inputStrm['WaveAmplitudeFile'],        self.waveAmp)
         reader.read(self.inputStrm['MeanSalinityFile'],         self.meanSal)
@@ -1082,12 +1083,12 @@ class Params(object):
         reader.read(self.inputStrm['WetlandMorphLandWaterFile'],self.landWater)
         reader.read(self.inputStrm['TreeEstCondFile'],          self.treeEstCond)
 
-        print 'Params: Msg: Rewinding all the input streams'
-        for strm in self.inputStrm.itervalues():
+        print ('Params: Msg: Rewinding all the input streams')
+        for strm in self.inputStrm.values():
             strm.seek(0,0)
 
-        if self.configDict.has_key('XFile'):
-            print 'Params: Msg: Access to XFile denied'
+        if 'XFile' in self.configDict:
+            print ('Params: Msg: Access to XFile denied')
 
     ##\brief Actions take at the end of the simulation.
     ##\details The primary responsibility of this function
@@ -1095,21 +1096,21 @@ class Params(object):
     # called at the end of the simulation as the program
     # is getting ready to exit.
     def done(self):
-        for iter in self.inputStrm.itervalues():
+        for iter in self.inputStrm.values():
             iter.close();
 
-        for iter in self.outputStrm.itervalues():
+        for iter in self.outputStrm.values():
             iter.close();
 
     def make_lon_lat_file(self, initCond):
-        print 'Params: Msg: Building locations data'
+        print ('Params: Msg: Building locations data')
         nrow = int( initCond.nrow )
         ncol = int( initCond.ncol )
 
 
-        ret = pandas.DataFrame(index=range(0,nrow*ncol), columns=['CellID','row','col','x','y'])
+        ret = pandas.DataFrame(index=list(range(0,nrow*ncol)), columns=['CellID','row','col','x','y'])
         count = 0
-        for r,c in itertools.product( range(0,nrow), range(0,ncol)):
+        for r,c in itertools.product( list(range(0,nrow)), list(range(0,ncol))):
             if initCond.has_data_at(r,c):
                 cellID = initCond.data[(r,c)]
                 lon    = initCond.xllcorner + (c + 0.5) * initCond.cellsize
@@ -1121,7 +1122,7 @@ class Params(object):
                 ret['y']     [count] = lat
                 count += 1
 
-        print 'Params: Msg: Writting locations data'
+        print ('Params: Msg: Writting locations data')
         ret.to_csv('locations.csv')
 
 
@@ -1184,7 +1185,8 @@ class PatchModel(dict):
         # Skip the SAV and WATER types because they do not "senesce" in the same way
         # as the other types, and because their growth is not computed the same way
         # as the other types.
-        for spName, spModel in itertools.ifilterfalse(lambda (k,v): k == 'BAREGRND' or k == 'SAV' or k == 'WATER' or v.modelType == 'FloatingMarshModel', spModelList.iteritems()):
+
+        for spName, spModel in itertools.filterfalse(lambda k,v: k == 'BAREGRND' or k == 'SAV' or k == 'WATER' or v.modelType == 'FloatingMarshModel', list(spModelList.items())):
             cover                = spCoverList[spName]
             death                = spModel.senescence(loc)
             #occupied            += cover
@@ -1201,7 +1203,7 @@ class PatchModel(dict):
         # Again, skip SAV, WATER and the floating marsh types because they do not
         # operate the same way as the other types.
         if growthLikelihood:
-            for spName, spModel in itertools.ifilterfalse(lambda (k,v): k == 'BAREGRND' or k=='SAV' or k=='WATER' or v.modelType=='FloatingMarshModel', spModelList.iteritems()):
+            for spName, spModel in itertools.filterfalse(lambda k,v: k == 'BAREGRND' or k=='SAV' or k=='WATER' or v.modelType=='FloatingMarshModel', list(spModelList.items())):
                 growth               = spModel.growth(loc)/growthLikelihood
                 spCoverList[spName] += growth * unoccupied
                 unoccupied          -= growth * unoccupied
@@ -1225,7 +1227,7 @@ class PatchModel(dict):
         # Step 2.1: Compute the area lost per floating species and the total area lost by all floating species
         deadFloating     = 0.0
         growthLikelihood = 0.0
-        for spName, spModel in itertools.ifilter(lambda (k,v): v.modelType == 'FloatingMarshModel', spModelList.iteritems()):
+        for spName, spModel in filter(lambda k,v: v.modelType == 'FloatingMarshModel', iter(spModelList.items())):
             cover                   = spCoverList[spName]
             death                   = spModel.senescence(loc)
             deadFloating           += death * cover
@@ -1235,7 +1237,7 @@ class PatchModel(dict):
 
         # Step 2.2: Compute the area gained by each floating species.
         if growthLikelihood:
-            for spName, spModel in itertools.ifilter(lambda (k,v): v.modelType == 'FloatingMarshModel', spModelList.iteritems()):
+            for spName, spModel in filter(lambda k,v: v.modelType == 'FloatingMarshModel', iter(spModelList.items())):
                 growth                  = spModel.growth(loc)/growthLikelihood
                 spCoverList[spName]    += growth * deadFloating
                 deadFloating           -= growth * deadFloating
@@ -1259,12 +1261,12 @@ class PatchModel(dict):
         #
         #######################################################
         checkSum = 0.0
-        for spName in itertools.ifilter( lambda(spName) : spName != 'DEAD_Flt', spModelList.iterkeys()):
+        for spName in filter( lambda spName : spName != 'DEAD_Flt', iter(spModelList.keys())):
             checkSum += spCoverList[spName]
 
         tol = 0.005
         if not( (1.0 - tol) < checkSum and checkSum < (1.0 + tol) ):
-            print('PatchMod: Error: checkSum is out of range. checkSum = ' + str(checkSum) + ' should be 1.0')
+            print(('PatchMod: Error: checkSum is out of range. checkSum = ' + str(checkSum) + ' should be 1.0'))
 
     #def copy_to_str(self, dataFormat='{}'):
     #    ret = ''
@@ -1302,21 +1304,20 @@ class DynamicsModel(landscape.LandscapePlus):
         landscape.Landscape.copy(self, params.initCond)
         self.patchModel.config(params)
         self.spModelList = params.spModelList
-
-        for row,col in itertools.ifilter(   lambda (r,c): params.initCond.has_data_at(r,c), itertools.product(range(int(params.initCond.nrow)), range(int(params.initCond.ncol)) )    ):
+        for row, col in filter(   lambda r,c: params.initCond.has_data_at(r,c), itertools.product(list(range(int(params.initCond.nrow))), list(range(int(params.initCond.ncol))) )    ):
             patchIndex                 = params.initCond.data[row,col]
             patchInitCond              = params.initCond[(row,col)]
             self.table[patchIndex]     = patchInitCond
             self.locList[patchIndex]   = (row,col)
 
         patchInitCond = params.initCond.table.iloc[0].to_dict()
-        for key in patchInitCond.iterkeys():
+        for key in patchInitCond.keys():
             patchInitCond[key] = 0.0
         self.table  [params.initCond.nodata_value] = patchInitCond
         self.locList[params.initCond.nodata_value] = (0,0)
 
     def table_to_stream(self, stream=sys.stdout):
-        keyNames = self.table.itervalues().next().keys()
+        keyNames = iter(self.table.values()).next().keys()
         keyNames.remove('DEAD_Flt')
 
         header = 'CELLID'
@@ -1327,43 +1328,43 @@ class DynamicsModel(landscape.LandscapePlus):
 
         errorMessage = ''
         try:
-            for key,value in itertools.ifilter(lambda (k,v): k!= self.nodata_value, self.table.iteritems()):
+            for key,value in filter(lambda k,v: k!= self.nodata_value, iter(self.table.items())):
                 line = '{:.0f}'.format(key)
                 for elt in keyNames:
                     try:
                         line += ', ' + '{:.5f}'.format(float(value[elt]))
-                    except exceptions.TypeError as error:
-                        print('Class type                = ' + str(    value[elt].__class__    ) )
-                        print('cover                     = ' + str(    value[elt].cover        ) )
-                        print('modelType                 = ' + str(    value[elt].modelType    ) )
-                        print('name()                    = ' + str(    value[elt].name()       ) )
-                        print('Class float_v1_0() fn id  = ' + str( id(value[elt].float_v1_0)  ) )
-                        print('Class float_v2_0() fn id  = ' + str( id(value[elt].float_v2_0)  ) )
-                        print('Class __float__()  fn id  = ' + str( id(value[elt].__float__)   ) )
-                        print('Class floater()    fn id  = ' + str( id(value[elt].floater)     ) )
-                        print('Class float_v1_0() fn val = ' + str(    value[elt].float_v1_0() ) )
-                        print('Class float_v2_0() fn val = ' + str(    value[elt].float_v2_0() ) )
-                        print('Class __float__()  fn val = ' + str(    value[elt].__float__()  ) )
-                        print('Class floater()    fn val = ' + str(    value[elt].floater()    ) )
+                    except TypeError as error:
+                        print(('Class type                = ' + str(    value[elt].__class__    ) ))
+                        print(('cover                     = ' + str(    value[elt].cover        ) ))
+                        print(('modelType                 = ' + str(    value[elt].modelType    ) ))
+                        print(('name()                    = ' + str(    value[elt].name()       ) ))
+                        print(('Class float_v1_0() fn id  = ' + str( id(value[elt].float_v1_0)  ) ))
+                        print(('Class float_v2_0() fn id  = ' + str( id(value[elt].float_v2_0)  ) ))
+                        print(('Class __float__()  fn id  = ' + str( id(value[elt].__float__)   ) ))
+                        print(('Class floater()    fn id  = ' + str( id(value[elt].floater)     ) ))
+                        print(('Class float_v1_0() fn val = ' + str(    value[elt].float_v1_0() ) ))
+                        print(('Class float_v2_0() fn val = ' + str(    value[elt].float_v2_0() ) ))
+                        print(('Class __float__()  fn val = ' + str(    value[elt].__float__()  ) ))
+                        print(('Class floater()    fn val = ' + str(    value[elt].floater()    ) ))
                         raise error
 
                 line += '\n'
                 stream.write(line)
-        except exceptions.KeyError as error:
+        except KeyError as error:
             errorMessage += 'LandscapePlus.table_to_stream(): Error: A species key does not appear to be defined. Additional info follows.\n'
             errorMessage += str(error)
 
 
         if len(errorMessage):
             errorMessage += 'LandscapePlus.table_to_stream(): Error: We\'re hosed, time to crash.\n'
-            raise exceptions.RuntimeError(errorMessage)
+            raise RuntimeError(errorMessage)
 
     def __getitem__(self, item):
         patchIndex = landscape.Landscape.__getitem__(self, item)
         return self.table[patchIndex]
 
     def update(self):
-        for loc in itertools.ifilter( lambda key: key != self.nodata_value, self.table.iterkeys()):
+        for loc in filter( lambda key: key != self.nodata_value, iter(self.table.keys())):
             self.patchModel.update( self.locList[loc], self.table[loc], self.spModelList)
 
 ##\class DispersalModel
@@ -1383,30 +1384,30 @@ class DispersalModel(object):
         #for row in range(0, int(params.initCond.nrow) ):
            #for col in range(0, int(params.initCond.ncol) ):
                 # if params.initCond.has_data_at(row,col):
-        for row,col in itertools.ifilter( lambda (r,c): params.initCond.has_data_at(r,c), itertools.product(   range(0,int(params.initCond.nrow)), range(0,int(params.initCond.ncol))   ) ):
+        for row,col in filter( lambda r,c: params.initCond.has_data_at(r,c), itertools.product(   list(range(0,int(params.initCond.nrow))), list(range(0,int(params.initCond.ncol)))   ) ):
                patchIndex                 = params.initCond.data[row,col]
                patchInitCond              = copy.deepcopy(params.initCond[(row,col)])
-               neighborList               = [ (nRow,nCol) for nRow,nCol in itertools.ifilter( lambda (r,c): params.initCond.has_data_at(r,c), itertools.product(range(row-1,row+2), range(col-1,col+2)) ) ] # This is slick as hell. I like python.
+               neighborList               = [ (nRow,nCol) for nRow,nCol in filter( lambda r,c: params.initCond.has_data_at(r,c), itertools.product(list(range(row-1,row+2)), list(range(col-1,col+2))) ) ] # This is slick as hell. I like python.
                newPatch                   = { 'spFreq':patchInitCond, 'neighborList':neighborList }
                self.patchDict[patchIndex] = newPatch
 
         patchInitCond = params.initCond.table.iloc[0].to_dict()
-        for key in patchInitCond.iterkeys():
+        for key in patchInitCond.keys():
             patchInitCond[key] = 0.0
         #newPatch = {'loc':(-1,-1), 'spFreq':patchInitCond, 'neighborList':[]}
         newPatch = {'spFreq':patchInitCond, 'neighborList':[]}
         self.patchDict[params.initCond.nodata_value] = newPatch
 
     def summary(self):
-        print 'DispersalModel: Msg: Summary info start'
-        print self.patchIndexLandscape.header()
-        print 'len(patchDict) = ' + str(len(self.patchDict))
-        print next( self.patchDict.itervalues() )
+        print ('DispersalModel: Msg: Summary info start')
+        print((self.patchIndexLandscape.header()))
+        print(('len(patchDict) = ' + str(len(self.patchDict))))
+        print((next( iter(self.patchDict.values()) )))
         patchAddress = self.patchIndexLandscape.data[241,44]
-        print 'DispersalModel: patchAddress = ' + str(patchAddress)
-        print 'DispersalModel: Stuff at patchAddress = ' + str( self.patchDict[patchAddress] )
-        print 'DispersalModel: Stuff at patchAddress[\'spFreq\'] = ' + str( self.patchDict[patchAddress]['spFreq'])
-        print 'DispersalModel: Msg: Summary info end'
+        print(('DispersalModel: patchAddress = ' + str(patchAddress)))
+        print(('DispersalModel: Stuff at patchAddress = ' + str( self.patchDict[patchAddress] )))
+        print(('DispersalModel: Stuff at patchAddress[\'spFreq\'] = ' + str( self.patchDict[patchAddress]['spFreq'])))
+        print ('DispersalModel: Msg: Summary info end')
 
     def __getitem__(self, item):
         patchAddress = self.patchIndexLandscape.data[item]
@@ -1422,12 +1423,12 @@ class DispersalModel(object):
 
         total = 0.0
 
-        for sp in ptr.iterkeys():
+        for sp in ptr.keys():
             ptr[sp] = 0
 
         for neighbor in neighborList:
             patchCoverList = DispersalModel.dynModel[neighbor]
-            for sp,spCover in patchCoverList.iteritems():
+            for sp,spCover in patchCoverList.items():
                 ptr[sp] += spCover
                 total   += spCover
 
@@ -1457,11 +1458,11 @@ class DispersalModel(object):
         #                    raise error
 
         if total:
-            for sp in ptr.iterkeys():
+            for sp in ptr.keys():
                 ptr[sp] /= total
 
     def update(self):
-        for loc in itertools.ifilter( lambda key: key != self.patchIndexLandscape.nodata_value, self.patchDict.iterkeys()):
+        for loc in filter( lambda key: key != self.patchIndexLandscape.nodata_value, iter(self.patchDict.keys())):
             self.compute_local_dsp(self.patchDict[loc])
 
 
@@ -1482,7 +1483,7 @@ class WetlandMorphModel:
         # For the purposes of this calculation, the floating marsh types count as land.
         # However, this may change if the land/water file starting including a distinction floating type
         curLand = 0.0
-        for spName, spCover in itertools.ifilterfalse( lambda(k,v): k=='SAV' or k=='WATER', spModelList.iteritems()):
+        for spName, spCover in itertools.filterfalse( lambda k,v: k=='SAV' or k=='WATER', iter(spModelList.items())):
             curLand += spCoverList[spName]
 
         # Step 2: Adjust the types based on the differences between
@@ -1507,7 +1508,7 @@ class WetlandMorphModel:
         # land/water file, then decrease the area of all land types and increase the amount of water.
         else: # curLand > newLand
             scaleLand = newLand/curLand # scaleLand < 1.0
-            for spName, spCover in itertools.ifilterfalse( lambda(k,v): k=='SAV' or k=='WATER', spModelList.iteritems()):
+            for spName, spCover in itertools.filterfalse( lambda k,v: k=='SAV' or k=='WATER', iter(spModelList.items())):
                 spCoverList[spName] *= scaleLand
 
             deltaLand             = curLand - newLand
@@ -1517,7 +1518,7 @@ class WetlandMorphModel:
         return
 
     def update(self):
-        for loc in itertools.ifilter( lambda key: key != WetlandMorphModel.dynModel.nodata_value, WetlandMorphModel.dynModel.table.iterkeys()):
+        for loc in filter( lambda key: key != WetlandMorphModel.dynModel.nodata_value, iter(WetlandMorphModel.dynModel.table.keys())):
             pos = WetlandMorphModel.dynModel.locList[loc]
             newLand = self.landWater[pos]/100.0
             if newLand < 0: continue
@@ -1539,7 +1540,7 @@ class ModelUpdateEvent(event.Event):
         self.model = model
 
     def act(self):
-        print self.name
+        print((self.name))
         self.model.update()
 
 ##\class DeadFloatingOutputEvent
@@ -1553,10 +1554,10 @@ class DeadFloatingOutputEvent(landscape.WriteASCIIGrid):
         self.model = model
 
     def act(self):
-        print self.name
+        print((self.name))
         deadFloating = self.model.extract_layer('DEAD_Flt')
         landscape.WriteASCIIGrid.write(self, self.stream, deadFloating, self.dataFormat)
-        for patch in self.model.table.itervalues():
+        for patch in self.model.table.values():
             patch['DEAD_Flt'] = 0.0
 
 class CloseStreamEvent(event.Event):
@@ -1588,7 +1589,7 @@ class StopWatch:
     def stop(self):
         self._end   = time.time()
         self.running = 0
-        print 'StopWatch: Msg: Delta t = ' + str(self._end - self._start)
+        print(('StopWatch: Msg: Delta t = ' + str(self._end - self._start)))
 
     def act(self):
         if self.running:
@@ -1703,25 +1704,25 @@ class Model(object):
         plantingmodel.PlantingModel.dynModel     = self.dynModel
 
     def config(self, argv):
-        print 'Model: Msg: This is LAVegMod V2.2 (model_v2.py)'
+        print ('Model: Msg: This is LAVegMod V2.2 (model_v2.py)')
 
-        print 'Model: Msg: Reading configuration information'
+        print ('Model: Msg: Reading configuration information')
         self.params.config(argv)
 
-        print 'Model: Msg: Configuring the dynamics model'
+        print ('Model: Msg: Configuring the dynamics model')
         self.dynModel.config(self.params)
 
-        print 'Model: Msg: Configuring the dispersal model'
+        print ('Model: Msg: Configuring the dispersal model')
         self.dspModel.config(self.params)
         # self.dspModel.summary()
 
-        print 'Model: Msg: Configuring the wetland morph process'
+        print ('Model: Msg: Configuring the wetland morph process')
         self.welModel.config(self.params)
 
-        print 'Model: Msg: Configuring the plantings model'
+        print ('Model: Msg: Configuring the plantings model')
         self.plantingModel.config(self.params)
 
-        print 'Model: Msg: Configuring the update queue'
+        print ('Model: Msg: Configuring the update queue')
         self.eventQueue.clear()
         perYearSW = StopWatch()
         totalSW   = StopWatch()
@@ -1751,15 +1752,15 @@ class Model(object):
             self.eventQueue.add_event(landscape.ReadASCIIGrid(event.Time(year,450), name='ReadASCIIGrid: Msg: Reading wetland morph data',                  stream=self.params.inputStrm['WetlandMorphLandWaterFile'], landscape=self.params.landWater ))
             self.eventQueue.add_event(     event.GenericEvent(event.Time(year,1050), name='ModelUpdateEvent: Msg: Adding the effects from the wetland morph data', callable=self.welModel  ))
 
-        for year, submodel in self.plantingModel.eventDict.iteritems():
+        for year, submodel in self.plantingModel.eventDict.items():
             self.eventQueue.add_event( ModelUpdateEvent(event.Time(year, 1075), name='ModelUpdateEvent: Msg: Processing plantings for year ' + str(year),  model=submodel ))
 
-        for yearKey,yearStream in itertools.ifilter( lambda (k,v): re.match(r'^__Single_',k) != None, self.params.outputStrm.iteritems() ):
+        for yearKey,yearStream in filter( lambda k,v: re.match(r'^__Single_',k) != None, iter(self.params.outputStrm.items()) ):
             year = int( yearKey.replace('__Single_','') )
             self.eventQueue.add_event(landscape.WriteASCIIGridPlus(event.Time(year, 1500), name='WriteASCIIGrid: Msg: Writing model output for year  ' + str(year), stream=yearStream, landscape=self.dynModel))
             self.eventQueue.add_event(CloseStreamEvent            (event.Time(year, 1501), name='WriteASCIIGrid: Msg: Closing stream for output year ' + str(year), stream=yearStream ))
 
-        for yearKey,yearStream in itertools.ifilter( lambda (k,v): re.match(r'^__DeadFloating_',k) != None, self.params.outputStrm.iteritems() ):
+        for yearKey,yearStream in filter( lambda k,v: re.match(r'^__DeadFloating_',k) != None, iter(self.params.outputStrm.items()) ):
             year = int( yearKey.replace('__DeadFloating_','') )
             self.eventQueue.add_event(DeadFloatingOutputEvent(event.Time(year, 1550), name='WriteASCIIGrid: Msg: Writing dead floating output for year ' + str(year), stream=yearStream, model=self.dynModel))
             self.eventQueue.add_event(CloseStreamEvent       (event.Time(year, 1551), name='WriteASCIIGrid: Msg: Closing stream for output year        ' + str(year), stream=yearStream ))
@@ -1773,8 +1774,8 @@ class Model(object):
     def run(self):
         try:
             self.config(sys.argv)
-        except exceptions.RuntimeError as error:
-            print error
+        except RuntimeError as error:
+            print (error)
             return 1
         #except:
         #    print 'Model: Error: Caught an unknown error : ' , sys.exc_info()[0]
@@ -1785,4 +1786,3 @@ class Model(object):
         self.params.done()
 
         return 0;
-

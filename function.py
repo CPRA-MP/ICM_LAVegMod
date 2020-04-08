@@ -10,7 +10,7 @@
 #
 
 # Standard Python Modules
-import exceptions
+from builtins import Exception as exceptions
 import itertools
 import math
 import numpy
@@ -30,7 +30,7 @@ class Function(object):
         if len(xValue) != len(yValue):
             msg  = 'Function: Error: Number of elements in xValue an yValue must match'
             msg += ' len(xValue) = ' + str(len(xValue)) + ' len(yValue) = ' + str(len(yValue))
-            raise exceptions.RuntimeError(msg)
+            raise RuntimeError(msg)
 
         self.xValue = xValue
         self.yValue = yValue
@@ -41,7 +41,7 @@ class Function(object):
             msg += 'x = ' + str(x)             + '\n'
             msg += 'vec[0]  = ' + str(vec[0])  + '\n'
             msg += 'vec[-1] = ' + str(vec[-1]) + '\n'
-            raise exceptions.RuntimeError(msg)
+            raise RuntimeError(msg)
 
         b = 0                          # b = the "bottom" index
         t = len(vec)-1                 # t = the "top" index
@@ -78,18 +78,18 @@ class ReadVegTable1D(object):
             xValue = list( data.ix[:,0] )
             yValue = list( data[species] )
             return {'elvValue':xValue, 'rate':yValue}
-        except exceptions.IOError as error:
+        except IOError as error:
             errorMessage  = 'ReadVegTable1D: Error: Could not open file for reading : ' + filename + '\n'
             errorMessage += 'ReadVegTable1D: Error: Addition error info : ' + str(error) + '\n'
-            raise exceptions.RuntimeError(errorMessage)
+            raise RuntimeError(errorMessage)
         except xlrd.biffh.XLRDError as error:
             errorMessage  = 'ReadVegTable1D: Error: Could not find sheet named ' + modelType + ' in file ' + filename + '\n'
             errorMessage += 'ReadVegTable1D: Error: Additional error info : ' + str(error) + '\n'
-            raise exceptions.RuntimeError(errorMessage)
-        except exceptions.KeyError as error:
+            raise RuntimeError(errorMessage)
+        except KeyError as error:
             errorMessage  = 'ReadVegTable1D: Error: Could not find species named ' + species + ' in sheet ' + modelType + ' in file ' + filename +'\n'
             errorMessage += 'ReadVegTable1D: Error: Additional error info : ' + str(error) + '\n'
-            raise exceptions.RuntimeError(errorMessage)
+            raise RuntimeError(errorMessage)
 
 class Function2DFast(object):
 
@@ -100,12 +100,12 @@ class Function2DFast(object):
         if ( len(yValue) != numpy.size(data, 0) ):
             msg  = 'Function2DFast: Error: number of elements in yValue must match number of rows in data'
             msg += ' len(yValue) = ' + str(len(yValue)) + ' data.shape = ' + str(data.shape)
-            raise exceptions.RuntimeError(msg)
+            raise RuntimeError(msg)
 
         if ( len(xValue) != numpy.size(data, 1) ):
             msg  = 'Function2DFast: Error: number of elements in xValue must match number of columns in data'
             msg += ' len(xValue) = ' + str(len(Value)) + ' size(data) = ' + str(data.shape)
-            raise exceptions.RuntimeError(msg)
+            raise RuntimeError(msg)
 
         self.xValue = xValue
         self.yValue = yValue
@@ -118,7 +118,7 @@ class Function2DFast(object):
             msg += 'x = ' + str(x)             + '\n'
             msg += 'vec[0]  = ' + str(vec[0])  + '\n'
             msg += 'vec[-1] = ' + str(vec[-1]) + '\n'
-            raise exceptions.RuntimeError(msg)
+            raise RuntimeError(msg)
 
         b = 0                          # b = the "bottom" index
         t = len(vec)-1                 # t = the "top" index
@@ -218,12 +218,12 @@ class Function2D(object):
         if len(yValue) != numpy.size(data, 0):
             msg  = 'Function2D: Error: number of elements in yValue must match number of rows in data'
             msg += ' len(yValue) = ' + str(len(yValue)) + ' data.shape = ' + str(data.shape)
-            raise exceptions.RuntimeError(msg)
+            raise RuntimeError(msg)
 
         if len(xValue) != numpy.size(data, 1):
             msg  = 'Function2D: Error: number of elements in xValue must match number of columns in data'
             msg += ' len(xValue) = ' + str(len(Value)) + ' size(data) = ' + str(data.shape)
-            raise exceptions.RuntimeError(msg)
+            raise RuntimeError(msg)
 
         self.point = numpy.array( [ [x,y] for y in yValue for x in xValue ] )
         self.value = numpy.array( [elt for row in data for elt in row] )
@@ -234,10 +234,10 @@ class Function2D(object):
 
     def __getitem__(self, item):
         if ( item[0] < self.minX or self.maxX < item[0] ):
-            raise exceptions.RuntimeError('Function2D: Error: x coordinate out of range. ' + str(item[0]) + ' not in ' + '[ ' + str(self.minX) + ', ' + str(self.maxX) + ' ]'    )
+            raise RuntimeError('Function2D: Error: x coordinate out of range. ' + str(item[0]) + ' not in ' + '[ ' + str(self.minX) + ', ' + str(self.maxX) + ' ]'    )
 
         if ( item[1] < self.minY or self.maxY < item[1] ):
-            raise exceptions.RuntimeError('Function2D: Error: y coordinate out of range. ' + str(item[1]) + ' not in ' + '[ ' + str(self.minY) + ', ' + str(self.maxY) + ' ]'    )
+            raise RuntimeError('Function2D: Error: y coordinate out of range. ' + str(item[1]) + ' not in ' + '[ ' + str(self.minY) + ', ' + str(self.maxY) + ' ]'    )
 
         return interp.griddata(self.point, self.value, ([item[0]],[item[1]] ), method='linear')[0]
 
@@ -253,14 +253,14 @@ class ReadVegTable2D(object):
             salValue   = data[spcode].tolist()
             rate       = numpy.asarray(data)[:,1:22]
             return {'spcode':spcode, 'waValue':waValue, 'salValue':salValue, 'rate':rate }
-        except exceptions.IOError as error:
+        except IOError as error:
             errorMessage  = 'ReadVegTable2D: Error: Could not open file for reading : ' + filename + '\n'
             errorMessage += 'ReadVegTable2D: Error: Addition error info : ' + str(error) + '\n'
-            raise exceptions.RuntimeError(errorMessage)
+            raise RuntimeError(errorMessage)
         except xlrd.biffh.XLRDError as error:
             errorMessage  = 'ReadVegTable2D: Error: Could not find sheet named ' + species +  ' in file : ' + filename + '\n'
             errorMessage += 'ReadVegTable2D: Error: Addition error info : ' + str(error) + '\n'
-            raise exceptions.RuntimeError(errorMessage)
+            raise RuntimeError(errorMessage)
 
 
 def check():
