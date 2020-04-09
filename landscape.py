@@ -122,7 +122,7 @@ class LandscapePlus(Landscape):
 
         errorMessage = ''
         try:
-            for key,value in filter(lambda k,v: k!= self.nodata_value, iter(self.table.items())):
+            for key,value in filter(lambda kv: kv[0]!= self.nodata_value, iter(self.table.items())):
                 line = '{:.0f}'.format(key)
                 for elt in keyNames:
                     try:
@@ -161,7 +161,7 @@ class LandscapePlus(Landscape):
         try:
             ret = Landscape()
             ret.copy(self)
-            for row,col in filter( lambda r,c: self.has_data_at(r,c), itertools.product(   list(range(int(ret.nrow))), list(range(int(ret.ncol)))    ) ):
+            for row,col in filter( lambda rc: self.has_data_at(rc[0],rc[1]), itertools.product(   list(range(int(ret.nrow))), list(range(int(ret.ncol)))    ) ):
                 ret[row,col] = self[row,col][layerName]
         except KeyError as error:
             errorMessage = 'LandscapePlus.extract_layer(): Error: Requested layer name does not exist: ' + str(error) + '\n'

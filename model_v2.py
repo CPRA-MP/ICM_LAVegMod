@@ -1186,7 +1186,7 @@ class PatchModel(dict):
         # as the other types, and because their growth is not computed the same way
         # as the other types.
 
-        for spName, spModel in itertools.filterfalse(lambda k,v: k == 'BAREGRND' or k == 'SAV' or k == 'WATER' or v.modelType == 'FloatingMarshModel', list(spModelList.items())):
+        for spName, spModel in itertools.filterfalse(lambda kv: kv[0] == 'BAREGRND' or kv[0] == 'SAV' or kv[0] == 'WATER' or kv[1].modelType == 'FloatingMarshModel', list(spModelList.items())):
             cover                = spCoverList[spName]
             death                = spModel.senescence(loc)
             #occupied            += cover
@@ -1203,7 +1203,7 @@ class PatchModel(dict):
         # Again, skip SAV, WATER and the floating marsh types because they do not
         # operate the same way as the other types.
         if growthLikelihood:
-            for spName, spModel in itertools.filterfalse(lambda k,v: k == 'BAREGRND' or k=='SAV' or k=='WATER' or v.modelType=='FloatingMarshModel', list(spModelList.items())):
+            for spName, spModel in itertools.filterfalse(lambda kv: kv[0] == 'BAREGRND' or kv[0]=='SAV' or kv[0]=='WATER' or kv[1].modelType=='FloatingMarshModel', list(spModelList.items())):
                 growth               = spModel.growth(loc)/growthLikelihood
                 spCoverList[spName] += growth * unoccupied
                 unoccupied          -= growth * unoccupied
@@ -1227,7 +1227,7 @@ class PatchModel(dict):
         # Step 2.1: Compute the area lost per floating species and the total area lost by all floating species
         deadFloating     = 0.0
         growthLikelihood = 0.0
-        for spName, spModel in filter(lambda k,v: v.modelType == 'FloatingMarshModel', iter(spModelList.items())):
+        for spName, spModel in filter(lambda kv: kv[1].modelType == 'FloatingMarshModel', iter(spModelList.items())):
             cover                   = spCoverList[spName]
             death                   = spModel.senescence(loc)
             deadFloating           += death * cover
@@ -1237,7 +1237,7 @@ class PatchModel(dict):
 
         # Step 2.2: Compute the area gained by each floating species.
         if growthLikelihood:
-            for spName, spModel in filter(lambda k,v: v.modelType == 'FloatingMarshModel', iter(spModelList.items())):
+            for spName, spModel in filter(lambda kv: kv[1].modelType == 'FloatingMarshModel', iter(spModelList.items())):
                 growth                  = spModel.growth(loc)/growthLikelihood
                 spCoverList[spName]    += growth * deadFloating
                 deadFloating           -= growth * deadFloating
@@ -1304,7 +1304,7 @@ class DynamicsModel(landscape.LandscapePlus):
         landscape.Landscape.copy(self, params.initCond)
         self.patchModel.config(params)
         self.spModelList = params.spModelList
-        for row, col in filter(   lambda r,c: params.initCond.has_data_at(r,c), itertools.product(list(range(int(params.initCond.nrow))), list(range(int(params.initCond.ncol))) )    ):
+        for row, col in filter(   lambda rc: params.initCond.has_data_at(rc[0],rc[1]), itertools.product((range(int(params.initCond.nrow))), (range(int(params.initCond.ncol))) )     ):
             patchIndex                 = params.initCond.data[row,col]
             patchInitCond              = params.initCond[(row,col)]
             self.table[patchIndex]     = patchInitCond
@@ -1317,9 +1317,8 @@ class DynamicsModel(landscape.LandscapePlus):
         self.locList[params.initCond.nodata_value] = (0,0)
 
     def table_to_stream(self, stream=sys.stdout):
-        keyNames = iter(self.table.values()).next().keys()
+        keyNames = list(next(iter(self.table.values())).keys())
         keyNames.remove('DEAD_Flt')
-
         header = 'CELLID'
         for name in keyNames:
             header += ', ' + str(name)
@@ -1328,7 +1327,7 @@ class DynamicsModel(landscape.LandscapePlus):
 
         errorMessage = ''
         try:
-            for key,value in filter(lambda k,v: k!= self.nodata_value, iter(self.table.items())):
+            for key,value in filter(lambda kv: kv[0]!= self.nodata_value, iter(self.table.items())):
                 line = '{:.0f}'.format(key)
                 for elt in keyNames:
                     try:
@@ -1384,10 +1383,11 @@ class DispersalModel(object):
         #for row in range(0, int(params.initCond.nrow) ):
            #for col in range(0, int(params.initCond.ncol) ):
                 # if params.initCond.has_data_at(row,col):
-        for row,col in filter( lambda r,c: params.initCond.has_data_at(r,c), itertools.product(   list(range(0,int(params.initCond.nrow))), list(range(0,int(params.initCond.ncol)))   ) ):
+
+        for row,col in filter( lambda rc: params.initCond.has_data_at(rc[0],rc[1]), itertools.product(   list(range(0,int(params.initCond.nrow))), list(range(0,int(params.initCond.ncol)))   ) ):
                patchIndex                 = params.initCond.data[row,col]
                patchInitCond              = copy.deepcopy(params.initCond[(row,col)])
-               neighborList               = [ (nRow,nCol) for nRow,nCol in filter( lambda r,c: params.initCond.has_data_at(r,c), itertools.product(list(range(row-1,row+2)), list(range(col-1,col+2))) ) ] # This is slick as hell. I like python.
+               neighborList               = [ (nRow,nCol) for nRow,nCol in filter( lambda rc: params.initCond.has_data_at(rc[0],rc[1]), itertools.product(list(range(row-1,row+2)), list(range(col-1,col+2))) ) ] # This is slick as hell. I like python.
                newPatch                   = { 'spFreq':patchInitCond, 'neighborList':neighborList }
                self.patchDict[patchIndex] = newPatch
 
@@ -1483,7 +1483,7 @@ class WetlandMorphModel:
         # For the purposes of this calculation, the floating marsh types count as land.
         # However, this may change if the land/water file starting including a distinction floating type
         curLand = 0.0
-        for spName, spCover in itertools.filterfalse( lambda k,v: k=='SAV' or k=='WATER', iter(spModelList.items())):
+        for spName, spCover in itertools.filterfalse( lambda kv: kv[0]=='SAV' or kv[0]=='WATER', iter(spModelList.items())):
             curLand += spCoverList[spName]
 
         # Step 2: Adjust the types based on the differences between
@@ -1508,7 +1508,7 @@ class WetlandMorphModel:
         # land/water file, then decrease the area of all land types and increase the amount of water.
         else: # curLand > newLand
             scaleLand = newLand/curLand # scaleLand < 1.0
-            for spName, spCover in itertools.filterfalse( lambda k,v: k=='SAV' or k=='WATER', iter(spModelList.items())):
+            for spName, spCover in itertools.filterfalse( lambda kv: kv[0]=='SAV' or kv[0]=='WATER', iter(spModelList.items())):
                 spCoverList[spName] *= scaleLand
 
             deltaLand             = curLand - newLand
@@ -1755,12 +1755,12 @@ class Model(object):
         for year, submodel in self.plantingModel.eventDict.items():
             self.eventQueue.add_event( ModelUpdateEvent(event.Time(year, 1075), name='ModelUpdateEvent: Msg: Processing plantings for year ' + str(year),  model=submodel ))
 
-        for yearKey,yearStream in filter( lambda k,v: re.match(r'^__Single_',k) != None, iter(self.params.outputStrm.items()) ):
+        for yearKey,yearStream in filter( lambda kv: re.match(r'^__Single_',kv[0]) != None, iter(self.params.outputStrm.items()) ):
             year = int( yearKey.replace('__Single_','') )
             self.eventQueue.add_event(landscape.WriteASCIIGridPlus(event.Time(year, 1500), name='WriteASCIIGrid: Msg: Writing model output for year  ' + str(year), stream=yearStream, landscape=self.dynModel))
             self.eventQueue.add_event(CloseStreamEvent            (event.Time(year, 1501), name='WriteASCIIGrid: Msg: Closing stream for output year ' + str(year), stream=yearStream ))
 
-        for yearKey,yearStream in filter( lambda k,v: re.match(r'^__DeadFloating_',k) != None, iter(self.params.outputStrm.items()) ):
+        for yearKey,yearStream in filter( lambda kv: re.match(r'^__DeadFloating_',kv[0]) != None, iter(self.params.outputStrm.items()) ):
             year = int( yearKey.replace('__DeadFloating_','') )
             self.eventQueue.add_event(DeadFloatingOutputEvent(event.Time(year, 1550), name='WriteASCIIGrid: Msg: Writing dead floating output for year ' + str(year), stream=yearStream, model=self.dynModel))
             self.eventQueue.add_event(CloseStreamEvent       (event.Time(year, 1551), name='WriteASCIIGrid: Msg: Closing stream for output year        ' + str(year), stream=yearStream ))
