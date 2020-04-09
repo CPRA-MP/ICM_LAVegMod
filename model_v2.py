@@ -921,7 +921,7 @@ class Params(object):
         # - __Step 5__: Open all the input files for reading.
         #
         ###################################################
-        for key in self.inputStrm.keys():
+        for key in iter(self.inputStrm.keys()):
             try:
                 self.inputStrm[key] = self.open_file(key, 'r')
                 print(('Params: Msg: Opened file for reading: ' + str(key) + ' = ' + self.configDict[key]))
@@ -1012,7 +1012,7 @@ class Params(object):
                 self.outputStrm['__DeadFloating_'+str(year)] = None
 
         # Step 6.7: Open all the output files.
-        for key in self.outputStrm.keys():
+        for key in iter(self.outputStrm.keys()):
             try:
                 self.outputStrm[key] = self.open_file(key, 'w')
                 print(('Params: Msg: Output file opened ' + str(self.configDict[key])))
@@ -1084,7 +1084,7 @@ class Params(object):
         reader.read(self.inputStrm['TreeEstCondFile'],          self.treeEstCond)
 
         print ('Params: Msg: Rewinding all the input streams')
-        for strm in self.inputStrm.values():
+        for strm in iter(self.inputStrm.values()):
             strm.seek(0,0)
 
         if 'XFile' in self.configDict:
@@ -1096,10 +1096,10 @@ class Params(object):
     # called at the end of the simulation as the program
     # is getting ready to exit.
     def done(self):
-        for iter in self.inputStrm.values():
+        for iter in iter(self.inputStrm.values()):
             iter.close();
 
-        for iter in self.outputStrm.values():
+        for iter in iter(self.outputStrm.values()):
             iter.close();
 
     def make_lon_lat_file(self, initCond):
@@ -1311,7 +1311,7 @@ class DynamicsModel(landscape.LandscapePlus):
             self.locList[patchIndex]   = (row,col)
 
         patchInitCond = params.initCond.table.iloc[0].to_dict()
-        for key in patchInitCond.keys():
+        for key in iter(patchInitCond.keys()):
             patchInitCond[key] = 0.0
         self.table  [params.initCond.nodata_value] = patchInitCond
         self.locList[params.initCond.nodata_value] = (0,0)
@@ -1392,7 +1392,7 @@ class DispersalModel(object):
                self.patchDict[patchIndex] = newPatch
 
         patchInitCond = params.initCond.table.iloc[0].to_dict()
-        for key in patchInitCond.keys():
+        for key in iter(patchInitCond.keys()):
             patchInitCond[key] = 0.0
         #newPatch = {'loc':(-1,-1), 'spFreq':patchInitCond, 'neighborList':[]}
         newPatch = {'spFreq':patchInitCond, 'neighborList':[]}
@@ -1423,12 +1423,12 @@ class DispersalModel(object):
 
         total = 0.0
 
-        for sp in ptr.keys():
+        for sp in iter(ptr.keys()):
             ptr[sp] = 0
 
         for neighbor in neighborList:
             patchCoverList = DispersalModel.dynModel[neighbor]
-            for sp,spCover in patchCoverList.items():
+            for sp,spCover in iter(patchCoverList.items()):
                 ptr[sp] += spCover
                 total   += spCover
 
@@ -1458,7 +1458,7 @@ class DispersalModel(object):
         #                    raise error
 
         if total:
-            for sp in ptr.keys():
+            for sp in iter(ptr.keys()):
                 ptr[sp] /= total
 
     def update(self):
@@ -1557,7 +1557,7 @@ class DeadFloatingOutputEvent(landscape.WriteASCIIGrid):
         print((self.name))
         deadFloating = self.model.extract_layer('DEAD_Flt')
         landscape.WriteASCIIGrid.write(self, self.stream, deadFloating, self.dataFormat)
-        for patch in self.model.table.values():
+        for patch in iter(self.model.table.values()):
             patch['DEAD_Flt'] = 0.0
 
 class CloseStreamEvent(event.Event):
@@ -1752,7 +1752,7 @@ class Model(object):
             self.eventQueue.add_event(landscape.ReadASCIIGrid(event.Time(year,450), name='ReadASCIIGrid: Msg: Reading wetland morph data',                  stream=self.params.inputStrm['WetlandMorphLandWaterFile'], landscape=self.params.landWater ))
             self.eventQueue.add_event(     event.GenericEvent(event.Time(year,1050), name='ModelUpdateEvent: Msg: Adding the effects from the wetland morph data', callable=self.welModel  ))
 
-        for year, submodel in self.plantingModel.eventDict.items():
+        for year, submodel in iter(self.plantingModel.eventDict.items()):
             self.eventQueue.add_event( ModelUpdateEvent(event.Time(year, 1075), name='ModelUpdateEvent: Msg: Processing plantings for year ' + str(year),  model=submodel ))
 
         for yearKey,yearStream in filter( lambda kv: re.match(r'^__Single_',kv[0]) != None, iter(self.params.outputStrm.items()) ):

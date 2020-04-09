@@ -178,7 +178,7 @@ class PlantingModel:
         #self.setup_shapefile(params)
 
         allYearPlantingList = list()
-        for key, dataSource in params.plantingDict.items():
+        for key, dataSource in iter(params.plantingDict.items()):
             print(('PlantingModel: Msg: Reading configuration for ' + key))
 
             layer = dataSource.GetLayer()
@@ -273,11 +273,11 @@ class PlantingModel:
             for sp in itertools.filterfalse( lambda k : k == 'SAV' or k == 'WATER', iter(spCoverDict.keys()) ):
                 spCoverDict[sp] *= scale
 
-            for sp,cover in plantingDict.items():
+            for sp,cover in iter(plantingDict.items()):
                 spCoverDict[sp] += cover * totalLand * ( 1.0 - scale )
 
             total = 0.0
-            for cover in spCoverDict.values():
+            for cover in iter(spCoverDict.values()):
                 total += cover
 
             if (total - 1.0) > 0.01:
@@ -293,7 +293,7 @@ class PlantingModel:
                 raise RuntimeError(errorMsg)
 
             if total > 1.0:
-                for sp in spCoverDict.keys():
+                for sp in iter(spCoverDict.keys()):
                     spCoverDict[sp] /= total
             else:
                 spCoverDict['BAREGRND'] += 1.0 - total

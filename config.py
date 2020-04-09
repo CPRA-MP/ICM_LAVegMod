@@ -65,6 +65,6 @@ class Config(dict):
 
     def __str__(self):
         ret = ''
-        for (key,value) in list(self.items()):
+        for (key,value) in iter(self.items()):
             ret += str(key) + ' = ' + str(value) + '\n'
         return ret
