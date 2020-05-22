@@ -479,7 +479,7 @@ class SpeciesModelList(dict):
         try:
             mortData = pandas.read_excel(mortFilename, 'VegTypeNames', index_col=None)
         except IOError as error:
-            errorMessage += 'SpeciesModelList: Error: Could not open file for reading: ' + str(estFilename) + '\n'
+            errorMessage += 'SpeciesModelList: Error: Could not open file for reading: ' + str(estFilename) + '\n' #shouldn't this be mortFilename?
             errorMessage += 'SpeciesModelList: Error: Additional error info: ' + str(error) + '\n';
         except xlrd.biffh.XLRDError as error:
             errorMessage += 'SpeciesModelList: Error: While opening : ' + str(estFilename) + '\n'
@@ -1198,6 +1198,7 @@ class PatchModel(dict):
         #unoccupied = max(     0, min( (1.0-occupied)+lost, 1.0)     )
         # Add in the area lost to the area currently unoccupied.
         unoccupied += lost
+        unoccupied_0 = unoccupied
 
         # Step 1.2: Work out the gain in cover for all species.
         # Again, skip SAV, WATER and the floating marsh types because they do not
@@ -1205,8 +1206,9 @@ class PatchModel(dict):
         if growthLikelihood:
             for spName, spModel in itertools.filterfalse(lambda kv: kv[0] == 'BAREGRND' or kv[0]=='SAV' or kv[0]=='WATER' or kv[1].modelType=='FloatingMarshModel', list(spModelList.items())):
                 growth               = spModel.growth(loc)/growthLikelihood
-                spCoverList[spName] += growth * unoccupied
-                unoccupied          -= growth * unoccupied
+                spCoverList[spName] += growth * unoccupied_0
+                unoccupied          -= growth * unoccupied_0
+                
         # else:
         #     print('PatchModel: Msg: There were no species able to occupy the vacated area.')
         #     print('PatchModel: Msg: Unoccupied area = ' + str(unoccupied))
@@ -1234,13 +1236,15 @@ class PatchModel(dict):
             spCoverList[spName]    -= death * cover
 
             growthLikelihood       += spModel.growth(loc)
+        
+        deadFloating_0 = deadFloating
 
         # Step 2.2: Compute the area gained by each floating species.
         if growthLikelihood:
             for spName, spModel in filter(lambda kv: kv[1].modelType == 'FloatingMarshModel', iter(spModelList.items())):
                 growth                  = spModel.growth(loc)/growthLikelihood
-                spCoverList[spName]    += growth * deadFloating
-                deadFloating           -= growth * deadFloating
+                spCoverList[spName]    += growth * deadFloating_0
+                deadFloating           -= growth * deadFloating_0
 
         spCoverList['DEAD_Flt'] += deadFloating
         spCoverList['WATER']    += deadFloating

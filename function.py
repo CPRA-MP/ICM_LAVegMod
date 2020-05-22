@@ -75,7 +75,7 @@ class ReadVegTable1D(object):
     def read(self, filename, modelType, species):
         try:
             data = pandas.read_excel(filename, modelType, index_col=None )
-            xValue = list( data.ix[:,0] )
+            xValue = list( data.iloc[:,0] )
             yValue = list( data[species] )
             return {'elvValue':xValue, 'rate':yValue}
         except IOError as error:
@@ -247,7 +247,7 @@ class ReadVegTable2D(object):
 
     def read(self, filename, species):
         try:
-            data       = pandas.read_excel(filename, species, index_col=None, parse_cols=range(1,23), skiprows=1)
+            data       = pandas.read_excel(filename, species, index_col=None, usecols=range(1,23), skiprows=1)
             waValue    = data.columns.values.tolist()[1:len(data.columns)]
             spcode     = data.columns.values.tolist()[0]
             salValue   = data[spcode].tolist()
