@@ -1496,7 +1496,7 @@ class WetlandMorphModel:
         # Step 2.1: If the current land and new land are the same, there is nothing to do.
         if curLand == newLand: return
 
-        # Step 2.2: If there is less land in the current veg model state than indicated by the
+        # Step 2.2: LAND GAIN - If there is less land in the current veg model state than indicated by the
         # land/water file, then increase the amount of area in land types and decrease the area
         # of water types. All the new land is classified as BAREGRND at this point.
         if curLand < newLand: # curWater > newWater
@@ -1508,15 +1508,20 @@ class WetlandMorphModel:
             scaleWater               = newWater/curWater # scaleWater < 1.0
             spCoverList['WATER']    *= scaleWater
             spCoverList['SAV']      *= scaleWater
-        # Step 2.3: If ther eis more land in the current veg model state than indicated by the
+        # Step 2.3: LAND LOSS - If there is more land in the current veg model state than indicated by the
         # land/water file, then decrease the area of all land types and increase the amount of water.
         else: # curLand > newLand
-            scaleLand = newLand/curLand # scaleLand < 1.0
-            for spName, spCover in itertools.filterfalse( lambda kv: kv[0]=='SAV' or kv[0]=='WATER', iter(spModelList.items())):
-                spCoverList[spName] *= scaleLand
-
             deltaLand             = curLand - newLand
             spCoverList['WATER'] += deltaLand
+            if spCoverList['BAREGRND'] >= deltaLand:
+                spCoverList['BAREGRND'] -= deltaLand
+            else:
+                spCoverList['BAREGRND'] = 0.0
+                scaleLand = newLand/(curLand - spCoverList['BAREGRND'])# scaleLand < 1.0
+                for spName, spCover in itertools.filterfalse( lambda kv: kv[0]=='SAV' or kv[0]=='WATER' or kv[0]=='BAREGRND', iter(spModelList.items())):
+                    spCoverList[spName] *= scaleLand
+                
+            
 
         # Done
         return
