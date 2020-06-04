@@ -1176,9 +1176,7 @@ class PatchModel(dict):
         #
         #######################################################
 
-        # step 1.05: Work out how much area is currently unoccupied, i.e. area in BAREGRND
-        # This is the area available for a terrestrial species to claim via establishment
-        unoccupied       = spCoverList['BAREGRND']
+
 
         # Step 1.1: Work out the loss of cover for all species.
         # Skip the Floating Marsh types, because they are handled separately.
@@ -1186,7 +1184,7 @@ class PatchModel(dict):
         # as the other types, and because their growth is not computed the same way
         # as the other types.
 
-        for spName, spModel in itertools.filterfalse(lambda kv: kv[0] == 'BAREGRND' or kv[0] == 'SAV' or kv[0] == 'WATER' or kv[1].modelType == 'FloatingMarshModel', list(spModelList.items())):
+        for spName, spModel in itertools.filterfalse(lambda kv: kv[0] == 'BAREGRND_NEW' or kv[0] == 'BAREGRND_OLD' or kv[0] == 'SAV' or kv[0] == 'WATER' or kv[1].modelType == 'FloatingMarshModel', list(spModelList.items())):
             cover                = spCoverList[spName]
             death                = spModel.senescence(loc)
             #occupied            += cover
@@ -1199,16 +1197,22 @@ class PatchModel(dict):
         # Add in the area lost to the area currently unoccupied.
         unoccupied += lost
         unoccupied_0 = unoccupied
+        spCoverList['BAREGRND_NEW'] = unoccupied #Newly dead areas become new bareground
+        
+        # step 1.15: Work out the total area that is currently unoccupied, i.e. area in BAREGRND_OLD and newly dead area (same as BAREGROUND_NEW)
+        # This is the area available for a terrestrial species to claim via establishment
+        unoccupied       += spCoverList['BAREGRND_OLD'] 
 
         # Step 1.2: Work out the gain in cover for all species.
         # Again, skip SAV, WATER and the floating marsh types because they do not
         # operate the same way as the other types.
         if growthLikelihood:
-            for spName, spModel in itertools.filterfalse(lambda kv: kv[0] == 'BAREGRND' or kv[0]=='SAV' or kv[0]=='WATER' or kv[1].modelType=='FloatingMarshModel', list(spModelList.items())):
+            for spName, spModel in itertools.filterfalse(lambda kv: kv[0] == 'BAREGRND_NEW' or kv[0]== 'BAREGRND_OLD' or kv[0]=='SAV' or kv[0]=='WATER' or kv[1].modelType=='FloatingMarshModel', list(spModelList.items())):
                 growth               = spModel.growth(loc)/growthLikelihood
                 spCoverList[spName] += growth * unoccupied_0
-                unoccupied          -= growth * unoccupied_0
+                unoccupied          -= growth * unoccupied_0 #Should always end up at 0
                 
+        # Note: No BAREGROUND (new or old) exists if something can grow      
         # else:
         #     print('PatchModel: Msg: There were no species able to occupy the vacated area.')
         #     print('PatchModel: Msg: Unoccupied area = ' + str(unoccupied))
@@ -1218,7 +1222,7 @@ class PatchModel(dict):
         #     print('PatchModel: Msg: mean salinity               = ' + str(self.params.meanSal[loc]) )
         #     print()
 
-        spCoverList['BAREGRND'] = unoccupied
+        #spCoverList['BAREGRND'] = unoccupied
 
         #######################################################
         # Step 2: Work out the change in cover for the floating
@@ -1489,6 +1493,10 @@ class WetlandMorphModel:
         curLand = 0.0
         for spName, spCover in itertools.filterfalse( lambda kv: kv[0]=='SAV' or kv[0]=='WATER', iter(spModelList.items())):
             curLand += spCoverList[spName]
+            
+        # Step 1.5: Reset the bareground ages. New bareground should be zeroed and added to old
+        spCoverList['BAREGRND_OLD'] += spCoverList['BAREGRND_NEW']
+        spCoverList['BAREGRND_NEW'] = 0.0
 
         # Step 2: Adjust the types based on the differences between
         # the current land cover and the new land cover provided by the land/water file.
@@ -1501,7 +1509,7 @@ class WetlandMorphModel:
         # of water types. All the new land is classified as BAREGRND at this point.
         if curLand < newLand: # curWater > newWater
             deltaLand                = newLand - curLand
-            spCoverList['BAREGRND'] += deltaLand
+            spCoverList['BAREGRND_OLD'] += deltaLand
 
             curWater                 = 1.0 - curLand
             newWater                 = 1.0 - newLand
@@ -1513,12 +1521,12 @@ class WetlandMorphModel:
         else: # curLand > newLand
             deltaLand             = curLand - newLand
             spCoverList['WATER'] += deltaLand
-            if spCoverList['BAREGRND'] >= deltaLand:
-                spCoverList['BAREGRND'] -= deltaLand
+            if spCoverList['BAREGRND_OLD'] >= deltaLand:
+                spCoverList['BAREGRND_OLD'] -= deltaLand
             else:
-                spCoverList['BAREGRND'] = 0.0
-                scaleLand = newLand/(curLand - spCoverList['BAREGRND'])# scaleLand < 1.0
-                for spName, spCover in itertools.filterfalse( lambda kv: kv[0]=='SAV' or kv[0]=='WATER' or kv[0]=='BAREGRND', iter(spModelList.items())):
+                spCoverList['BAREGRND_OLD'] = 0.0
+                scaleLand = newLand/(curLand - spCoverList['BAREGRND_OLD'])# scaleLand < 1.0
+                for spName, spCover in itertools.filterfalse( lambda kv: kv[0]=='SAV' or kv[0]=='WATER' or kv[0]=='BAREGRND_OLD', iter(spModelList.items())):
                     spCoverList[spName] *= scaleLand
                 
             
