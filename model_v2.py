@@ -752,6 +752,7 @@ class Params(object):
                               'BarrierIslandEstCondFile'         :None, \
                               'BarrierIslandHeightAboveWaterFile':None, \
                               'WetlandMorphLandWaterFile'        :None, \
+                              'AccuteSalinityStressFile'         :None, \
                               'TreeEstCondFile'                  :None }
 
         ##\brief List of model output filenames.
@@ -776,6 +777,8 @@ class Params(object):
         self.heightAboveWater   = landscape.Landscape()
         ##\brief The land/water map
         self.landWater         = landscape.Landscape()
+        ##\brief The map of accutue salinity stress
+        self.accuteSal         = landscape.Landscape()
         ##\brief The tree establishment conditions map
         self.treeEstCond       = landscape.Landscape() # TreeEstCondFile
 
@@ -1081,6 +1084,7 @@ class Params(object):
         reader.read(self.inputStrm['BarrierIslandEstCondFile'], self.biEstCond)
         reader.read(self.inputStrm['BarrierIslandHeightAboveWaterFile'], self.biHeightAboveWater)
         reader.read(self.inputStrm['WetlandMorphLandWaterFile'],self.landWater)
+        reader.read(self.inputStrm['AccuteSalinityStressFile'], self.accuteSal)
         reader.read(self.inputStrm['TreeEstCondFile'],          self.treeEstCond)
 
         print ('Params: Msg: Rewinding all the input streams')
@@ -1196,12 +1200,12 @@ class PatchModel(dict):
         #unoccupied = max(     0, min( (1.0-occupied)+lost, 1.0)     )
         # Add in the area lost to the area currently unoccupied.
         unoccupied += lost
-        unoccupied_0 = unoccupied
         spCoverList['BAREGRND_NEW'] = unoccupied #Newly dead areas become new bareground
         
         # step 1.15: Work out the total area that is currently unoccupied, i.e. area in BAREGRND_OLD and newly dead area (same as BAREGROUND_NEW)
         # This is the area available for a terrestrial species to claim via establishment
         unoccupied       += spCoverList['BAREGRND_OLD'] 
+        unoccupied_0 = unoccupied
 
         # Step 1.2: Work out the gain in cover for all species.
         # Again, skip SAV, WATER and the floating marsh types because they do not
@@ -1211,7 +1215,11 @@ class PatchModel(dict):
                 growth               = spModel.growth(loc)/growthLikelihood
                 spCoverList[spName] += growth * unoccupied_0
                 unoccupied          -= growth * unoccupied_0 #Should always end up at 0
-                
+        
+        if growthLikelihood:
+            spCoverList['BAREGRND_NEW']=unoccupied #should be the same as setting to 0
+            spCoverList['BAREGRND_OLD']=unoccupied #should be the same as setting to 0
+            # if nothing established, then BAREGRND NEW/OLD can stay the same
         # Note: No BAREGROUND (new or old) exists if something can grow      
         # else:
         #     print('PatchModel: Msg: There were no species able to occupy the vacated area.')
@@ -1523,9 +1531,9 @@ class WetlandMorphModel:
             spCoverList['WATER'] += deltaLand
             if spCoverList['BAREGRND_OLD'] >= deltaLand:
                 spCoverList['BAREGRND_OLD'] -= deltaLand
-            else:
-                spCoverList['BAREGRND_OLD'] = 0.0
+            else:              
                 scaleLand = newLand/(curLand - spCoverList['BAREGRND_OLD'])# scaleLand < 1.0
+                spCoverList['BAREGRND_OLD'] = 0.0
                 for spName, spCover in itertools.filterfalse( lambda kv: kv[0]=='SAV' or kv[0]=='WATER' or kv[0]=='BAREGRND_OLD', iter(spModelList.items())):
                     spCoverList[spName] *= scaleLand
                 
@@ -1757,6 +1765,7 @@ class Model(object):
             self.eventQueue.add_event(landscape.ReadASCIIGrid(event.Time(year,  700), name='ReadASCIIGrid: Msg: Reading summer mean temperature data',      stream=self.params.inputStrm['SummerMeanTempFile'],       landscape=self.params.smTemp))
             self.eventQueue.add_event(landscape.ReadASCIIGrid(event.Time(year,  800), name='ReadASCIIGrid: Msg: Reading water height above ground data',    stream=self.params.inputStrm['HeightAboveWaterFile'],     landscape=self.params.heightAboveWater))
             self.eventQueue.add_event(landscape.ReadASCIIGrid(event.Time(year,  850), name='ReadASCIIGrid: Msg: Reading bi water height above ground data', stream=self.params.inputStrm['BarrierIslandHeightAboveWaterFile'],     landscape=self.params.biHeightAboveWater))
+            self.eventQueue.add_event(landscape.ReadASCIIGrid(event.Time(year,  900), name='ReadASCIIGrid: Msg: Reading accute salinity stress data',       stream=self.params.inputStrm['AccuteSalinityStressFile'],          landscape=self.params.accuteSal))
             self.eventQueue.add_event(landscape.ReadASCIIGrid(event.Time(year, 1000), name='ReadASCIIGrid: Msg: Reading tree establishment data',           stream=self.params.inputStrm['TreeEstCondFile'],          landscape=self.params.treeEstCond))
             self.eventQueue.add_event(       ModelUpdateEvent(event.Time(year, 1100), name='ModelUpdateEvent: Msg: Updating veg dynamics',                  model=self.dynModel  )  )
             self.eventQueue.add_event(       ModelUpdateEvent(event.Time(year, 1200), name='ModelUpdateEvent: Msg: Updating dispersal model',               model=self.dspModel  )  )
