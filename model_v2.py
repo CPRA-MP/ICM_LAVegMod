@@ -887,7 +887,16 @@ class Params(object):
             if not('DEAD_Flt' in self.initCond.table):
                 print ('Params: Msg: Adding DEAD_Flt class to the initial conditions because the type was not defined.')
                 self.initCond.table['DEAD_Flt'] = 0.0
-
+            if not('BAREGRND_Flt' in self.initCond.table):
+                print ('Params: Msg: Adding BAREGRND_Flt class to the initial conditions because the type was not defined.')
+                self.initCond.table['BAREGRND_Flt'] = 0.0
+            if not('BAREGRND_NEW' in self.initCond.table):
+                print ('Params: Msg: Adding BAREGRND_NEW class to the initial conditions because the type was not defined.')
+                self.initCond.table['BAREGRND_NEW'] = 0.0
+            if not('BAREGRND_OLD' in self.initCond.table):
+                print ('Params: Msg: Adding BAREGRND_OLD class to the initial conditions because the type was not defined.')
+                self.initCond.table['BAREGRND_OLD'] = 0.0
+                
         except RuntimeError as error:
             errorMessage += str(error)
 
@@ -1239,27 +1248,39 @@ class PatchModel(dict):
         #######################################################
 
         # Step 2.1: Compute the area lost per floating species and the total area lost by all floating species
-        deadFloating     = 0.0
-        growthLikelihood = 0.0
-        for spName, spModel in filter(lambda kv: kv[1].modelType == 'FloatingMarshModel', iter(spModelList.items())):
-            cover                   = spCoverList[spName]
-            death                   = spModel.senescence(loc)
-            deadFloating           += death * cover
-            spCoverList[spName]    -= death * cover
-
-            growthLikelihood       += spModel.growth(loc)
+        growthLikelihood    = 0.0
+        deadThinFloating    = 0.0
+        deadThickFloating   = 0.0
         
-        deadFloating_0 = deadFloating
+        # For thin mat, the loss is:
+        spModel = spModelList['ELBA2_Flt']
+        cover = spCoverList['ELBA2_Flt']
+        death = spModel.senescence(loc)
+        spCoverList['ELBA2_Flt']    -= death * cover
+        deadThinFloating += death*cover
+        growthLikelihood       += spModel.growth(loc)
+        
+        #For thick mat, the loss is:
+        spModel = spModelList['PAHE2_Flt']
+        cover = spCoverList['PAHE2_Flt']
+        death = spModel.senescence(loc)
+        spCoverList['PAHE2_Flt']    -= death * cover
+        deadThickFloating += death*cover
+        growthLikelihood       += spModel.growth(loc)
+ 
+        # Step 2.2: Compute the area gained by each floating species.       
+        #If there can be growth, it can be on dead thin mat, dead thick mat, or bareground float
 
-        # Step 2.2: Compute the area gained by each floating species.
         if growthLikelihood:
+            deadFloating_0 = deadThickFloating + deadThinFloating + spCoverList['BAREGRND_Flt']
+            spCoverList['BAREGRND_Flt'] = 0.0
             for spName, spModel in filter(lambda kv: kv[1].modelType == 'FloatingMarshModel', iter(spModelList.items())):
-                growth                  = spModel.growth(loc)/growthLikelihood
+                growth = spModel.growth(loc)/growthLikelihood
                 spCoverList[spName]    += growth * deadFloating_0
-                deadFloating           -= growth * deadFloating_0
-
-        spCoverList['DEAD_Flt'] += deadFloating
-        spCoverList['WATER']    += deadFloating
+        else:
+            spCoverList['WATER']    += deadThinFloating + spCoverList['BAREGRND_Flt']
+            spCoverList['DEAD_Flt'] += deadThinFloating + spCoverList['BAREGRND_Flt'] #passed to Morph, where it is set as water 1 m deep
+            spCoverList['BAREGRND_Flt']    = deadThickFloating
 
 
         #######################################################
