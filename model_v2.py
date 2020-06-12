@@ -72,9 +72,10 @@ class SpeciesModel(object):
     #\param [in] abr       The species USDA alpha-numeric vegetation code.
     #\param [in] name      The full species name.
     #\param [in] modelType The type of a model.
+    #\param [in] habitat   The habitat provided by the species (salinity regime)
     #\param [in] cover     The fraction of model cell that is covered by a species.
     #\param [in] loc       The x,y location of a cell. Given as the row,column index with in the model grid.
-    def __init__(self, index=0, name='', abr='', modelType='', cover=0, loc=0):
+    def __init__(self, index=0, name='', abr='', modelType='', habitat='', cover=0, loc=0):
         ##\brief Species index
         ##\details An integer that is a unique numerical species index.
         ## - Type: integer
@@ -104,7 +105,19 @@ class SpeciesModel(object):
         # - NullModel
         ##\n
         self.modelType = modelType
-
+        
+        ##\brief The habitat type
+        ##\details A string containing the habitat type.
+        ##\n
+        ## This member should one of the following values (as a string):\n
+        # - Fresh
+        # - Intermediate
+        # - Brackish 
+        # - Saline
+        # - NA
+        ##\n
+        self.habitat = habitat
+        
         ##\brief The area occupied by a species
         ##\details This is the fraction of a patch covered by a species.
         ## - Type: float
@@ -123,17 +136,19 @@ class SpeciesModel(object):
     #\param abr The species USDA alpha-numeric vegetation code.
     #\param name The full species name.
     #\param modelType The type of a model.
+    #\param habitat The habitat provided by the species (salinity regime)
     #\param cover The fraction of model cell that is covered by a species.
     #\param loc The x,y location of a cell. Given as the row,column index with in the model grid.
     ##\detail This function is used to configure an object after it has been created.
     # this is used SpeciesModelList when it is creating the list of species from
     # the species growth/senescence tables and by PatchModel when creating the
     # individual species model for each location.
-    def config(self, index=0, name='', abr='', modelType='', cover=0, loc=0):
+    def config(self, index=0, name='', abr='', modelType='', habitat='', cover=0, loc=0):
         #self.index     = index
         #self.name      = name
         self.abr       = abr
         self.modelType = modelType
+        self.habitat   = habitat
         self.cover     = cover
         #self.loc       = loc
 
@@ -170,8 +185,8 @@ class SpeciesModel(object):
 # do not really do anything. Having this class makes
 # the rest of the model code simpler.
 class NullModel(SpeciesModel):
-    def __init__(self, index=0, name='', abr='', cover=0, loc=0):
-        SpeciesModel.__init__(self, index, name, abr, 'NullModel', cover, loc)
+    def __init__(self, index=0, name='', abr='', habitat = '', cover=0, loc=0):
+        SpeciesModel.__init__(self, index, name, abr, 'NullModel', habitat, cover, loc)
 
     ##\brief
     ##\detail
@@ -190,8 +205,8 @@ class NullModel(SpeciesModel):
 ##\detail Upland forest types change state based on the
 # height of the habitat above mean water surface.
 class UplandForestModel(SpeciesModel):
-    def __init__(self, index=0, name='', abr='', cover=0, loc=0, Pdata=None, Ddata=None):
-        SpeciesModel.__init__(self, index, name, abr, 'UplandForestModel', cover, loc)
+    def __init__(self, index=0, name='', abr='', habitat='', cover=0, loc=0, Pdata=None, Ddata=None):
+        SpeciesModel.__init__(self, index, name, abr, 'UplandForestModel', habitat, cover, loc)
         self.P = function.Function(Pdata['elvValue'], Pdata['rate'])
         self.D = function.Function(Ddata['elvValue'], Ddata['rate'])
 
@@ -256,8 +271,8 @@ class UplandForestModel(SpeciesModel):
 ##\detail
 #
 class EmergentWetlandModel(SpeciesModel):
-    def __init__(self, index=0, name='', abr='', cover=0, loc=0, Pdata=None, Ddata=None):
-        SpeciesModel.__init__(self, index, name, abr, 'EmergentWetlandModel', cover, loc)
+    def __init__(self, index=0, name='', abr='', habitat = '', cover=0, loc=0, Pdata=None, Ddata=None):
+        SpeciesModel.__init__(self, index, name, abr, 'EmergentWetlandModel', habitat, cover, loc)
         self.P     = function.Function2DFast(Pdata['waValue'], Pdata['salValue'], Pdata['rate'])
         self.D     = function.Function2DFast(Ddata['waValue'], Ddata['salValue'], Ddata['rate'])
 
@@ -297,15 +312,15 @@ class EmergentWetlandModel(SpeciesModel):
         dsp     = SpeciesModel.dspModel[loc][self.abr]
 
 #No_elev_threshold#        if bi or elv > SpeciesModel.params.elevationThreshold:
-        if bi > SpeciesModel.params.elevationThreshold:
-
-             return 0.0
+        #if bi > SpeciesModel.params.elevationThreshold:
+        
+        if bi: return 0.0
 
         return self.P[waveAmp, meanSal] * dsp
 
 class SwampForestModel(SpeciesModel):
-    def __init__(self, index=0, name='', abr='', cover=0, loc=0, Pdata=None, Ddata=None):
-        SpeciesModel.__init__(self, index, name, abr, 'SwampForestModel', cover, loc)
+    def __init__(self, index=0, name='', abr='', habitat = '', cover=0, loc=0, Pdata=None, Ddata=None):
+        SpeciesModel.__init__(self, index, name, abr, 'SwampForestModel', habitat, cover, loc)
         self.P     = function.Function2DFast(Pdata['waValue'], Pdata['salValue'], Pdata['rate'])
         self.D     = function.Function2DFast(Ddata['waValue'], Ddata['salValue'], Ddata['rate'])
 
@@ -350,8 +365,8 @@ class SwampForestModel(SpeciesModel):
 ##\detail
 #
 class SAVModel(SpeciesModel):
-    def __init__(self, index=0, name='', abr='', cover=0, loc=0, SAVData=None):
-        SpeciesModel.__init__(self, index, name, abr, 'SAVModel', cover, loc)
+    def __init__(self, index=0, name='', abr='', habitat = '', cover=0, loc=0, SAVData=None):
+        SpeciesModel.__init__(self, index, name, abr, 'SAVModel', habitat, cover, loc)
 
         if SAVData == None:
             errorMessage = 'SAVModel: Error: No SAVData object passed to constructor (i.e. __init__() )\n'
@@ -382,8 +397,8 @@ class SAVModel(SpeciesModel):
 ##\detail
 #
 class BarrierIslandModel(SpeciesModel):
-    def __init__(self, index=0, name='', abr='', cover=0, loc=0, Pdata=None, Ddata=None):
-        SpeciesModel.__init__(self, index, name, abr, 'BarrierIslandModel', cover, loc)
+    def __init__(self, index=0, name='', abr='', habitat='', cover=0, loc=0, Pdata=None, Ddata=None):
+        SpeciesModel.__init__(self, index, name, abr, 'BarrierIslandModel', habitat, cover, loc)
         self.P = function.Function(Pdata['elvValue'], Pdata['rate'])
         self.D = function.Function(Ddata['elvValue'], Ddata['rate'])
 
@@ -412,8 +427,8 @@ class BarrierIslandModel(SpeciesModel):
 ##\detail
 #
 class FloatingMarshModel(EmergentWetlandModel):
-    def __init__(self, index=0, name='', abr='', cover=0, loc=0, Pdata=None, Ddata=None):
-        EmergentWetlandModel.__init__(self, index, name, abr, cover, loc, Pdata, Ddata)
+    def __init__(self, index=0, name='', abr='', habitat ='', cover=0, loc=0, Pdata=None, Ddata=None):
+        EmergentWetlandModel.__init__(self, index, name, abr, habitat, cover, loc, Pdata, Ddata)
         self.modelType = 'FloatingMarshModel'
         self.transList = None
 
@@ -516,6 +531,7 @@ class SpeciesModelList(dict):
             spID        = spInfo['ID']
             spName      = spInfo['Common Name']
             spModelType = spInfo['ModelType']
+            spHabitat   = spInfo['Habitat']
 
             print(('SpeciesModelList: Msg: Configuring model for species ' + str(spSymbol) + ', model type is ' + spModelType + '.'))
 
@@ -547,7 +563,7 @@ class SpeciesModelList(dict):
                     errorMessage += str(error) + '\n'
                     errorMessage += 'SpeciesModelList: Error: error while working on species ' + str(spSymbol) + '\n'
 
-                spModel = UplandForestModel(index=spID, name=spName, abr=spSymbol, cover=0, loc=-1, Pdata=Pdata, Ddata=Ddata)
+                spModel = UplandForestModel(index=spID, name=spName, abr=spSymbol, habitat = spHabitat, cover=0, loc=-1, Pdata=Pdata, Ddata=Ddata)
                 self.__setitem__(spSymbol, spModel)
 
             ###########################################
@@ -576,7 +592,7 @@ class SpeciesModelList(dict):
                     errorMessage += str(error) + '\n'
                     errorMessage += 'SpeciesModelList: Error: error while working on species ' + str(spSymbol) + '\n'
 
-                spModel = EmergentWetlandModel(index=spID, name=spName, abr=spSymbol, cover=0, loc=-1, Pdata=Pdata, Ddata=Ddata)
+                spModel = EmergentWetlandModel(index=spID, name=spName, abr=spSymbol, habitat = spHabitat, cover=0, loc=-1, Pdata=Pdata, Ddata=Ddata)
                 self.__setitem__(spSymbol, spModel)
 
 
@@ -606,7 +622,7 @@ class SpeciesModelList(dict):
                     errorMessage += str(error) + '\n'
                     errorMessage += 'SpeciesModelList: Error: error while working on species ' + str(spSymbol) + '\n'
 
-                spModel = SwampForestModel(index=spID, name=spName, abr=spSymbol, cover=0, loc=-1, Pdata=Pdata, Ddata=Ddata)
+                spModel = SwampForestModel(index=spID, name=spName, abr=spSymbol, habitat = spHabitat, cover=0, loc=-1, Pdata=Pdata, Ddata=Ddata)
                 self.__setitem__(spSymbol, spModel)
 
 
@@ -636,7 +652,7 @@ class SpeciesModelList(dict):
                     errorMessage += str(error) + '\n'
                     errorMessage += 'SpeciesModelList: Error: error while working on species ' + str(spSymbol) + '\n'
 
-                spModel = FloatingMarshModel(index=spID, name=spName, abr=spSymbol, cover=0, loc=-1, Pdata=Pdata, Ddata=Ddata)
+                spModel = FloatingMarshModel(index=spID, name=spName, abr=spSymbol, habitat = spHabitat, cover=0, loc=-1, Pdata=Pdata, Ddata=Ddata)
                 self.__setitem__(spSymbol, spModel)
 
 
@@ -659,7 +675,7 @@ class SpeciesModelList(dict):
                     errorMessage += 'SpeciesModelList: Error : Dictionary key error. SAV table probably has wrong column headings\n'
                     errorMessage += 'SpeciesModelList: Error : '
 
-                spModel = SAVModel(index=spID, name=spName, abr=spSymbol, cover=0, loc=-1, SAVData=savData)
+                spModel = SAVModel(index=spID, name=spName, abr=spSymbol, habitat=spHabitat, cover=0, loc=-1, SAVData=savData)
                 self.__setitem__(spSymbol, spModel)
 
             ###########################################
@@ -690,7 +706,7 @@ class SpeciesModelList(dict):
                     errorMessage += str(error) + '\n'
                     errorMessage += 'SpeciesModelList: Error: error while working on species ' + str(spSymbol) + '\n'
 
-                spModel = BarrierIslandModel(index=spID, name=spName, abr=spSymbol, cover=0, loc=-1, Pdata=Pdata, Ddata=Ddata)
+                spModel = BarrierIslandModel(index=spID, name=spName, abr=spSymbol, habitat=spHabitat, cover=0, loc=-1, Pdata=Pdata, Ddata=Ddata)
                 self.__setitem__(spSymbol, spModel)
 
             ###########################################
@@ -698,7 +714,7 @@ class SpeciesModelList(dict):
             #
             ###########################################
             elif ( spModelType == 'NullModel'):
-                spModel = NullModel(index=spID, name=spName, abr=spSymbol, cover=0, loc=-1)
+                spModel = NullModel(index=spID, name=spName, abr=spSymbol, habitat=spHabitat, cover=0, loc=-1)
                 self.__setitem__(spSymbol, spModel)
 
             ###########################################
@@ -752,7 +768,7 @@ class Params(object):
                               'BarrierIslandEstCondFile'         :None, \
                               'BarrierIslandHeightAboveWaterFile':None, \
                               'WetlandMorphLandWaterFile'        :None, \
-                              'AccuteSalinityStressFile'         :None, \
+                              'AcuteSalinityStressFile'         :None, \
                               'TreeEstCondFile'                  :None }
 
         ##\brief List of model output filenames.
@@ -778,7 +794,7 @@ class Params(object):
         ##\brief The land/water map
         self.landWater         = landscape.Landscape()
         ##\brief The map of accutue salinity stress
-        self.accuteSal         = landscape.Landscape()
+        self.acuteSal         = landscape.Landscape()
         ##\brief The tree establishment conditions map
         self.treeEstCond       = landscape.Landscape() # TreeEstCondFile
 
@@ -1093,7 +1109,7 @@ class Params(object):
         reader.read(self.inputStrm['BarrierIslandEstCondFile'], self.biEstCond)
         reader.read(self.inputStrm['BarrierIslandHeightAboveWaterFile'], self.biHeightAboveWater)
         reader.read(self.inputStrm['WetlandMorphLandWaterFile'],self.landWater)
-        reader.read(self.inputStrm['AccuteSalinityStressFile'], self.accuteSal)
+        reader.read(self.inputStrm['AcuteSalinityStressFile'], self.acuteSal)
         reader.read(self.inputStrm['TreeEstCondFile'],          self.treeEstCond)
 
         print ('Params: Msg: Rewinding all the input streams')
@@ -1291,10 +1307,33 @@ class PatchModel(dict):
         totalWater           = spCoverList['SAV'] + spCoverList['WATER']
         spCoverList['SAV']   = SAVModel.growth(loc) * totalWater
         spCoverList['WATER'] = totalWater - spCoverList['SAV']
+        
+        #######################################################
+        # Step 4: Decrease in coverage due to acute salinity stress
+        #
+        #######################################################
+        
+        acute_sal_stress  = SpeciesModel.params.acuteSal[loc]
+        
+        if acute_sal_stress:
+            # Step 4.1: Eliminate coverage of flotant marsh. It follows the same process as step 2 with thin mat becoming open water and thick becoming bareground_flt
+            deadThinFloating    = spCoverList['ELBA2_Flt']
+            deadThickFloating   = spCoverList['PAHE2_Flt']
+            spCoverList['ELBA2_Flt'] -= spCoverList['ELBA2_Flt']
+            spCoverList['PAHE2_Flt'] -= spCoverList['PAHE2_Flt']
+            spCoverList['WATER']    += deadThinFloating 
+            spCoverList['DEAD_Flt'] += deadThinFloating  #passed to Morph, where it is set as water 1 m deep
+            spCoverList['BAREGRND_Flt']    += deadThickFloating
+            
+            # Step 4.2: Eliminate coverage of fresh attached marsh coverage.
+            for spName, spModel in filter(lambda kv: kv[1].modelType == 'EmergentWetlandModel', iter(spModelList.items())):     
+                if spModel.habitat == 'Fresh' :
+                    spCoverList['BAREGRND_NEW'] += spCoverList[spName]
+                    spCoverList[spName] -= spCoverList[spName]#wipes out the fresh attached marsh 
 
 
         #######################################################
-        # Step 4: Check sum
+        # Step 5: Check sum
         #
         #######################################################
         checkSum = 0.0
@@ -1786,7 +1825,7 @@ class Model(object):
             self.eventQueue.add_event(landscape.ReadASCIIGrid(event.Time(year,  700), name='ReadASCIIGrid: Msg: Reading summer mean temperature data',      stream=self.params.inputStrm['SummerMeanTempFile'],       landscape=self.params.smTemp))
             self.eventQueue.add_event(landscape.ReadASCIIGrid(event.Time(year,  800), name='ReadASCIIGrid: Msg: Reading water height above ground data',    stream=self.params.inputStrm['HeightAboveWaterFile'],     landscape=self.params.heightAboveWater))
             self.eventQueue.add_event(landscape.ReadASCIIGrid(event.Time(year,  850), name='ReadASCIIGrid: Msg: Reading bi water height above ground data', stream=self.params.inputStrm['BarrierIslandHeightAboveWaterFile'],     landscape=self.params.biHeightAboveWater))
-            self.eventQueue.add_event(landscape.ReadASCIIGrid(event.Time(year,  900), name='ReadASCIIGrid: Msg: Reading accute salinity stress data',       stream=self.params.inputStrm['AccuteSalinityStressFile'],          landscape=self.params.accuteSal))
+            self.eventQueue.add_event(landscape.ReadASCIIGrid(event.Time(year,  900), name='ReadASCIIGrid: Msg: Reading acute salinity stress data',       stream=self.params.inputStrm['AcuteSalinityStressFile'],          landscape=self.params.acuteSal))
             self.eventQueue.add_event(landscape.ReadASCIIGrid(event.Time(year, 1000), name='ReadASCIIGrid: Msg: Reading tree establishment data',           stream=self.params.inputStrm['TreeEstCondFile'],          landscape=self.params.treeEstCond))
             self.eventQueue.add_event(       ModelUpdateEvent(event.Time(year, 1100), name='ModelUpdateEvent: Msg: Updating veg dynamics',                  model=self.dynModel  )  )
             self.eventQueue.add_event(       ModelUpdateEvent(event.Time(year, 1200), name='ModelUpdateEvent: Msg: Updating dispersal model',               model=self.dspModel  )  )
