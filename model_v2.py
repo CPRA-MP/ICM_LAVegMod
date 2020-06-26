@@ -168,10 +168,17 @@ class SpeciesModel(object):
         return 0.0
 
     ##\brief Computes the probability of establishment
-    ##\details This is a generic function that returns the probability of plats growing.
+    ##\details This is a generic function that returns the probability of plants growing.
     # This function should be redefined by each class that inherits from SpeciesModel.
     def growth(self, loc):
         return 0.0
+    
+    ##\brief Computes the probability of establishment for high dispersal species
+    ##\details This is a generic function that returns the probability of plants growing.
+    # This function should be redefined by each class that inherits from SpeciesModel.
+    def spread(self, loc):
+        return 0.0    
+    
 
     def __float__(self):
         return -3.0
@@ -205,6 +212,9 @@ class NullModel(SpeciesModel):
     ##\brief
     ##\detail
     def growth(self, loc):
+        return 0.0
+    
+    def spread(self,loc):
         return 0.0
 
 ##\class UplandForestModel
@@ -273,12 +283,33 @@ class UplandForestModel(SpeciesModel):
             msg = 'UplandForestModel.growth(): Error: location out of range. Additional info follows\n'
             msg += str(error)
             raise RuntimeError(msg)
-
+            
+    def spread(self,loc):
+        if self.dspClass == 3:
+            try:
+                elv = SpeciesModel.params.heightAboveWater[loc]
+                sal = SpeciesModel.params.meanSal[loc]
+                est = SpeciesModel.params.treeEstCond[loc]
+                bi  = SpeciesModel.params.biEstCond[loc]
+            
+                if bi or sal > 1.0:
+                    return 0
+                
+                return self.P[elv]*est
+    
+        
+            except RuntimeError as error:
+                msg = 'UplandForestModel.growth(): Error: location out of range. Additional info follows\n'
+                msg += str(error)
+                raise RuntimeError(msg)
+        else:
+            return 0.0
+        
 ##\class EmergentWetlandModel
 ##\brief This class handles the ecology for the emergent wetland species.
 ##\role{Ecology}
 ##\detail
-#
+
 class EmergentWetlandModel(SpeciesModel):
     def __init__(self, index=0, name='', abr='', habitat = '', dspClass=0, cover=0, loc=0, Pdata=None, Ddata=None):
         SpeciesModel.__init__(self, index, name, abr, 'EmergentWetlandModel', habitat, dspClass, cover, loc)
@@ -327,6 +358,20 @@ class EmergentWetlandModel(SpeciesModel):
         if bi: return 0.0
 
         return self.P[waveAmp, meanSal] * dsp
+    
+    def spread(self,loc):
+        if self.dspClass == 3:
+            waveAmp = SpeciesModel.params.waveAmp[loc]
+            meanSal = SpeciesModel.params.meanSal[loc]
+            elv     = SpeciesModel.params.heightAboveWater[loc]
+            bi      = SpeciesModel.params.biEstCond[loc]  
+            
+            if bi: return 0.0
+            
+            return self.P[waveAmp, meanSal]
+        else:
+            return 0.0
+                
 
 class SwampForestModel(SpeciesModel):
     def __init__(self, index=0, name='', abr='', habitat = '', dspClass=0, cover=0, loc=0, Pdata=None, Ddata=None):
@@ -368,6 +413,19 @@ class SwampForestModel(SpeciesModel):
         if bi: return 0.0
 
         return self.P[waveAmp, meanSal] * dsp * est
+    
+    def spread(self,loc):
+        if self.dspClass == 3:
+            waveAmp = SpeciesModel.params.waveAmp[loc]
+            meanSal = SpeciesModel.params.meanSal[loc]
+            est     = SpeciesModel.params.treeEstCond[loc]
+            bi      = SpeciesModel.params.biEstCond[loc]
+            
+            if bi: return 0.0
+
+            return self.P[waveAmp, meanSal] * est
+        else:
+            return 0.0
 
 ##\class SAVModel
 ##\brief This class handles the ecology for the SAV species.
@@ -1192,6 +1250,7 @@ class PatchModel(dict):
         unoccupied       = 0.0
         lost             = 0.0
         growthLikelihood = 0.0
+        spreadLikelihood = 0.0
 
         #######################################################
         # WARNING: The order of steps here is important. Additional
@@ -1230,6 +1289,7 @@ class PatchModel(dict):
             lost                += death * cover
             spCoverList[spName] -= death * cover
             growthLikelihood    += spModel.growth(loc)
+            spreadLikelihood    += spModel.spread(loc)
 
         #unoccupied = max(     0, min( (1.0-occupied)+lost, 1.0)     )
         # Add in the area lost to the area currently unoccupied.
@@ -1249,8 +1309,15 @@ class PatchModel(dict):
                 growth               = spModel.growth(loc)/growthLikelihood
                 spCoverList[spName] += growth * unoccupied_0
                 unoccupied          -= growth * unoccupied_0 #Should always end up at 0
-        
-        if growthLikelihood:
+        else:
+            if spreadLikelihood:
+                for spName, spModel in itertools.filterfalse(lambda kv: kv[0] == 'BAREGRND_NEW' or kv[0]== 'BAREGRND_OLD' or kv[0]=='SAV' or kv[0]=='WATER' or kv[1].modelType=='FloatingMarshModel', list(spModelList.items())):
+                    spread               = spModel.spread(loc)/spreadLikelihood
+                    spCoverList[spName] += spread * unoccupied_0
+                    unoccupied          -= spread * unoccupied_0 #Should always end up at 0
+                    
+                
+        if growthLikelihood or spreadLikelihood:
             spCoverList['BAREGRND_NEW']=unoccupied #should be the same as setting to 0
             spCoverList['BAREGRND_OLD']=unoccupied #should be the same as setting to 0
             # if nothing established, then BAREGRND NEW/OLD can stay the same
