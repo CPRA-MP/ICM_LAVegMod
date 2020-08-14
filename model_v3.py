@@ -74,10 +74,10 @@ class SpeciesModel(object):
     #\param [in] modelType The type of a model.
     #\param [in] habitat   The habitat provided by the species (salinity regime)
     #\param [in] dspClass  The dispersal class of the species (0,1,2,3=high)
-    #\param [in] fibsScore The FIBS (fresh, intermediate, brackish, saline) score for that species
+    #\param [in] ffibsScore The FFIBS (forested, fresh, intermediate, brackish, saline) score for that species
     #\param [in] cover     The fraction of model cell that is covered by a species.
     #\param [in] loc       The x,y location of a cell. Given as the row,column index with in the model grid.
-    def __init__(self, index=0, name='', abr='', modelType='', habitat='', dspClass=0, fibsScore=0, cover=0, loc=0):
+    def __init__(self, index=0, name='', abr='', modelType='', habitat='', dspClass=0, ffibsScore=0, cover=0, loc=0):
         ##\brief Species index
         ##\details An integer that is a unique numerical species index.
         ## - Type: integer
@@ -102,36 +102,37 @@ class SpeciesModel(object):
         ## This member should one of the following values (as a string):\n
         # - BarrierIslandModel
         # - EmergentWetlandModel
-        # - UplandForestModel
+        # - BottomlandHardwoodForestModel
         # - SAVModel
+        # - NullModel_Coverage
         # - NullModel
         ##\n
         self.modelType = modelType
-        
+
         ##\brief The habitat type
         ##\details A string containing the habitat type.
         ##\n
         ## This member should one of the following values (as a string):\n
         # - Fresh
         # - Intermediate
-        # - Brackish 
+        # - Brackish
         # - Saline
         # - NA
         ##\n
         self.habitat = habitat
-        
+
         ##\brief The dispersal class of a species
-        ##\details Dispersal classes describe far a species can establish, 1 is from one cell away, 2 is from two cells away,  3 is from anywhere, and 0 is for null 
+        ##\details Dispersal classes describe far a species can establish, 1 is from one cell away, 2 is from two cells away,  3 is from anywhere, and 0 is for null
         ## - Type: float
         ## - Range: [0, 3]
         self.dspClass     = dspClass
-        
+
         ##\brief The FIBS score of a species corresponds to its salinity regime: Fresh = 0.25, Intermediate = 1.5, Brackish = 7.15 or 11.5, Saline = 17.5 or 24, null coverages are nan
-        ##\details FIBS score  
+        ##\details FIBS score
         ## - Type: float
         ## - Range: [0.25, 24]
-        self.fibsScore     = fibsScore
-        
+        self.ffibsScore     = ffibsScore
+
         ##\brief The area occupied by a species
         ##\details This is the fraction of a patch covered by a species.
         ## - Type: float
@@ -152,21 +153,21 @@ class SpeciesModel(object):
     #\param modelType The type of a model.
     #\param habitat The habitat provided by the species (salinity regime).
     #\param dspClass The dispersal class the species belongs (low, med, high).
-    #\param fibsScore The FIBS score of the species.
+    #\param ffibsScore The FFIBS score of the species.
     #\param cover The fraction of model cell that is covered by a species.
     #\param loc The x,y location of a cell. Given as the row,column index with in the model grid.
     ##\detail This function is used to configure an object after it has been created.
     # this is used SpeciesModelList when it is creating the list of species from
     # the species growth/senescence tables and by PatchModel when creating the
     # individual species model for each location.
-    def config(self, index=0, name='', abr='', modelType='', habitat='', dspClass=0, fibsScore=0, cover=0, loc=0):
+    def config(self, index=0, name='', abr='', modelType='', habitat='', dspClass=0, ffibsScore=0, cover=0, loc=0):
         #self.index     = index
         #self.name      = name
         self.abr       = abr
         self.modelType = modelType
         self.habitat   = habitat
         self.dspClass = dspClass
-        self.fibsScore = fibsScore
+        self.ffibsScore = ffibsScore
         self.cover     = cover
         #self.loc       = loc
 
@@ -181,13 +182,13 @@ class SpeciesModel(object):
     # This function should be redefined by each class that inherits from SpeciesModel.
     def growth(self, loc):
         return 0.0
-    
+
     ##\brief Computes the probability of establishment for high dispersal species
     ##\details This is a generic function that returns the probability of plants growing.
     # This function should be redefined by each class that inherits from SpeciesModel.
     def spread(self, loc):
-        return 0.0    
-    
+        return 0.0
+
 
     def __float__(self):
         return -3.0
@@ -206,12 +207,11 @@ class SpeciesModel(object):
 ##\class NullModel
 ##\brief A place holder.
 ##\role{Machinery}
-##\detail A place holder for habitat and vegetation types that
-# do not really do anything. Having this class makes
-# the rest of the model code simpler.
+##\detail A place holder for items in the output that are not coverage values (e.g. FFIBS).
+## Having this class makes the rest of the model code simpler.
 class NullModel(SpeciesModel):
-    def __init__(self, index=0, name='', abr='', habitat = '', dspClass=0, fibsScore=0, cover=0, loc=0):
-        SpeciesModel.__init__(self, index, name, abr, 'NullModel', habitat, dspClass, fibsScore, cover, loc)
+    def __init__(self, index=0, name='', abr='', habitat = '', dspClass=0, ffibsScore=0, cover=0, loc=0):
+        SpeciesModel.__init__(self, index, name, abr, 'NullModel', habitat, dspClass, ffibsScore, cover, loc)
 
     ##\brief
     ##\detail
@@ -222,24 +222,47 @@ class NullModel(SpeciesModel):
     ##\detail
     def growth(self, loc):
         return 0.0
+
+    def spread(self,loc):
+        return 0.0
     
+##\class NullModel_Coverage
+##\brief A place holder.
+##\role{Machinery}
+##\detail A place holder for coverage types that
+# do not really do anything but do need to be counted when adding up coverage (e.g. water).
+# Having this class makes the rest of the model code simpler.
+class NullModel_Coverage(SpeciesModel):
+    def __init__(self, index=0, name='', abr='', habitat = '', dspClass=0, ffibsScore=0, cover=0, loc=0):
+        SpeciesModel.__init__(self, index, name, abr, 'NullModel_Coverage', habitat, dspClass, ffibsScore, cover, loc)
+
+    ##\brief
+    ##\detail
+    def senescence(self, loc):
+        return 0.0
+
+    ##\brief
+    ##\detail
+    def growth(self, loc):
+        return 0.0
+
     def spread(self,loc):
         return 0.0
 
-##\class UplandForestModel
+##\class BottomlandHardwoodForestModel
 
-##\brief This class handles the ecology for the upland forest species.
+##\brief This class handles the ecology for the bottomland hardwood forest species.
 ##\role{Ecology}
-##\detail Upland forest types change state based on the
+##\detail bottomland hardwood forest types change state based on the
 # height of the habitat above mean water surface.
-class UplandForestModel(SpeciesModel):
-    def __init__(self, index=0, name='', abr='', habitat='', dspClass=0, fibsScore=0, cover=0, loc=0, Pdata=None, Ddata=None):
-        SpeciesModel.__init__(self, index, name, abr, 'UplandForestModel', habitat, dspClass, fibsScore, cover, loc)
+class BottomlandHardwoodForestModel(SpeciesModel):
+    def __init__(self, index=0, name='', abr='', habitat='', dspClass=0, ffibsScore=0, cover=0, loc=0, Pdata=None, Ddata=None):
+        SpeciesModel.__init__(self, index, name, abr, 'BottomlandHardwoodForestModel', habitat, dspClass, ffibsScore, cover, loc)
         self.P = function.Function(Pdata['elvValue'], Pdata['rate'])
         self.D = function.Function(Ddata['elvValue'], Ddata['rate'])
 
     ## Senescence function
-    # This function determines the probability that an upland forest species
+    # This function determines the probability that a bottomland hardwood forest species
     # will experience senescence. The probability of senescence is a function
     # of the elevation of the local habitat above the mean water surface. The
     # exact functional relationship between height above water and the probability
@@ -257,13 +280,13 @@ class UplandForestModel(SpeciesModel):
             return self.D[elv]
 
         except RuntimeError as error:
-            msg = 'UplandForestModel.senescence(): Error: location out of range. Additional info follows\n'
+            msg = 'BottomlandHardwoodForestModel.senescence(): Error: location out of range. Additional info follows\n'
             msg += str(error)
             raise RuntimeError(msg)
 
     ## Growth function
-    # This function determines the probability that an upland forest species will become
-    # established at the current location. The probability of an upland forest species becoming
+    # This function determines the probability that a bottomland hardwood forest species will become
+    # established at the current location. The probability of a bottomland hardwood forest species becoming
     # established is depended on three major factors. First, the salinity must be below 1.0 ppt.
     # Second, there must be a period of 14 days with no flooding followed by a period of 14 with
     # water depths below 14 cm. Finally, the height of the habitat above mean water level determines
@@ -273,9 +296,9 @@ class UplandForestModel(SpeciesModel):
     # I'm not entirely happy with the current state of this function because the computation
     # of the basic establishment conditions (14 day no flood, 14 days water depth < 14 cm) is
     # handled external to the model. The problem is that the current approach divides
-    # the responsibilities for representing the ecology of upland forest species. An external program
-    # determines the establishment conditions while the model proper handles the final computation of the
-    # probability of establishment. I would like to fix this.
+    # the responsibilities for representing the ecology of upland forest species (now bottomland hardwood forest).
+    # An external program determines the establishment conditions while the model proper handles
+    # the final computation of the probability of establishment. I would like to fix this.
     def growth(self, loc):
         try:
             elv = SpeciesModel.params.heightAboveWater[loc]
@@ -289,10 +312,10 @@ class UplandForestModel(SpeciesModel):
 
             return self.P[elv] * dsp * est
         except RuntimeError as error:
-            msg = 'UplandForestModel.growth(): Error: location out of range. Additional info follows\n'
+            msg = 'BottomlandHardwoodForestModel.growth(): Error: location out of range. Additional info follows\n'
             msg += str(error)
             raise RuntimeError(msg)
-            
+
     def spread(self,loc):
         if self.dspClass == 3:
             try:
@@ -300,28 +323,28 @@ class UplandForestModel(SpeciesModel):
                 sal = SpeciesModel.params.meanSal[loc]
                 est = SpeciesModel.params.treeEstCond[loc]
                 bi  = SpeciesModel.params.biEstCond[loc]
-            
+
                 if bi or sal > 1.0:
                     return 0
-                
+
                 return self.P[elv]*est
-    
-        
+
+
             except RuntimeError as error:
-                msg = 'UplandForestModel.growth(): Error: location out of range. Additional info follows\n'
+                msg = 'BottomlandHardwoodForestModel.growth(): Error: location out of range. Additional info follows\n'
                 msg += str(error)
                 raise RuntimeError(msg)
         else:
             return 0.0
-        
+
 ##\class EmergentWetlandModel
 ##\brief This class handles the ecology for the emergent wetland species.
 ##\role{Ecology}
 ##\detail
 
 class EmergentWetlandModel(SpeciesModel):
-    def __init__(self, index=0, name='', abr='', habitat = '', dspClass=0, fibsScore=0, cover=0, loc=0, Pdata=None, Ddata=None):
-        SpeciesModel.__init__(self, index, name, abr, 'EmergentWetlandModel', habitat, dspClass, fibsScore, cover, loc)
+    def __init__(self, index=0, name='', abr='', habitat = '', dspClass=0, ffibsScore=0, cover=0, loc=0, Pdata=None, Ddata=None):
+        SpeciesModel.__init__(self, index, name, abr, 'EmergentWetlandModel', habitat, dspClass, ffibsScore, cover, loc)
         self.P     = function.Function2DFast(Pdata['waValue'], Pdata['salValue'], Pdata['rate'])
         self.D     = function.Function2DFast(Ddata['waValue'], Ddata['salValue'], Ddata['rate'])
 
@@ -359,32 +382,32 @@ class EmergentWetlandModel(SpeciesModel):
         elv     = SpeciesModel.params.heightAboveWater[loc]
         bi      = SpeciesModel.params.biEstCond[loc]
         dsp     = SpeciesModel.dspModel[loc][self.abr]
-        
+
 
 #No_elev_threshold#        if bi or elv > SpeciesModel.params.elevationThreshold:
         #if bi > SpeciesModel.params.elevationThreshold:
-        
+
         if bi: return 0.0
 
         return self.P[waveAmp, meanSal] * dsp
-    
+
     def spread(self,loc):
         if self.dspClass == 3:
             waveAmp = SpeciesModel.params.waveAmp[loc]
             meanSal = SpeciesModel.params.meanSal[loc]
             elv     = SpeciesModel.params.heightAboveWater[loc]
-            bi      = SpeciesModel.params.biEstCond[loc]  
-            
+            bi      = SpeciesModel.params.biEstCond[loc]
+
             if bi: return 0.0
-            
+
             return self.P[waveAmp, meanSal]
         else:
             return 0.0
-                
+
 
 class SwampForestModel(SpeciesModel):
-    def __init__(self, index=0, name='', abr='', habitat = '', dspClass=0, fibsScore=0, cover=0, loc=0, Pdata=None, Ddata=None):
-        SpeciesModel.__init__(self, index, name, abr, 'SwampForestModel', habitat, dspClass, fibsScore, cover, loc)
+    def __init__(self, index=0, name='', abr='', habitat = '', dspClass=0, ffibsScore=0, cover=0, loc=0, Pdata=None, Ddata=None):
+        SpeciesModel.__init__(self, index, name, abr, 'SwampForestModel', habitat, dspClass, ffibsScore, cover, loc)
         self.P     = function.Function2DFast(Pdata['waValue'], Pdata['salValue'], Pdata['rate'])
         self.D     = function.Function2DFast(Ddata['waValue'], Ddata['salValue'], Ddata['rate'])
 
@@ -422,14 +445,14 @@ class SwampForestModel(SpeciesModel):
         if bi: return 0.0
 
         return self.P[waveAmp, meanSal] * dsp * est
-    
+
     def spread(self,loc):
         if self.dspClass == 3:
             waveAmp = SpeciesModel.params.waveAmp[loc]
             meanSal = SpeciesModel.params.meanSal[loc]
             est     = SpeciesModel.params.treeEstCond[loc]
             bi      = SpeciesModel.params.biEstCond[loc]
-            
+
             if bi: return 0.0
 
             return self.P[waveAmp, meanSal] * est
@@ -442,8 +465,8 @@ class SwampForestModel(SpeciesModel):
 ##\detail
 #
 class SAVModel(SpeciesModel):
-    def __init__(self, index=0, name='', abr='', habitat = '', dspClass=0, fibsScore=0, cover=0, loc=0, SAVData=None):
-        SpeciesModel.__init__(self, index, name, abr, 'SAVModel', habitat, dspClass,fibsScore, cover, loc)
+    def __init__(self, index=0, name='', abr='', habitat = '', dspClass=0, ffibsScore=0, cover=0, loc=0, SAVData=None):
+        SpeciesModel.__init__(self, index, name, abr, 'SAVModel', habitat, dspClass,ffibsScore, cover, loc)
 
         if SAVData == None:
             errorMessage = 'SAVModel: Error: No SAVData object passed to constructor (i.e. __init__() )\n'
@@ -474,8 +497,8 @@ class SAVModel(SpeciesModel):
 ##\detail
 #
 class BarrierIslandModel(SpeciesModel):
-    def __init__(self, index=0, name='', abr='', habitat='', dspClass=0, fibsScore=0, cover=0, loc=0, Pdata=None, Ddata=None):
-        SpeciesModel.__init__(self, index, name, abr, 'BarrierIslandModel', habitat, dspClass, fibsScore, cover, loc)
+    def __init__(self, index=0, name='', abr='', habitat='', dspClass=0, ffibsScore=0, cover=0, loc=0, Pdata=None, Ddata=None):
+        SpeciesModel.__init__(self, index, name, abr, 'BarrierIslandModel', habitat, dspClass, ffibsScore, cover, loc)
         self.P = function.Function(Pdata['elvValue'], Pdata['rate'])
         self.D = function.Function(Ddata['elvValue'], Ddata['rate'])
 
@@ -504,8 +527,8 @@ class BarrierIslandModel(SpeciesModel):
 ##\detail
 #
 class FloatingMarshModel(EmergentWetlandModel):
-    def __init__(self, index=0, name='', abr='', habitat ='', dspClass=0, fibsScore=0, cover=0, loc=0, Pdata=None, Ddata=None):
-        EmergentWetlandModel.__init__(self, index, name, abr, habitat, dspClass, fibsScore, cover, loc, Pdata, Ddata)
+    def __init__(self, index=0, name='', abr='', habitat ='', dspClass=0, ffibsScore=0, cover=0, loc=0, Pdata=None, Ddata=None):
+        EmergentWetlandModel.__init__(self, index, name, abr, habitat, dspClass, ffibsScore, cover, loc, Pdata, Ddata)
         self.modelType = 'FloatingMarshModel'
         self.transList = None
 
@@ -538,9 +561,9 @@ class SpeciesModelList(dict):
     # should be divided into a set of separate tabbed sheets. One sheet should
     # be named "VegTypeNames". This sheet should list all the species to include
     # in the model. There should also be one table for each of the species included in the
-    # model. There are three exceptions to this: SAV, the Upland forest species and the
+    # model. There are three exceptions to this: SAV, the bottomland hardwood forest species and the
     # barrier island species. SAV parameters are read from the model configuration file.
-    # The barrier island species and the upland forest species are each represented by a single
+    # The barrier island species and the bottomland hardwood forest species are each represented by a single
     # sheet.
     #
     # The function performs the following steps:\n
@@ -610,21 +633,21 @@ class SpeciesModelList(dict):
             spModelType = spInfo['ModelType']
             spHabitat   = spInfo['Habitat']
             spDspClass  = spInfo['Dispersal Class']
-            spFIBSScore = spInfo['FIBS score']
+            spFFIBSScore = spInfo['FFIBS score']
 
             print(('SpeciesModelList: Msg: Configuring model for species ' + str(spSymbol) + ', model type is ' + spModelType + '.'))
 
             ###########################################
-            # Upland Forest Model
+            # Bottomland Hardwood Forest Model
             #
             ###########################################
-            if ( spModelType == 'UplandForestModel'):
+            if ( spModelType == 'BottomlandHardwoodForestModel'):
                 reader = function.ReadVegTable1D()
                 Pdata = None
                 Ddata = None
 
                 try:
-                    Pdata = reader.read(estFilename, 'UplandForest', spSymbol)
+                    Pdata = reader.read(estFilename, 'BottomlandHardwoodForest', spSymbol)
                 except RuntimeError as error:
                     errorMessage += str(error) + '\n'
                     errorMessage += 'SpeciesModelList: Error: error while working on species ' + str(spSymbol) + '\n'
@@ -634,7 +657,7 @@ class SpeciesModelList(dict):
 
 
                 try:
-                    Ddata = reader.read(mortFilename, 'UplandForest', spSymbol)
+                    Ddata = reader.read(mortFilename, 'BottomlandHardwoodForest', spSymbol)
                 except RuntimeError as error:
                     errorMessage += str(error) + '\n'
                     errorMessage += 'SpeciesModelList: Error: error while working on species ' + str(spSymbol) + '\n'
@@ -642,7 +665,7 @@ class SpeciesModelList(dict):
                     errorMessage += str(error) + '\n'
                     errorMessage += 'SpeciesModelList: Error: error while working on species ' + str(spSymbol) + '\n'
 
-                spModel = UplandForestModel(index=spID, name=spName, abr=spSymbol, habitat = spHabitat, dspClass=spDspClass, fibsScore=spFIBSScore, cover=0, loc=-1, Pdata=Pdata, Ddata=Ddata)
+                spModel = BottomlandHardwoodForestModel(index=spID, name=spName, abr=spSymbol, habitat = spHabitat, dspClass=spDspClass, ffibsScore=spFFIBSScore, cover=0, loc=-1, Pdata=Pdata, Ddata=Ddata)
                 self.__setitem__(spSymbol, spModel)
 
             ###########################################
@@ -671,7 +694,7 @@ class SpeciesModelList(dict):
                     errorMessage += str(error) + '\n'
                     errorMessage += 'SpeciesModelList: Error: error while working on species ' + str(spSymbol) + '\n'
 
-                spModel = EmergentWetlandModel(index=spID, name=spName, abr=spSymbol, habitat = spHabitat, dspClass=spDspClass, fibsScore=spFIBSScore, cover=0, loc=-1, Pdata=Pdata, Ddata=Ddata)
+                spModel = EmergentWetlandModel(index=spID, name=spName, abr=spSymbol, habitat = spHabitat, dspClass=spDspClass, ffibsScore=spFFIBSScore, cover=0, loc=-1, Pdata=Pdata, Ddata=Ddata)
                 self.__setitem__(spSymbol, spModel)
 
 
@@ -701,7 +724,7 @@ class SpeciesModelList(dict):
                     errorMessage += str(error) + '\n'
                     errorMessage += 'SpeciesModelList: Error: error while working on species ' + str(spSymbol) + '\n'
 
-                spModel = SwampForestModel(index=spID, name=spName, abr=spSymbol, habitat = spHabitat, dspClass=spDspClass, fibsScore=spFIBSScore, cover=0, loc=-1, Pdata=Pdata, Ddata=Ddata)
+                spModel = SwampForestModel(index=spID, name=spName, abr=spSymbol, habitat = spHabitat, dspClass=spDspClass, ffibsScore=spFFIBSScore, cover=0, loc=-1, Pdata=Pdata, Ddata=Ddata)
                 self.__setitem__(spSymbol, spModel)
 
 
@@ -731,7 +754,7 @@ class SpeciesModelList(dict):
                     errorMessage += str(error) + '\n'
                     errorMessage += 'SpeciesModelList: Error: error while working on species ' + str(spSymbol) + '\n'
 
-                spModel = FloatingMarshModel(index=spID, name=spName, abr=spSymbol, habitat = spHabitat, dspClass=spDspClass, fibsScore=spFIBSScore, cover=0, loc=-1, Pdata=Pdata, Ddata=Ddata)
+                spModel = FloatingMarshModel(index=spID, name=spName, abr=spSymbol, habitat = spHabitat, dspClass=spDspClass, ffibsScore=spFFIBSScore, cover=0, loc=-1, Pdata=Pdata, Ddata=Ddata)
                 self.__setitem__(spSymbol, spModel)
 
 
@@ -754,7 +777,7 @@ class SpeciesModelList(dict):
                     errorMessage += 'SpeciesModelList: Error : Dictionary key error. SAV table probably has wrong column headings\n'
                     errorMessage += 'SpeciesModelList: Error : '
 
-                spModel = SAVModel(index=spID, name=spName, abr=spSymbol, habitat=spHabitat, dspClass=spDspClass, fibsScore=spFIBSScore, cover=0, loc=-1, SAVData=savData)
+                spModel = SAVModel(index=spID, name=spName, abr=spSymbol, habitat=spHabitat, dspClass=spDspClass, ffibsScore=spFFIBSScore, cover=0, loc=-1, SAVData=savData)
                 self.__setitem__(spSymbol, spModel)
 
             ###########################################
@@ -785,7 +808,7 @@ class SpeciesModelList(dict):
                     errorMessage += str(error) + '\n'
                     errorMessage += 'SpeciesModelList: Error: error while working on species ' + str(spSymbol) + '\n'
 
-                spModel = BarrierIslandModel(index=spID, name=spName, abr=spSymbol, habitat=spHabitat, dspClass=spDspClass,fibsScore=spFIBSScore, cover=0, loc=-1, Pdata=Pdata, Ddata=Ddata)
+                spModel = BarrierIslandModel(index=spID, name=spName, abr=spSymbol, habitat=spHabitat, dspClass=spDspClass,ffibsScore=spFFIBSScore, cover=0, loc=-1, Pdata=Pdata, Ddata=Ddata)
                 self.__setitem__(spSymbol, spModel)
 
             ###########################################
@@ -793,7 +816,15 @@ class SpeciesModelList(dict):
             #
             ###########################################
             elif ( spModelType == 'NullModel'):
-                spModel = NullModel(index=spID, name=spName, abr=spSymbol, habitat=spHabitat, dspClass=spDspClass, fibsScore=spFIBSScore, cover=0, loc=-1)
+                spModel = NullModel(index=spID, name=spName, abr=spSymbol, habitat=spHabitat, dspClass=spDspClass, ffibsScore=spFFIBSScore, cover=0, loc=-1)
+                self.__setitem__(spSymbol, spModel)
+                
+            ###########################################
+            # Null Model Coverage
+            #
+            ###########################################
+            elif ( spModelType == 'NullModel_Coverage'):
+                spModel = NullModel_Coverage(index=spID, name=spName, abr=spSymbol, habitat=spHabitat, dspClass=spDspClass, ffibsScore=spFFIBSScore, cover=0, loc=-1)
                 self.__setitem__(spSymbol, spModel)
 
             ###########################################
@@ -991,20 +1022,31 @@ class Params(object):
             if not('BAREGRND_OLD' in self.initCond.table):
                 print ('Params: Msg: Adding BAREGRND_OLD class to the initial conditions because the type was not defined.')
                 self.initCond.table['BAREGRND_OLD'] = 0.0
-            if not('FIBS' in self.initCond.table):
-                print ('Params: Msg: Adding FIBS class to the initial conditions because the type was not defined.')
-                self.initCond.table['FIBS'] = numpy.nan #0.0 #numpy.nan
-            #just to test the new initial map vs. old 
-            if not('SCRO5' in self.initCond.table):
-                print ('Params: Msg: Adding SCRO5 class to the initial conditions because the type was not defined.')
-                self.initCond.table['SCRO5'] = 0.0
-            if not('SPCY' in self.initCond.table):
-                print ('Params: Msg: Adding SPCY class to the initial conditions because the type was not defined.')
-                self.initCond.table['SPCY'] = 0.0
-            
-            
-            #at this point, the initiCond.table is correct (values and nans only for FIBS)
-                
+            if not('FFIBS' in self.initCond.table):
+                print ('Params: Msg: Adding FFIBS class to the initial conditions because the type was not defined.')
+                self.initCond.table['FFIBS'] = -9999 #numpy.nan #0.0 #numpy.nan
+            if not('pL_BF' in self.initCond.table):
+                print ('Params: Msg: Adding pl_BF class to the initial conditions because the type was not defined.')
+                self.initCond.table['pL_BF'] = 0.0
+            if not('pL_SF' in self.initCond.table):
+                print ('Params: Msg: Adding pl_SF class to the initial conditions because the type was not defined.')
+                self.initCond.table['pL_SF'] = 0.0
+            if not('pL_FM' in self.initCond.table):
+                print ('Params: Msg: Adding pl_FM class to the initial conditions because the type was not defined.')
+                self.initCond.table['pL_FM'] = 0.0
+            if not('pL_IM' in self.initCond.table):
+                print ('Params: Msg: Adding pl_IM class to the initial conditions because the type was not defined.')
+                self.initCond.table['pL_IM'] = 0.0
+            if not('pL_BM' in self.initCond.table):
+                print ('Params: Msg: Adding pl_BM class to the initial conditions because the type was not defined.')
+                self.initCond.table['pL_BM'] = 0.0
+            if not('pL_SM' in self.initCond.table):
+                print ('Params: Msg: Adding pl_SM class to the initial conditions because the type was not defined.')
+                self.initCond.table['pL_SM'] = 0.0
+
+
+            #at this point, the initiCond.table is correct (values and nans only for FFIBS)
+
         except RuntimeError as error:
             errorMessage += str(error)
 
@@ -1104,6 +1146,7 @@ class Params(object):
 
 
         # Step 6.4: Open all the output files.
+        self.outputStrm.pop('OutputFile')
         for key in iter(self.outputStrm.keys()):
             try:
                 self.outputStrm[key] = self.open_file(key, 'w')
@@ -1230,8 +1273,8 @@ class Params(object):
 # keys for the dictionary are the abbreviated names, stored as a string, for
 # each of the species. The value for each entry in the dictionary is an object
 # instantiated from a class that inherits from SpeciesModel. That is, each value
-# is an object of one of the following classes: UplandForestModel, EmergentWetlandModel,
-# SAVModel, BarierIslandModel, FloatingMarshModel, or NullModel.
+# is an object of one of the following classes: BottomlandHardwoodForestModel, EmergentWetlandModel,
+# SAVModel, BarierIslandModel, FloatingMarshModel, NullModel_Coverage or NullModel.
 class PatchModel(dict):
     def __init__(self):
         dict.__init__(self)
@@ -1270,14 +1313,33 @@ class PatchModel(dict):
         #######################################################
 
 
+        # Step 1.05: Allow "weedy" species to establish on new bareground. If none can
+        # establish, then convert it to old bareground.
+        
+        if spCoverList['BAREGRND_NEW']>0.0:
+ #           for spName, spModel in itertools.filterfalse(lambda kv: kv[0] == 'BAREGRND_NEW' or kv[0] == 'BAREGRND_OLD' or kv[0] == 'SAV' or kv[0] == 'WATER' or kv[0] == 'FFIBS' or kv[1].modelType == 'FloatingMarshModel', list(spModelList.items())):
+    #technicaly not needed because spread will just be 0 for all the others... 
+            for spName, spModel in itertools.filterfalse(lambda kv: kv[1].modelType == 'NullModel' or kv[1] == 'NullModel_Coverage' or kv[1].modelType == 'FloatingMarshModel', list(spModelList.items())):             
+                spreadLikelihood    += spModel.spread(loc)
+            if spreadLikelihood:
+                for spName, spModel in itertools.filterfalse(lambda kv: kv[0] == 'BAREGRND_NEW' or kv[0]== 'BAREGRND_OLD' or kv[0]=='SAV' or kv[0]=='WATER' or kv[0] == 'FFIBS' or kv[1].modelType=='FloatingMarshModel', list(spModelList.items())):
+                    spread               = spModel.spread(loc)/spreadLikelihood
+                    spCoverList[spName] += spread * spCoverList['BAREGRND_NEW']
+            else:
+                spCoverList['BAREGRND_OLD'] += spCoverList['BAREGRND_NEW']
+
+        spCoverList['BAREGRND_NEW']=0.0 #it either already was 0.0, or it was just reassigned to BG OLD or vegetation (meaning it now needs to be 0.0)
+        
+
         # Step 1.1: Work out the loss of cover for all species.
         # Skip the Floating Marsh types, because they are handled separately.
         # Skip the SAV and WATER types because they do not "senesce" in the same way
         # as the other types, and because their growth is not computed the same way
         # as the other types.
 
-        
-        for spName, spModel in itertools.filterfalse(lambda kv: kv[0] == 'BAREGRND_NEW' or kv[0] == 'BAREGRND_OLD' or kv[0] == 'SAV' or kv[0] == 'WATER' or kv[0] == 'FIBS' or kv[1].modelType == 'FloatingMarshModel', list(spModelList.items())):
+        spreadLikelihood = 0.0
+
+        for spName, spModel in itertools.filterfalse(lambda kv: kv[0] == 'BAREGRND_NEW' or kv[0] == 'BAREGRND_OLD' or kv[0] == 'SAV' or kv[0] == 'WATER' or kv[0] == 'FFIBS' or kv[1].modelType == 'FloatingMarshModel', list(spModelList.items())):
             cover                = spCoverList[spName]
             death                = spModel.senescence(loc)
             #occupied            += cover
@@ -1285,80 +1347,57 @@ class PatchModel(dict):
             spCoverList[spName] -= death * cover
             growthLikelihood    += spModel.growth(loc)
             spreadLikelihood    += spModel.spread(loc)
-            
+
             growth = 999
             spread = 999
 
-        
-        #unoccupied = max(     0, min( (1.0-occupied)+lost, 1.0)     )
-        # Add in the area lost to the area currently unoccupied.
 
         unoccupied += lost
 
-        spCoverList['BAREGRND_NEW'] = unoccupied #Newly dead areas become new 
+        spCoverList['BAREGRND_NEW'] = unoccupied #Newly dead areas become new
 
         # step 1.15: Work out the total area that is currently unoccupied, i.e. area in BAREGRND_OLD and newly dead area (same as BAREGROUND_NEW)
         # This is the area available for a terrestrial species to claim via establishment
-        unoccupied       += spCoverList['BAREGRND_OLD'] 
+        unoccupied       += spCoverList['BAREGRND_OLD']
         unoccupied_0 = unoccupied
+
 
         # Step 1.2: Work out the gain in cover for all species.
         # Again, skip SAV, WATER and the floating marsh types because they do not
         # operate the same way as the other types.
         if growthLikelihood:
-            for spName, spModel in itertools.filterfalse(lambda kv: kv[0] == 'BAREGRND_NEW' or kv[0]== 'BAREGRND_OLD' or kv[0]=='SAV' or kv[0]=='WATER' or kv[0] == 'FIBS' or kv[1].modelType=='FloatingMarshModel', list(spModelList.items())):
+            for spName, spModel in itertools.filterfalse(lambda kv: kv[0] == 'BAREGRND_NEW' or kv[0]== 'BAREGRND_OLD' or kv[0]=='SAV' or kv[0]=='WATER' or kv[1].modelType == 'NullModel' or kv[1].modelType=='FloatingMarshModel', list(spModelList.items())):
                 growth               = spModel.growth(loc)/growthLikelihood
                 spCoverList[spName] += growth * unoccupied_0
                 unoccupied          -= growth * unoccupied_0 #Should always end up at 0
- 
+
         else:
             if spreadLikelihood and firstyear == 0:
-                for spName, spModel in itertools.filterfalse(lambda kv: kv[0] == 'BAREGRND_NEW' or kv[0]== 'BAREGRND_OLD' or kv[0]=='SAV' or kv[0]=='WATER' or kv[0] == 'FIBS' or kv[1].modelType=='FloatingMarshModel', list(spModelList.items())):
+                for spName, spModel in itertools.filterfalse(lambda kv: kv[0] == 'BAREGRND_NEW' or kv[0]== 'BAREGRND_OLD' or kv[0]=='SAV' or kv[0]=='WATER' or kv[1].modelType == 'NullModel' or kv[1].modelType=='FloatingMarshModel', list(spModelList.items())):
                     spread               = spModel.spread(loc)/spreadLikelihood
                     spCoverList[spName] += spread * unoccupied_0
-                    unoccupied          -= spread * unoccupied_0 #Should always end up at 0   
-         
-        if loc[0] == 243 and loc[1] == 714:
-            print('The growthliklihood, growth, spreadliklihood, spread, and firstyear are:')
-            print(growthLikelihood)
-            print(growth)
-            print(spreadLikelihood)
-            print(spread)
-            print(firstyear)
-            
-        
+                    unoccupied          -= spread * unoccupied_0 #Should always end up at 0
+
+
         if growthLikelihood:
             spCoverList['BAREGRND_NEW']=unoccupied #should be the same as setting to 0
             spCoverList['BAREGRND_OLD']=unoccupied #should be the same as setting to 0
         elif spreadLikelihood and firstyear==0:
             spCoverList['BAREGRND_NEW']=unoccupied #should be the same as setting to 0
             spCoverList['BAREGRND_OLD']=unoccupied #should be the same as setting to 0
-            # if nothing established, then BAREGRND NEW/OLD can stay the same
-        # Note: No BAREGROUND (new or old) exists if something can grow      
-        # else:
-        #     print('PatchModel: Msg: There were no species able to occupy the vacated area.')
-        #     print('PatchModel: Msg: Unoccupied area = ' + str(unoccupied))
-        #     print('PatchModel: Msg: growthLikelihood = ' + str(growthLikelihood))
-        #     print('PatchModel: Msg: Local conditions are:' )
-        #     print('PatchModel: Msg: standard deviation of stage = ' + str(self.params.waveAmp[loc]) )
-        #     print('PatchModel: Msg: mean salinity               = ' + str(self.params.meanSal[loc]) )
-        #     print()
 
-        #spCoverList['BAREGRND'] = unoccupied
 
         #######################################################
         # Step 2: Work out the change in cover for the floating
         #         types.
         #
         #######################################################
-        
-
 
         # Step 2.1: Compute the area lost per floating species and the total area lost by all floating species
         growthLikelihood    = 0.0
         deadThinFloating    = 0.0
         deadThickFloating   = 0.0
-        
+
         # For thin mat, the loss is:
         spModel = spModelList['ELBA2_Flt']
         cover = spCoverList['ELBA2_Flt']
@@ -1366,7 +1405,7 @@ class PatchModel(dict):
         spCoverList['ELBA2_Flt']    -= death * cover
         deadThinFloating += death*cover
         growthLikelihood       += spModel.growth(loc)
-        
+
         #For thick mat, the loss is:
         spModel = spModelList['PAHE2_Flt']
         cover = spCoverList['PAHE2_Flt']
@@ -1374,8 +1413,8 @@ class PatchModel(dict):
         spCoverList['PAHE2_Flt']    -= death * cover
         deadThickFloating += death*cover
         growthLikelihood       += spModel.growth(loc)
- 
-        # Step 2.2: Compute the area gained by each floating species.       
+
+        # Step 2.2: Compute the area gained by each floating species.
         #If there can be growth, it can be on dead thin mat, dead thick mat, or bareground float
 
         if growthLikelihood:
@@ -1399,29 +1438,29 @@ class PatchModel(dict):
         totalWater           = spCoverList['SAV'] + spCoverList['WATER']
         spCoverList['SAV']   = SAVModel.growth(loc) * totalWater
         spCoverList['WATER'] = totalWater - spCoverList['SAV']
-               
+
         #######################################################
         # Step 4: Decrease in coverage due to acute salinity stress
         #
         #######################################################
-        
+
         acute_sal_stress  = SpeciesModel.params.acuteSal[loc]
-        
+
         if acute_sal_stress:
             # Step 4.1: Eliminate coverage of flotant marsh. It follows the same process as step 2 with thin mat becoming open water and thick becoming bareground_flt
             deadThinFloating    = spCoverList['ELBA2_Flt']
             deadThickFloating   = spCoverList['PAHE2_Flt']
             spCoverList['ELBA2_Flt'] -= spCoverList['ELBA2_Flt']
             spCoverList['PAHE2_Flt'] -= spCoverList['PAHE2_Flt']
-            spCoverList['WATER']    += deadThinFloating 
+            spCoverList['WATER']    += deadThinFloating
             spCoverList['DEAD_Flt'] += deadThinFloating  #passed to Morph, where it is set as water 1 m deep
             spCoverList['BAREGRND_Flt']    += deadThickFloating
-            
+
             # Step 4.2: Eliminate coverage of fresh attached marsh coverage.
 
-            for spName, spModel in filter(lambda kv: kv[1].modelType == 'EmergentWetlandModel' and kv[1].habitat == 'Fresh', iter(spModelList.items())):     
+            for spName, spModel in filter(lambda kv: kv[1].modelType == 'EmergentWetlandModel' and kv[1].habitat == 'Fresh', iter(spModelList.items())):
                 spCoverList['BAREGRND_NEW'] += spCoverList[spName]
-                spCoverList[spName] -= spCoverList[spName]#wipes out the fresh attached marsh    
+                spCoverList[spName] -= spCoverList[spName]#wipes out the fresh attached marsh
 
         #######################################################
         # Step 5: Check sum
@@ -1430,39 +1469,103 @@ class PatchModel(dict):
 
         checkSum = 0.0
        # for spName in filter( lambda spName : spName != 'DEAD_Flt' or spName != 'FIBS', iter(spModelList.keys())):
-        for spName in itertools.filterfalse(lambda k: k == 'DEAD_Flt' or k == 'FIBS', iter(spModelList.keys())):           
-            checkSum += spCoverList[spName]
 
+        for spName, spModel in itertools.filterfalse(lambda kv: kv[1].modelType == 'NullModel', iter(spModelList.items())):
+            checkSum += spCoverList[spName]
 
         tol = 0.005
         if not( (1.0 - tol) < checkSum and checkSum < (1.0 + tol) ):
             print(('PatchMod: Error: checkSum is out of range. checkSum = ' + str(checkSum) + ' should be 1.0'))
+      #      if numpy.isnan(checkSum):  
+      #      print(loc)
+       #     print(spCoverList)
+        #   print()
 
-            
+
+
          #######################################################
-        # Step 6: Calculate the FIBS score
+        # Step 6: Calculate the FFIBS score
         #
-        #######################################################         
-     #   fibsList  = []
-     #   fibsCover = []
+        #######################################################
+
      # FFIBS is Forested, Fresh, Intermediate, Brackish, Saline and does not include the flotant
-        fibsValues = 0.0
-        fibsCover = 0.0
-        for spName, spModel in iter(spModelList.items()): 
-            if ~numpy.isnan(spModel.fibsScore):
-                fibsValues += (spModel.fibsScore*spCoverList[spName])
-                fibsCover += spCoverList[spName]
-        if fibsValues:
-            spCoverList['FIBS'] = fibsValues/fibsCover
-                
+        ffibsValues = 0.0
+        ffibsCover = 0.0
+        for spName, spModel in iter(spModelList.items()):
+            if spModel.ffibsScore>-9999:
+          #  if ~numpy.isnan(spModel.ffibsScore):
+                ffibsValues += (spModel.ffibsScore*spCoverList[spName])
+                ffibsCover += spCoverList[spName]
+        if ffibsValues:
+            spCoverList['FFIBS'] = ffibsValues/ffibsCover
+        else:
+            spCoverList['FFIBS']=-9999
+
                # fibsList.append(spModel.fibsScore*spCoverList[spName])
                 #fibsCover.append(spCoverList[spName])
-           
-            #fibsCover.append(spCoverList[spName]*(spModel.fibsScore/spModel.fibsScore)) #rather goofy way to exclude coverages that don't have a FIBS score, but it works         
+
+            #fibsCover.append(spCoverList[spName]*(spModel.fibsScore/spModel.fibsScore)) #rather goofy way to exclude coverages that don't have a FIBS score, but it works
         #if sum(~numpy.isnan(fibsCover)) > 0:
           #  spCoverList['FIBS'] = numpy.nansum(fibsList)/numpy.nansum(fibsCover)
+          
+         #######################################################
+        # Step 7: Calculate the percent of total land for 
+        # bottomland hardwood forest, swamp forest, fresh marsh, inter. marsh, brackish marsh, saline marsh
+        #
+        #######################################################
+        BI = 0.0
+        for spName, spModel in filter(lambda kv: kv[1].modelType == 'BarrierIslandModel', iter(spModelList.items())):
+                BI += spCoverList[spName]     
+                
+        total_vegetated_land = ffibsCover + BI ####BARRIER ISLAND SPECIES ARE COUNTED WITH SALINE MARSH 
         
+        if total_vegetated_land > 0:
+            BF = 0.0
+            for spName, spModel in filter(lambda kv: kv[1].modelType == 'BottomlandHardwoodForestModel', iter(spModelList.items())):
+                BF += spCoverList[spName]        
             
+            SF = 0.0
+            for spName, spModel in filter(lambda kv: kv[1].modelType == 'SwampForestModel', iter(spModelList.items())):
+                SF += spCoverList[spName]
+    
+            FM = 0.0
+            for spName, spModel in filter(lambda kv: kv[1].modelType == 'EmergentWetlandModel' and kv[1].habitat == 'Fresh' , iter(spModelList.items())):
+                FM += spCoverList[spName]        
+            
+            IM = 0.0
+            for spName, spModel in filter(lambda kv: kv[1].modelType == 'EmergentWetlandModel' and kv[1].habitat == 'Intermediate', iter(spModelList.items())):
+                IM += spCoverList[spName]
+       
+            BM = 0.0
+            for spName, spModel in filter(lambda kv: kv[1].modelType == 'EmergentWetlandModel' and kv[1].habitat == 'Brackish', iter(spModelList.items())):
+                BM += spCoverList[spName]        
+            
+            SM = 0.0
+            for spName, spModel in filter(lambda kv: kv[1].modelType == 'EmergentWetlandModel' and kv[1].habitat == 'Saline', iter(spModelList.items())):
+                SM += spCoverList[spName]
+            
+            for spName, spModel in filter(lambda kv: kv[1].modelType == 'BarrierIslandModel', iter(spModelList.items())):
+                SM += spCoverList[spName] 
+             
+            spCoverList['pL_BF'] = BF/total_vegetated_land
+            spCoverList['pL_SF'] = SF/total_vegetated_land
+            numpy.seterr('raise') 
+            spCoverList['pL_FM'] = FM/total_vegetated_land
+            spCoverList['pL_IM'] = IM/total_vegetated_land
+            spCoverList['pL_BM'] = BM/total_vegetated_land
+            spCoverList['pL_SM'] = SM/total_vegetated_land
+
+        else:
+            spCoverList['pL_BF'] = 0.0
+            spCoverList['pL_SF'] = 0.0
+            spCoverList['pL_FM'] = 0.0
+            spCoverList['pL_IM'] = 0.0
+            spCoverList['pL_BM'] = 0.0
+            spCoverList['pL_SM'] = 0.0
+        
+      
+        
+
     #def copy_to_str(self, dataFormat='{}'):
     #    ret = ''
     #    sep = ''
@@ -1570,7 +1673,7 @@ class DispersalModel(object):
     def __init__(self):
         self.patchIndexLandscape = landscape.Landscape()
         self.patchDict           = dict()
-            
+
     def config(self, params):
         self.patchIndexLandscape.copy(params.initCond)
 
@@ -1614,40 +1717,40 @@ class DispersalModel(object):
     def compute_local_dsp(self, ret):
 
         #row,col      = ret['loc']
-        ptr          = ret['spFreq'] 
+        ptr          = ret['spFreq']
         neighborListMoore = ret['neighborList']
         neighborListExt = ret['neighborListExt']
-  
+
   #      for spName, spModel in iter(WetlandMorphModel.dynModel.spModelList.items()):
-        
+
        # dspClass     = spModel.dspClass
        # total = 0.0
 
         for sp in iter(ptr.keys()):
             ptr[sp] = 0
-        
+
         for sp in iter(ptr.keys()):
-            
+
             dspClass = WetlandMorphModel.dynModel.spModelList[sp].dspClass
             neighborList = neighborListMoore
-            
+
             if dspClass  > 1:
                 neighborList = neighborListExt
             elif dspClass == 1:
                 neighborList = neighborListMoore
             else:
                 neighborList = []
-            
+
             for neighbor in neighborList:
                 patchCoverList = DispersalModel.dynModel[neighbor]
                 ptr[sp] += patchCoverList[sp]
-            
+
             ptr[sp] /= max(len(neighborList),1)
-            
+
                 #total += patchCoverList[sp]
-                
-                ## 
-                
+
+                ##
+
        # for neighbor in neighborListExt:
         #    patchCoverList = DispersalModel.dynModel[neighbor]
          #   if maddie == 10:
@@ -1685,14 +1788,14 @@ class DispersalModel(object):
        # if total:
         #    for sp in iter(ptr.keys()):
          #       ptr[sp] /= total
-        
-        
+
+
     def update(self):
         for loc in filter( lambda key: key != self.patchIndexLandscape.nodata_value, iter(self.patchDict.keys())):
             self.compute_local_dsp(self.patchDict[loc])
 
 
-                
+
 
 
 ##\class WetlandMorphModel
@@ -1708,49 +1811,94 @@ class WetlandMorphModel:
         self.landWater = params.landWater
 
     def update_patch(self, newLand, spCoverList, spModelList):
-        # Step 1: Figure out how much land there is currently.
-
+        # Step 1: Figure out how much land there is currently. For 2023, morph land = vegetated area + bareground + flotant
+        
         curLand = 0.0
-        for spName, spCover, spModel in itertools.filterfalse( lambda kv: kv[0]=='SAV' or kv[0]=='WATER' or kv[0]=='FIBS' or kv[0]=='DEAD_Flt' or kv[2].modelType == 'FloatingMarshModel', iter(spModelList.items())):
+        for spName, spModel in itertools.filterfalse( lambda kv: kv[0]=='SAV' or kv[0]=='WATER' or kv[0]=='NOTMOD' or kv[1].modelType == 'NullModel', iter(spModelList.items())):
+        #for spName, spModel in itertools.filterfalse (lambda kv: kv[0] == 'SAV' or kv[0] == 'WATER' or kv[1].modelType == 'FloatingMarshModel' or kv[1].modelType == 'NullModel', iter(spModelList.items())):
             curLand += spCoverList[spName]
-            
+
         # Step 1.5: Reset the bareground ages and Dead flotant. New bareground should be zeroed and added to old
         spCoverList['BAREGRND_OLD'] += spCoverList['BAREGRND_NEW']
         spCoverList['BAREGRND_NEW'] = 0.0
-        spCoverList['Dead_Flt'] = 0.0
+        spCoverList['Dead_Flt'] = 0.0 
 
         # Step 2: Adjust the types based on the differences between
         # the current land cover and the new land cover provided by the land/water file.
+        flotant = 0.0
+        for spName, spModel in filter( lambda kv: kv[1].modelType == 'FloatingMarshModel', iter(spModelList.items())):
+            flotant += spCoverList[spName]
+
+      #  curLand = curLand+flotant
 
         # Step 2.1: If the current land and new land are the same, there is nothing to do.
         if curLand == newLand: return
 
         # Step 2.2: LAND GAIN - If there is less land in the current veg model state than indicated by the
-        # land/water file, then increase the amount of area in land types and decrease the area
-        # of water types. All the new land is classified as BAREGRND at this point.
+        # land/water file, then increase the bareground and decrease the area
+        # of water types. All the new land is classified as new bareground at this point.
         if curLand < newLand: # curWater > newWater
-            deltaLand                = newLand - curLand
-            spCoverList['BAREGRND_OLD'] += deltaLand
 
-            curWater                 = 1.0 - curLand
-            newWater                 = 1.0 - newLand
-            scaleWater               = newWater/curWater # scaleWater < 1.0
-            spCoverList['WATER']    *= scaleWater
-            spCoverList['SAV']      *= scaleWater
+           curWater                 = 1.0 - (curLand+spCoverList['NOTMOD'])
+           newWater                 = 1.0 - (newLand+spCoverList['NOTMOD'])
+         
+           # curWater                 = 1.0 - (curLand+flotant)
+           # newWater                 = 1.0 - (newLand+flotant)         
+           if curWater == 0:
+               print('The current water is zero, but it is trying to reduce it due to land gain. Ignore for now.')
+           else:
+               deltaLand                = newLand - curLand
+               spCoverList['BAREGRND_NEW'] += deltaLand
+               scaleWater               = newWater/curWater # scaleWater < 1.0
+               spCoverList['WATER']    *= scaleWater
+               spCoverList['SAV']      *= scaleWater
+
+         #   if giveoutput == 1:
+         #       print('the cur water, newwater, and scaleWater are:')
+         #       print(curWater)
+         #       print(newWater)
+         #       print(scaleWater)
+                
+          #      checkSum = 0.0
+          #      for spName, spModel in itertools.filterfalse(lambda kv: kv[1].modelType == 'NullModel', iter(spModelList.items())):
+          #          checkSum += spCoverList[spName]
+          #      tol = 0.005
+          #      if not( (1.0 - tol) < checkSum and checkSum < (1.0 + tol) ):
+          #         print(('MorphMod, land gain: Error: checkSum is out of range. checkSum = ' + str(checkSum) + ' should be 1.0'))
+          #         for spName, spModel in itertools.filterfalse(lambda kv: kv[1].modelType == 'NullModel', iter(spModelList.items())):
+          #             print(spName)
+          #             print(spCoverList[spName]) 
+
+
+
         # Step 2.3: LAND LOSS - If there is more land in the current veg model state than indicated by the
         # land/water file, then decrease the area of all land types and increase the amount of water.
+        # The bareground is reduced first, and if that is less than the total change, the vegetated land is reduced
         else: # curLand > newLand
             deltaLand             = curLand - newLand
-            spCoverList['WATER'] += deltaLand
-            if spCoverList['BAREGRND_OLD'] >= deltaLand:
-                spCoverList['BAREGRND_OLD'] -= deltaLand
-            else:              
-                scaleLand = newLand/(curLand - spCoverList['BAREGRND_OLD'])# scaleLand < 1.0
-                spCoverList['BAREGRND_OLD'] = 0.0
-                for spName, spCover in itertools.filterfalse( lambda kv: kv[0]=='SAV' or kv[0]=='WATER' or kv[0]=='BAREGRND_OLD', iter(spModelList.items())):
-                    spCoverList[spName] *= scaleLand
-                
-            
+            flotant = 0.0
+            for spName, spModel in filter( lambda kv: kv[1].modelType == 'FloatingMarshModel', iter(spModelList.items())):
+               flotant += spCoverList[spName]
+               
+            if ((spCoverList['WATER']+spCoverList['NOTMOD'])==1):
+                print('The whole cell is water and not mod, but it is trying to reduce land. Ignore for now.') 
+                    
+            elif spCoverList['BAREGRND_OLD'] >= deltaLand:
+                    spCoverList['BAREGRND_OLD'] -= deltaLand
+                    spCoverList['WATER'] += deltaLand
+            else:
+                if (curLand - spCoverList['BAREGRND_OLD'] - flotant)<= 0.0:
+                    print('The current land minus BG old and flotant are 0, but it is trying to reduce the land. Ignore for now.')
+                else:
+                    scaleLand = (newLand-flotant)/(curLand - spCoverList['BAREGRND_OLD'] - flotant)# scaleLand < 1.0
+                    #scaleLand = (newLand-spCoverList['NOTMOD'])/(curLand - spCoverList['BAREGRND_OLD'] - spCoverList['NOTMOD'])# scaleLand < 1.0
+                    spCoverList['BAREGRND_OLD'] = 0.0
+                    # because BG has been knocked out, it's ok to exclude all NullModel_Coverage types from this loop: only vegetated land should be reduced
+                    for spName, spModel in itertools.filterfalse( lambda kv: kv[0]=='SAV' or kv[1].modelType == 'NullModel' or kv[1].modelType == 'NullModel_Coverage' or kv[1].modelType == 'FloatingMarshModel', iter(spModelList.items())):
+                        spCoverList[spName] *= scaleLand
+                    spCoverList['WATER'] += deltaLand   
+                     
+            #elif (curLand - spCoverList['BAREGRND_OLD'] - flotant) <= 0:
 
         # Done
         return
@@ -1758,8 +1906,13 @@ class WetlandMorphModel:
     def update(self):
         for loc in filter( lambda key: key != WetlandMorphModel.dynModel.nodata_value, iter(WetlandMorphModel.dynModel.table.keys())):
             pos = WetlandMorphModel.dynModel.locList[loc]
+       
             newLand = self.landWater[pos]/100.0
             if newLand < 0: continue
+           # if loc == 154037:
+           #     giveoutput = 1
+           # else:
+           #     giveoutput = 0
             self.update_patch(newLand, WetlandMorphModel.dynModel.table[loc], WetlandMorphModel.dynModel.spModelList)
 
 
@@ -1926,7 +2079,7 @@ class Model(object):
         plantingmodel.PlantingModel.dynModel     = self.dynModel
 
     def config(self, argv):
-        print ('Model: Msg: This is LAVegMod V2.2 (model_v2.py)')
+        print ('Model: Msg: This is LAVegMod V3 (model_v3.py)')
 
         print ('Model: Msg: Reading configuration information')
         self.params.config(argv)
@@ -1950,8 +2103,8 @@ class Model(object):
         totalSW   = StopWatch()
 
         self.eventQueue.add_event(              event.GenericEvent(event.Time(self.params.startYear,    0) , name='StopWatch', callable=totalSW) )
-        self.eventQueue.add_event(              event.MsgEvent(event.Time(self.params.startYear,  100),                                                                       stream=self.params.outputStrm['OutputFile'] , msg='# Year = ' + str(self.params.startYear))    )
-        self.eventQueue.add_event(landscape.WriteASCIIGridPlus(event.Time(self.params.startYear,  200), name='WriteASCIIGrid: Msg: Writing model output',                     stream=self.params.outputStrm['OutputFile'],              landscape=self.dynModel))
+    #   self.eventQueue.add_event(              event.MsgEvent(event.Time(self.params.startYear,  100),                                                                       stream=self.params.outputStrm['OutputFile'] , msg='# Year = ' + str(self.params.startYear))    )
+    #    self.eventQueue.add_event(landscape.WriteASCIIGridPlus(event.Time(self.params.startYear,  200), name='WriteASCIIGrid: Msg: Writing model output',                     stream=self.params.outputStrm['OutputFile'],              landscape=self.dynModel))
         for year in range(self.params.startYear+1, self.params.endYear+1):
             self.eventQueue.add_event(          event.GenericEvent(event.Time(year,  100), name='StopWatch', callable=perYearSW ) )
             self.eventQueue.add_event(         event.MsgEvent(event.Time(year,  200), msg='Year = ' + str(year))    )
@@ -1966,8 +2119,8 @@ class Model(object):
             self.eventQueue.add_event(landscape.ReadASCIIGrid(event.Time(year, 1000), name='ReadASCIIGrid: Msg: Reading tree establishment data',           stream=self.params.inputStrm['TreeEstCondFile'],          landscape=self.params.treeEstCond))
             self.eventQueue.add_event(       ModelUpdateEvent(event.Time(year, 1100), name='ModelUpdateEvent: Msg: Updating veg dynamics',                  model=self.dynModel  )  )
             self.eventQueue.add_event(       ModelUpdateEvent(event.Time(year, 1200), name='ModelUpdateEvent: Msg: Updating dispersal model',               model=self.dspModel  )  )
-            self.eventQueue.add_event(         event.MsgEvent(event.Time(year, 1300),                                                                       stream=self.params.outputStrm['OutputFile'] , msg='# Year = ' + str(year))    )
-            self.eventQueue.add_event(landscape.WriteASCIIGridPlus(event.Time(year, 1400), name='WriteASCIIGrid: Msg: Writing model output',                stream=self.params.outputStrm['OutputFile'],              landscape=self.dynModel))
+           # self.eventQueue.add_event(         event.MsgEvent(event.Time(year, 1300),                                                                       stream=self.params.outputStrm['OutputFile'] , msg='# Year = ' + str(year))    )
+           # self.eventQueue.add_event(landscape.WriteASCIIGridPlus(event.Time(year, 1400), name='WriteASCIIGrid: Msg: Writing model output',                stream=self.params.outputStrm['OutputFile'],              landscape=self.dynModel))
             self.eventQueue.add_event(         event.GenericEvent(event.Time(year, 1600), name='StopWatch', callable=perYearSW ) )
             self.eventQueue.add_event(       event.PauseEvent(event.Time(year, 2000)))
 
