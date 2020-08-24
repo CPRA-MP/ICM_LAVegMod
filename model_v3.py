@@ -1821,7 +1821,7 @@ class WetlandMorphModel:
         # Step 1.5: Reset the bareground ages and Dead flotant. New bareground should be zeroed and added to old
         spCoverList['BAREGRND_OLD'] += spCoverList['BAREGRND_NEW']
         spCoverList['BAREGRND_NEW'] = 0.0
-        spCoverList['Dead_Flt'] = 0.0 
+        spCoverList['DEAD_Flt'] = 0.0 
 
         # Step 2: Adjust the types based on the differences between
         # the current land cover and the new land cover provided by the land/water file.
