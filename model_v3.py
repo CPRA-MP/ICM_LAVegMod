@@ -1496,7 +1496,7 @@ class PatchModel(dict):
           #  if ~numpy.isnan(spModel.ffibsScore):
                 ffibsValues += (spModel.ffibsScore*spCoverList[spName])
                 ffibsCover += spCoverList[spName]
-        if ffibsValues:
+        if ffibsCover:
             spCoverList['FFIBS'] = ffibsValues/ffibsCover
         else:
             spCoverList['FFIBS']=-9999
@@ -1810,110 +1810,79 @@ class WetlandMorphModel:
     def config(self, params):
         self.landWater = params.landWater
 
-    def update_patch(self, newLand, spCoverList, spModelList):
-        # Step 1: Figure out how much land there is currently. For 2023, morph land = vegetated area + bareground + flotant
+    def update_patch(self, newWater, spCoverList, spModelList):
+        # Step 1: Figure out how much water there is currently (prior to 2023, Morph output the amount of land). Sum water and SAV to calculate the equivalent in LAVegMod
         
-        curLand = 0.0
-        for spName, spModel in itertools.filterfalse( lambda kv: kv[0]=='SAV' or kv[0]=='WATER' or kv[0]=='NOTMOD' or kv[1].modelType == 'NullModel', iter(spModelList.items())):
-        #for spName, spModel in itertools.filterfalse (lambda kv: kv[0] == 'SAV' or kv[0] == 'WATER' or kv[1].modelType == 'FloatingMarshModel' or kv[1].modelType == 'NullModel', iter(spModelList.items())):
-            curLand += spCoverList[spName]
-
+        curWater = spCoverList['WATER'] + spCoverList['SAV']
+        
         # Step 1.5: Reset the bareground ages and Dead flotant. New bareground should be zeroed and added to old
         spCoverList['BAREGRND_OLD'] += spCoverList['BAREGRND_NEW']
         spCoverList['BAREGRND_NEW'] = 0.0
         spCoverList['DEAD_Flt'] = 0.0 
+        
 
         # Step 2: Adjust the types based on the differences between
-        # the current land cover and the new land cover provided by the land/water file.
-        flotant = 0.0
-        for spName, spModel in filter( lambda kv: kv[1].modelType == 'FloatingMarshModel', iter(spModelList.items())):
-            flotant += spCoverList[spName]
-
-      #  curLand = curLand+flotant
-
-        # Step 2.1: If the current land and new land are the same, there is nothing to do.
-        if curLand == newLand: return
-
-        # Step 2.2: LAND GAIN - If there is less land in the current veg model state than indicated by the
+        # the current water cover and the new water cover provided by the land/water file.
+        
+        # Step 2.1: If the current water and new water are the same, there is nothing to do.
+        if curWater == newWater: return  
+        
+        
+        # Step 2.2: LAND GAIN - If there is more water in the current veg model state than indicated by the
         # land/water file, then increase the bareground and decrease the area
         # of water types. All the new land is classified as new bareground at this point.
-        if curLand < newLand: # curWater > newWater
-
-           curWater                 = 1.0 - (curLand+spCoverList['NOTMOD'])
-           newWater                 = 1.0 - (newLand+spCoverList['NOTMOD'])
-         
-           # curWater                 = 1.0 - (curLand+flotant)
-           # newWater                 = 1.0 - (newLand+flotant)         
-           if curWater == 0:
-               print('The current water is zero, but it is trying to reduce it due to land gain. Ignore for now.')
-           else:
-               deltaLand                = newLand - curLand
-               spCoverList['BAREGRND_NEW'] += deltaLand
-               scaleWater               = newWater/curWater # scaleWater < 1.0
-               spCoverList['WATER']    *= scaleWater
-               spCoverList['SAV']      *= scaleWater
-
-         #   if giveoutput == 1:
-         #       print('the cur water, newwater, and scaleWater are:')
-         #       print(curWater)
-         #       print(newWater)
-         #       print(scaleWater)
-                
-          #      checkSum = 0.0
-          #      for spName, spModel in itertools.filterfalse(lambda kv: kv[1].modelType == 'NullModel', iter(spModelList.items())):
-          #          checkSum += spCoverList[spName]
-          #      tol = 0.005
-          #      if not( (1.0 - tol) < checkSum and checkSum < (1.0 + tol) ):
-          #         print(('MorphMod, land gain: Error: checkSum is out of range. checkSum = ' + str(checkSum) + ' should be 1.0'))
-          #         for spName, spModel in itertools.filterfalse(lambda kv: kv[1].modelType == 'NullModel', iter(spModelList.items())):
-          #             print(spName)
-          #             print(spCoverList[spName]) 
-
-
-
-        # Step 2.3: LAND LOSS - If there is more land in the current veg model state than indicated by the
-        # land/water file, then decrease the area of all land types and increase the amount of water.
+        if curWater > newWater: 
+           deltaWater                = curWater - newWater
+           spCoverList['BAREGRND_NEW'] += deltaWater
+           scaleWater               = newWater/curWater # scaleWater < 1.0
+           spCoverList['WATER']    *= scaleWater
+           spCoverList['SAV']      *= scaleWater       
+        
+        
+        # Step 2.3: LAND LOSS - If there is less water in the current veg model state than indicated by the
+        # land/water file, then decrease the area of all land types (not NOTMOD or flotant) and increase the amount of water.
         # The bareground is reduced first, and if that is less than the total change, the vegetated land is reduced
-        else: # curLand > newLand
-            deltaLand             = curLand - newLand
+        else: # curWater < newWater
+            deltaWater             = newWater - curWater
+             # flotant and not mod should not be changed here because they cannot be changed by Morph. 
             flotant = 0.0
             for spName, spModel in filter( lambda kv: kv[1].modelType == 'FloatingMarshModel', iter(spModelList.items())):
-               flotant += spCoverList[spName]
-               
-            if ((spCoverList['WATER']+spCoverList['NOTMOD'])==1):
-                print('The whole cell is water and not mod, but it is trying to reduce land. Ignore for now.') 
-                    
-            elif spCoverList['BAREGRND_OLD'] >= deltaLand:
-                    spCoverList['BAREGRND_OLD'] -= deltaLand
-                    spCoverList['WATER'] += deltaLand
-            else:
-                if (curLand - spCoverList['BAREGRND_OLD'] - flotant)<= 0.0:
-                    print('The current land minus BG old and flotant are 0, but it is trying to reduce the land. Ignore for now.')
-                else:
-                    scaleLand = (newLand-flotant)/(curLand - spCoverList['BAREGRND_OLD'] - flotant)# scaleLand < 1.0
-                    #scaleLand = (newLand-spCoverList['NOTMOD'])/(curLand - spCoverList['BAREGRND_OLD'] - spCoverList['NOTMOD'])# scaleLand < 1.0
+                flotant += spCoverList[spName]
+                                
+            newLand = 1 - (newWater + spCoverList['NOTMOD'] + flotant)
+            curLand = 1 - (curWater + spCoverList['NOTMOD'] + flotant)
+            
+            if curLand>0: #if curLand is greater than 0, then there is land available to be reduced 
+                if spCoverList['BAREGRND_OLD']>= deltaWater: #If there's enough BG to cover the change, then take it out of BG
+                    spCoverList['BAREGRND_OLD'] -= deltaWater
+                    spCoverList['WATER'] += deltaWater #increase the water coverage
+                elif spCoverList['BAREGRND_OLD']>0.0:
+                    deltaWater -= spCoverList['BAREGRND_OLD']
+                    spCoverList['WATER'] += spCoverList['BAREGRND_OLD']
+                    curLand -= spCoverList['BAREGRND_OLD']
                     spCoverList['BAREGRND_OLD'] = 0.0
-                    # because BG has been knocked out, it's ok to exclude all NullModel_Coverage types from this loop: only vegetated land should be reduced
-                    for spName, spModel in itertools.filterfalse( lambda kv: kv[0]=='SAV' or kv[1].modelType == 'NullModel' or kv[1].modelType == 'NullModel_Coverage' or kv[1].modelType == 'FloatingMarshModel', iter(spModelList.items())):
-                        spCoverList[spName] *= scaleLand
-                    spCoverList['WATER'] += deltaLand   
-                     
-            #elif (curLand - spCoverList['BAREGRND_OLD'] - flotant) <= 0:
-
-        # Done
+                    if curLand > 0: #there are still coverages to be reduced
+                        scaleLand = (newLand)/(curLand)# scaleLand < 1.0
+                        # because BG has been knocked out, it's ok to exclude all NullModel_Coverage types from this loop: only vegetated land should be reduced
+                        for spName, spModel in itertools.filterfalse( lambda kv: kv[0]=='SAV' or kv[1].modelType == 'NullModel' or kv[1].modelType == 'NullModel_Coverage' or kv[1].modelType == 'FloatingMarshModel', iter(spModelList.items())):
+                            spCoverList[spName] *= scaleLand                        
+                        spCoverList['WATER'] += deltaWater #increase the water coverage
+                    else:
+                        if deltaWater > 0.1:
+                            print('WARNING: Ignored a change in land loss greater than 10%, even after reducing bareground.')
+            else: #there are no categories that can be reduced here. The discrepancy is likely small and due to rounding or grid alignment. Ignore the changes. 
+                if deltaWater > 0.1:
+                    print('WARNING: Ignored a change in land loss greater than 10% because there was nothing that could be reduced.')
         return
 
     def update(self):
         for loc in filter( lambda key: key != WetlandMorphModel.dynModel.nodata_value, iter(WetlandMorphModel.dynModel.table.keys())):
             pos = WetlandMorphModel.dynModel.locList[loc]
        
-            newLand = self.landWater[pos]/100.0
-            if newLand < 0: continue
-           # if loc == 154037:
-           #     giveoutput = 1
-           # else:
-           #     giveoutput = 0
-            self.update_patch(newLand, WetlandMorphModel.dynModel.table[loc], WetlandMorphModel.dynModel.spModelList)
+            newWater = self.landWater[pos]/100.0
+
+
+            self.update_patch(newWater, WetlandMorphModel.dynModel.table[loc], WetlandMorphModel.dynModel.spModelList)
 
 
     def act(self):
