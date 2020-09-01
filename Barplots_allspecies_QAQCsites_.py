@@ -5,12 +5,14 @@ import numpy as np
 import pandas
 import os
 
-print('Plotting Vegetation output timeseries at each QAQC point.')
+print('\nPlotting Vegetation output timeseries at each QAQC point.')
 
-G = 'G028' ##INPUT
-S = 'S03' ##INPUT
+G = 'G030' ##INPUT
+S = 'S04' ##INPUT
 
-years2extract = range(1,51) 
+years2extract = range(1,4) 
+lastyear = max(years2extract)
+
 
 runprefix = r'MP2023_%s_%s_C000_U00_V00_SLA' % (S,G)
 file_o_01_50_prefix = r'%s_O_01_50' % (runprefix)
@@ -27,6 +29,7 @@ print(' - finding LAVegMod grid cell IDs for each QAQC point')
 gridIDcol = 15      # grid ID is column 16 in the QAQC output files
 cell_ID = []
 png_paths_dict = {}
+tags_dict = {}
 
 for qaqc_dir in ['ecoregion_points','CRMS_points','transect_points','random_points']:
     qdir = os.path.normpath('%s/output_qaqc/%s' % (morph_dir,qaqc_dir) )
@@ -35,14 +38,18 @@ for qaqc_dir in ['ecoregion_points','CRMS_points','transect_points','random_poin
         os.mkdir('%s/plots' % qdir)
     
     for qf in os.listdir():
-        with open(qf,mode='r') as qaqc_file:
-            dump=qaqc_file.readline()                                   # dump header
-            gridID=int(qaqc_file.readline().split(',')[gridIDcol])      # read in grid ID for site
+        if qf.endswith('.csv'):
+            with open(qf,mode='r') as qaqc_file:
+                dump=qaqc_file.readline()                                   # dump header
+                gridID=int(qaqc_file.readline().split(',')[gridIDcol])      # read in grid ID for site
         
-        if gridID > 0:
-            cell_ID.append(gridID)
-            png_paths_dict[gridID] = r'%s/plots/%s.png' % (qdir,f.split('.')[0])
-        
+            if gridID > 0:
+                cell_ID.append(gridID)
+                qfL = qf.split('.')[0]
+                png_paths_dict[gridID] = r'%s/plots/%s.png' % (qdir,qfL)
+                QAQCid = qfL.split('_')[11]
+                QAQCdesc = qfL.split('_')[12]
+                tags_dict[gridID] = 'QAQC:%s - %s' % (QAQCid,QAQCdesc)
 
 #move to the folder with the LAVegMod asc+ output file
 os.chdir(vegetation_dir)
@@ -51,9 +58,10 @@ os.chdir(vegetation_dir)
 df = pandas.DataFrame(columns=['pro_no','S','year','coverage_code','cell_ID','value','png_path'])
 
 #populate the dataframe:
+' - extracting LAVegMod output data'
 m = 0
 for Y in years2extract: 
-    print('On year '+ str(Y))
+    print('    - year '+ str(Y))
     if Y <10:
         #read in the LAVegMod output coverage values
         LVMout = np.genfromtxt('MP2023_'+ str(S) +'_'+ str(G)+'_C000_U00_V00_SLA_O_0'+str(Y)+'_0'+str(Y)+'_V_vegty.asc+',skip_header=622, delimiter=',', dtype='float') # skip the top portion of the asc+ files and only read in the column data starting on line 623
@@ -65,17 +73,17 @@ for Y in years2extract:
     for cell in cell_ID:
         coverages = LVMout[cell-1]
         for i in range(1,len(sp_names)):
-            df.loc[m] = pandas.Series({'pro_no':G,'S':S,'year':Y,'coverage_code':sp_names[i],'cell_ID':cell,'value':coverages[i],'png_path':pngpaths[i]})
+            df.loc[m] = pandas.Series({'pro_no':G,'S':S,'year':Y,'coverage_code':sp_names[i],'cell_ID':cell,'value':coverages[i]})
             m += 1
  
 #save the dataframe as a csv
-extracted_data_file = os.path.normpath('geomorph/output_qaqc/%s_V_barplot_input.csv' % file_o_01_50_prefix)
+extracted_data_file = os.path.normpath('%s/output_qaqc/%s_V_barplot_input.csv' % (morph_dir,file_o_01_50_prefix))
 df.to_csv(extracted_data_file)
 print(' - done extracting LAVegMod output for all QAQC grids.')
 
 data_in = np.genfromtxt(extracted_data_file,skip_header=1,delimiter=',',dtype='str')
 
-print(' - reading in extracted data from %s' % input_file)
+print(' - reading in extracted data from %s' % extracted_data_file)
 
 # columns in the input file:
 #   Project number
@@ -131,6 +139,7 @@ for S in list(PSEHts[prj].keys()): #scenarios
         for Cl in list(PSEHts[P][S].keys()): # cell ids 
             print(' - plotting %s %s %s' % (S,P,Cl) )
             png_fp = os.path.normpath(png_paths_dict[Cl])   # full relative path to save PNG to
+            tag = tags_dict[Cl]
             bars = []
             legtxt = []
             col = []
@@ -509,13 +518,13 @@ for S in list(PSEHts[prj].keys()): #scenarios
              
             #set axes and chart titles
             x_txt = 'Year'
-            y_txt = 'Coverage Type'
-            title_txt = 'Coverage:  %s - %s - %s' % (S,P,Cl)
+            y_txt = 'Proportional Coverage'
+            title_txt = '%s - %s - GridID:%s - %s ' % (S,P,Cl,tag)
             #print the number of unique coverages at the top of each bar
-            for r in range(0,50,2):
+            for r in range(0,lastyear,2):
                 plt.text(r+0.55,0.95,str(int(BBs[r])),fontsize=6)
-            for r in range(1,51,2):
-                plt.text(r+0.55,0.97,str(int(BBs[r])),fontsize=6) #vertically stagger every other one
+#            for r in range(1,lastyear+1,2):
+#                plt.text(r+0.55,0.97,str(int(BBs[r])),fontsize=6) #vertically stagger every other one
             
             plt.legend(ncol=3,fontsize='small',bbox_to_anchor=(0.5,-0.2), loc='upper center', borderaxespad=0.00)
             plt.ylabel(y_txt)
@@ -523,5 +532,5 @@ for S in list(PSEHts[prj].keys()): #scenarios
             plt.title(title_txt)
            
             plt.savefig(png_fp, bbox_inches='tight') 
-            plt.show()
+        #    plt.show()
             plt.close()
