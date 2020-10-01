@@ -26,7 +26,7 @@ morph_dir = os.path.normpath(r'%s/geomorph' % proj_dir)
 #read the cell IDs of where we want output 
 print(' - finding LAVegMod grid cell IDs for each QAQC point')
 
-gridIDcol = 15      # grid ID is column 16 in the QAQC output files
+gridIDcol = 18      # grid ID is column 18 in the QAQC output files
 cell_ID = []
 png_paths_dict = {}
 tags_dict = {}
@@ -95,12 +95,12 @@ with open(extracted_data_file,mode='w') as outcsv:
             print('    - reading in species list')
             sp_names = np.genfromtxt('MP2023_'+ str(S) +'_'+ str(G)+'_C000_U00_V00_SLA_O_'+str(Y)+'_'+str(Y)+'_V_vegty.asc+',skip_header=621, skip_footer = 187553, delimiter=',', dtype='str')
         print('    - populating dataframe with output')    
-        for cell in cell_ID:
+        for cell_row range(0,len(cell_ID)):
             #coverages = LVMout[cell-1]
             for i in range(1,len(sp_names)):
                 #df.loc[m] = pandas.Series({'pro_no':G,'S':S,'year':Y,'coverage_code':sp_names[i],'cell_ID':cell,'value':coverages[i]})
                 #m += 1
-                outcsv.write('%s,%s,%4d,%s,%d,%f\n'% (G,S,Y,sp_names[i],cell,LVMout[cell][i]))
+                outcsv.write('%s,%s,%4d,%s,%d,%f\n'% (G,S,Y,sp_names[i],cell_ID[cell_row],LVMout[cell_row][i]))
                 
 #save the dataframe as a csv
 #df.to_csv(extracted_data_file) # if using pandas df - this will print a row number in the first column, so update column indexs in read data_in (lines 109-117)
