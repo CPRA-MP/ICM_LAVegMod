@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-outdir = r'C:\Users\madel\Coastal Hydro Dropbox\Madeline Foster-Martinez\MRF_LAVegMod\Rus_1_2_July2020'
-input_file = r'C:\Users\madel\Coastal Hydro Dropbox\Madeline Foster-Martinez\MRF_LAVegMod\Rus_1_2_July2020\MP2023_G028_S03_barplot_input_sample4.csv'
+outdir = r'C:\Users\madel\Coastal Hydro Dropbox\Madeline Foster-Martinez\MRF_LAVegMod\flotant_cells_090920'
+input_file = r'C:\Users\madel\Coastal Hydro Dropbox\Madeline Foster-Martinez\MRF_LAVegMod\MP2023_G028_S03_flotant090920.csv'
 
 data_in = np.genfromtxt(input_file,skip_header=1,delimiter=',',dtype='str')
 
@@ -51,9 +51,9 @@ for row in data_in:
     if cid not in PSEHts[prj][s].keys():
         PSEHts[prj][s][cid] = {}
  
-    if cc not in PSEHts[prj][s][cid].keys() and cc not in ['FFIBS', 'pL_BF', 'pL_SF', 'pL_FM', 'pL_IM', 'pL_BM', 'pL_SM','DEAD_Flt','CELLID']:                  
+    if cc not in PSEHts[prj][s][cid].keys() and cc not in ['FIBS', 'pL_BF', 'pL_SF', 'pL_FM', 'pL_IM', 'pL_BM', 'pL_SM','DEAD_Flt','CELLID']:                  
         PSEHts[prj][s][cid][cc] = []   
-    if cc not in ['FFIBS', 'pL_BF', 'pL_SF', 'pL_FM', 'pL_IM', 'pL_BM', 'pL_SM','DEAD_Flt','CELLID']:
+    if cc not in ['FIBS', 'pL_BF', 'pL_SF', 'pL_FM', 'pL_IM', 'pL_BM', 'pL_SM','DEAD_Flt','CELLID']:
         PSEHts[prj][s][cid][cc].append(area)
       
 sp_names = list(PSEHts[prj][s][cid].keys())
@@ -342,6 +342,10 @@ for S in list(PSEHts[prj].keys()): #scenarios
                             m+=1
                             bot24 = np.array(bot23)+np.array(bars[i])
                         elif m==24:
+                            print(i)
+                            print(len(legtxt))
+                            print(len(col))
+                            print(len(bars))
                             pbar24 = plt.bar(years,bars[i],width=wid,label=legtxt[i],color=col[i],bottom=bot24)
                             m+=1
                             bot25 = np.array(bot24)+np.array(bars[i])

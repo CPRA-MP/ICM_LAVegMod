@@ -174,83 +174,83 @@ for S in list(PSEHts[prj].keys()): #scenarios
                     bars.append(PSEHts[P][S][Cl][sp_names[sp]])
                     legtxt.append(sp_names[sp])
                     if sp_names[sp] == 'WATER':
-                        col.append([0,0,1,1]) # water = blue
+                        col.append([0,0,200/255,1]) # water = blue
                     elif sp_names[sp] == 'NOTMOD':
-                        col.append([192/255,192/255,192/255,1]) # not mod = gray
+                        col.append([221/255,221/255,221/255,1]) # not mod = gray
                     elif sp_names[sp] == 'BAREGRND_OLD':
-                        col.append([153/255,102/255,51/255,1]) # bareground old = brown
+                        col.append([0,0,0,1]) 
                     elif sp_names[sp] == 'BAREGRND_NEW':
-                        col.append([204/255,153/255,0,1]) # bareground new = brown
+                        col.append([127/255,68/255,19/255,1]) # bareground new = brown
                     elif sp_names[sp] == 'SAV':
                         col.append([153/255,204/255,255/255,1]) # SAV = light blue
                     elif sp_names[sp] == 'PAHE2_Flt':
                         col.append([204/255,0/255,204/255,1]) # 
                     elif sp_names[sp] == 'ELBA2_Flt':
-                        col.append([1,51/255,1,1]) # 
+                        col.append([1,153/255,1,1]) # 
                     elif sp_names[sp] == 'BAREGRND_Flt':
-                        col.append([255/255,204/255,255/255,1]) # 
+                        col.append([128/255,0,128/255,1]) # 
                     elif sp_names[sp] == 'NYAQ2':
-                        col.append([76/255,0/255,153/255,1]) # 
+                        col.append([84/255,130/255,53/255,1]) # 
                     elif sp_names[sp] == 'SANI':
-                        col.append([127/255,0/255,255/255,1]) # 
+                        col.append([198/255,224/255,180/255,1]) # 
                     elif sp_names[sp] == 'TADI2':
-                        col.append([178/255,102/255,255/255,1]) # 
+                        col.append([112/255,173/255,71/255,1]) # 
                     elif sp_names[sp] == 'QULA3':
-                        col.append([0/255,102/255,51/255,1]) # 
+                        col.append([51/255,153/255,102/255,1]) # 
                     elif sp_names[sp] == 'QULE':
-                        col.append([0/255,153/255,76/255,1]) # 
+                        col.append([61/255,185/255,123/255,1]) # 
                     elif sp_names[sp] == 'QUNI':
-                        col.append([0/255,204/255,102/255,1]) # 
+                        col.append([103/255,114/255,40/255,1]) # 
                     elif sp_names[sp] == 'QUTE':
-                        col.append([0/255,255/255,128/255,1]) # 
+                        col.append([125/255,213/255,169/255,1]) # 
                     elif sp_names[sp] == 'QUVI':
-                        col.append([51/255,255/255,153/255,1]) # 
+                        col.append([0,102/255,0,1]) # 
                     elif sp_names[sp] == 'ULAM':
-                        col.append([153/255,205/255,154/255,1]) 
+                        col.append([137/255,151/255,53/255,1]) 
                     elif sp_names[sp] == 'COES':
-                        col.append([75/255,153/255,0/255,1]) # 
+                        col.append([102/255,255/255,51/255,1]) # 
                     elif sp_names[sp] == 'MOCE2':
-                        col.append([102/255,204/255,0/255,1]) # 
+                        col.append([44/255,184/255,0/255,1]) # 
                     elif sp_names[sp] == 'PAHE2':
-                        col.append([128/255,255/255,0/255,1]) # 
+                        col.append([146/255,208/255,80/255,1]) # 
                     elif sp_names[sp] == 'SALA2':
-                        col.append([178/255,255/255,102/255,1]) # 
+                        col.append([102/255,255/255,153/255,1]) # 
                     elif sp_names[sp] == 'ZIMI':
-                        col.append([229/255,255/255,204/255,1]) #                      
+                        col.append([109/255,218/255,0,1]) #                      
                     elif sp_names[sp] == 'CLMA10':
-                        col.append([204/255,204/255,0/255,1]) # 
+                        col.append([204/255,255/255,51/255,1]) # 
                     elif sp_names[sp] == 'ELCE':
-                        col.append([255/255,255/255,0/255,1]) # 
+                        col.append([255/255,255/255,200/255,1]) # 
                     elif sp_names[sp] == 'POPU5':
-                        col.append([255/255,255/255,153/255,1]) # 
+                        col.append([225/255,255/255,139/255,1]) # 
                     elif sp_names[sp] == 'SALA':
-                        col.append([255/255,255/255,102/255,1]) # 
+                        col.append([255/255,255/255,0/255,1]) # 
                     elif sp_names[sp] == 'IVFR':
-                        col.append([241/255,247/255,40/255,1]) # 
+                        col.append([162/255,120/255,0,1]) # 
                     elif sp_names[sp] == 'PAVA':
-                        col.append([255/255,255/255,204/255,1]) # 
+                        col.append([255/255,241/255,221/255,1]) # 
                     elif sp_names[sp] == 'PHAU7':
-                        col.append([243/255,249/255,83/255,1]) # 
+                        col.append([255/255,249/255,83/255,1]) # 
                     elif sp_names[sp] == 'SCCA11':
-                        col.append([226/255,232/255,54/255,1]) # 
+                        col.append([226/255,231/255,183/255,1]) # 
                     elif sp_names[sp] == 'TYDO':
-                        col.append([220/255,228/255,8/255,1]) #                     
+                        col.append([196/255,161/255,45/255,1]) #                     
                     elif sp_names[sp] == 'SCAM6':
-                        col.append([255/255,128/255,0/255,1])                    
+                        col.append([255/255,211/255,101/255,1])                    
                     elif sp_names[sp] == 'SCRO5':
-                        col.append([255/255,153/255,51/255,1])                                  
+                        col.append([234/255,156/255,0,1])                                  
                     elif sp_names[sp] == 'SPPA':
-                        col.append([255/255,178/255,102/255,1])                    
+                        col.append([255/255,192/255,0,1])                    
                     elif sp_names[sp] == 'SPCY':
-                        col.append([255/255,229/255,204/255,1])
+                        col.append([255/255,125/255,0,1])
                     elif sp_names[sp] == 'DISP':
-                        col.append([153/255,0,0,1])
+                        col.append([200/255,100/255,0,1])
                     elif sp_names[sp] == 'JURO':
-                        col.append([204/255,0,0,1])
+                        col.append([1,117/255,117/255,1])
                     elif sp_names[sp] == 'AVGE':
-                        col.append([255/255,0,0,1])
+                        col.append([162/255,0,0,1])
                     elif sp_names[sp] == 'SPAL':
-                        col.append([255/255,102/255,102/255,1]) 
+                        col.append([255/255,0,0,1]) 
                     elif sp_names[sp] == 'BAHABI':
                         col.append([102/255,0/255,51/255,1]) 
                     elif sp_names[sp] == 'DISPBI':
