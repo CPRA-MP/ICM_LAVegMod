@@ -370,12 +370,7 @@ class EmergentWetlandModel(SpeciesModel):
 
    ## Growth function
     # This function determines the probability that an emergent wetland species will become
-    # established at the current location. The probability of an wetland species becoming
-    # established is depended on
-    # three major factors. First, the salinity must be below 1.0 ppt.
-    # Second, there must be a period of 14 days with no flooding followed by a period of 14 with
-    # water depths below 14 cm. Finally, the height of the habitat above mean water level determines
-    # the final probability.
+    # established at the current location. 
     def growth(self, loc):
         waveAmp = SpeciesModel.params.waveAmp[loc]
         meanSal = SpeciesModel.params.meanSal[loc]
@@ -1332,11 +1327,11 @@ class PatchModel(dict):
         # Skip the Floating Marsh types, because they are handled separately.
         # Skip the SAV and WATER types because they do not "senesce" in the same way
         # as the other types, and because their growth is not computed the same way
-        # as the other types.
+        # as the other types.(note SAV is not skipped because it is no longer included for MP2023)
 
         spreadLikelihood = 0.0 #reset spreadLikelihood
 
-        for spName, spModel in itertools.filterfalse(lambda kv: kv[0] == 'BAREGRND_NEW' or kv[0] == 'BAREGRND_OLD' or kv[0] == 'WATER' or kv[0] == 'FFIBS' or kv[1].modelType == 'FloatingMarshModel', list(spModelList.items())):
+        for spName, spModel in itertools.filterfalse(lambda kv: kv[0] == 'BAREGRND_NEW' or kv[0] == 'BAREGRND_OLD' or kv[0] == 'WATER' or kv[0] == 'FFIBS' or kv[1].modelType == 'NullModel' or kv[1].modelType == 'FloatingMarshModel', list(spModelList.items())):
             cover                = spCoverList[spName]
             death                = spModel.senescence(loc)
             lost                += death * cover
