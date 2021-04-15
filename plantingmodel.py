@@ -1,18 +1,19 @@
 
-import exceptions
+from builtins import Exception
+
 import itertools
 import re
 
 #from osgeo import ogr
 
 
-class LAVegModNoneValueError(exceptions.Exception):
+class LAVegModNoneValueError(Exception):
     def __init__(self, value):
         self.value = value
     def __str__(self):
         return repr(self.value)
 
-class LAVegModNoMatchError(exceptions.Exception):
+class LAVegModNoMatchError(Exception):
     def __init__(self, value):
         self.value = value
     def __str__(self):
@@ -30,14 +31,14 @@ class PlantingModel:
         pass
 
     def setup_shapefile(self, params):
-        print 'PlantingModel: Msg: Setting up intersection shapefile'
+        print ('PlantingModel: Msg: Setting up intersection shapefile')
 
         outFilename   = './Intersection/intersections.shp'
         self.driver = ogr.GetDriverByName('ESRI Shapefile')
         if os.path.exists(outFilename):
             self.driver.DeleteDataSource(outFilename)
 
-        source = params.plantingDict.itervalues().next()
+        source = next(iter(params.plantingDict.values()))
 
         self.outSource  = self.driver.CreateDataSource(outFilename)
         outSrs          = source.GetLayer().GetSpatialRef()
@@ -72,7 +73,7 @@ class PlantingModel:
 
         #print 'PlantingModel: Msg: Finding intersections'
         count = 0
-        for row,col in itertools.product( range(rowStart,rowEnd), range(colStart,colEnd) ):
+        for row,col in itertools.product( list(range(rowStart,rowEnd)), list(range(colStart,colEnd)) ):
             boxN = northing - row * map.cellsize
             boxS = northing - (row+1) * map.cellsize
             boxE = map.xllcorner + (col+1) * map.cellsize
@@ -121,8 +122,8 @@ class PlantingModel:
 
         try:
             line = feature.GetField(label) # If the label does not exist, this function throws ValueError
-        except exceptions.ValueError as error:
-            raise exceptions.ValueError('PlantingModel: Warning: Label is not present in shapefile. label = ' + label)
+        except ValueError as error:
+            raise ValueError('PlantingModel: Warning: Label is not present in shapefile. label = ' + label)
 
         if line == None: # The field exists, but does not have a value
             raise LAVegModNoneValueError('PlantingModel: Warning: No value associated with field named ' + label)
@@ -139,11 +140,11 @@ class PlantingModel:
         return re.finditer(parsePattern, line)
 
     def config_with_planting_list(self, allYearPlantingList ):
-        print 'PlantingModel: Msg: Building submodels for each planting year.'
+        print ('PlantingModel: Msg: Building submodels for each planting year.')
         for planting in allYearPlantingList:
             year = planting[0]
-            if not self.eventDict.has_key(year):
-                print 'Adding planting submodel for year ' + str(year)
+            if year not in self.eventDict:
+                print(('Adding planting submodel for year ' + str(year)))
                 self.eventDict[year] = PlantingModel()
             self.eventDict[year].plantingList.append( planting )
 
@@ -151,7 +152,7 @@ class PlantingModel:
         if params.plantingsStrm == None:
             return
 
-        print 'PlantingModel: Msg: Configuring planting model from text file.'
+        print ('PlantingModel: Msg: Configuring planting model from text file.')
         allYearPlantingList = list()
         parsePattern = '([a-zA-Z0-9\-\.]+)'
         plantingStrm = params.plantingsStrm
@@ -177,15 +178,15 @@ class PlantingModel:
         #self.setup_shapefile(params)
 
         allYearPlantingList = list()
-        for key, dataSource in params.plantingDict.iteritems():
-            print 'PlantingModel: Msg: Reading configuration for ' + key
+        for key, dataSource in iter(params.plantingDict.items()):
+            print(('PlantingModel: Msg: Reading configuration for ' + key))
 
             layer = dataSource.GetLayer()
             for feature in layer:
                 try:
                     objectID     = feature.GetField('OBJECTID')
 
-                    print 'PlantingModel: Msg: Working on object id ' + str(objectID)
+                    print(('PlantingModel: Msg: Working on object id ' + str(objectID)))
                     value        = self.get_field(feature, 'Date_Pla_3', r'^ *YR +([0-9]+) *$',              r'([0-9]+)')
                     year         = float( value.next().group(0) )
 
@@ -194,44 +195,44 @@ class PlantingModel:
 
                     value        = self.get_field(feature, 'Frac_Spe_1', r'^ *([0-9]*\.{0,1}[0-9]+ *,{0,1} *)+$', r'([0-9]*\.{0,1}[0-9]+)' )
                     coverList    = [ float(m.group(0)) for m in value]
-                except exceptions.ValueError as error:
-                    print 'PlantingModel: Warning: Planting information will not be used for object id = ' + str(objectID)
-                    print 'PlantingModel: Warning: The reason follows.'
-                    print str(error)
+                except ValueError as error:
+                    print(('PlantingModel: Warning: Planting information will not be used for object id = ' + str(objectID)))
+                    print ('PlantingModel: Warning: The reason follows.')
+                    print((str(error)))
                     continue
                 except LAVegModNoneValueError as error:
-                    print 'PlantingModel: Warning: Planting information will not be used for object id = ' + str(objectID)
-                    print 'PlantingModel: Warning: The reason follows.'
-                    print str(error)
+                    print(('PlantingModel: Warning: Planting information will not be used for object id = ' + str(objectID)))
+                    print ('PlantingModel: Warning: The reason follows.')
+                    print((str(error)))
                     continue
                 except LAVegModNoMatchError as error:
-                    print 'PlantingModel: Warning: Planting information will not be used for object id = ' + str(objectID)
-                    print 'PlantingModel: Warning: The reason follows.'
-                    print str(error)
+                    print(('PlantingModel: Warning: Planting information will not be used for object id = ' + str(objectID)))
+                    print ('PlantingModel: Warning: The reason follows.')
+                    print((str(error)))
                     continue
 
                 if year < params.startYear or params.endYear < year:
-                    print 'PlantingModel: Warning: Planting information will not be used for object id = ' + str(objectID)
-                    print 'PlantingModel: Warning: Planting year is out of range of model simulation period'
-                    print 'PlantingModel: Warning: Planting year is ' + str(year)
+                    print(('PlantingModel: Warning: Planting information will not be used for object id = ' + str(objectID)))
+                    print ('PlantingModel: Warning: Planting year is out of range of model simulation period')
+                    print(('PlantingModel: Warning: Planting year is ' + str(year)))
                     continue
 
                 if len(spList) != len(coverList):
-                    print 'PlantingModel: Warning: Planting information will not be used for object id = ' + str(objectID)
-                    print 'PlantingModel: Warning: Number of species in Veg_Type_M does not match number of cover values in Frac_Spe_1'
+                    print(('PlantingModel: Warning: Planting information will not be used for object id = ' + str(objectID)))
+                    print ('PlantingModel: Warning: Number of species in Veg_Type_M does not match number of cover values in Frac_Spe_1')
                     continue
 
                 #print 'PlantingModel: Msg: Building planting dictionary from field information'
                 spCoverDict = dict()
                 total       = 0.0
-                for sp,cover in itertools.izip(spList, coverList ):
+                for sp,cover in zip(spList, coverList ):
                     spCoverDict[sp] = cover
                     total          += cover
 
                 if total > 1.0:
-                    print 'PlantingModel: Warning: Planting information will not be used for object id = ' + str(objectID)
-                    print 'PlantingModel: Warning: Total fraction of area to be planted is larger than 1.0'
-                    print 'PlantingModel: Warning: total = ' + str(total)
+                    print(('PlantingModel: Warning: Planting information will not be used for object id = ' + str(objectID)))
+                    print ('PlantingModel: Warning: Total fraction of area to be planted is larger than 1.0')
+                    print(('PlantingModel: Warning: total = ' + str(total)))
                     continue
 
                 #print 'PlantingModel: Msg: Getting geometry from feature'
@@ -269,14 +270,14 @@ class PlantingModel:
             frac       = min( frac, totalLand )
             scale      = (totalLand - frac)/totalLand
 
-            for sp in itertools.ifilterfalse( lambda k : k == 'SAV' or k == 'WATER', spCoverDict.iterkeys() ):
+            for sp in itertools.filterfalse( lambda k : k == 'SAV' or k == 'WATER', iter(spCoverDict.keys()) ):
                 spCoverDict[sp] *= scale
 
-            for sp,cover in plantingDict.iteritems():
+            for sp,cover in iter(plantingDict.items()):
                 spCoverDict[sp] += cover * totalLand * ( 1.0 - scale )
 
             total = 0.0
-            for cover in spCoverDict.itervalues():
+            for cover in iter(spCoverDict.values()):
                 total += cover
 
             if (total - 1.0) > 0.01:
@@ -289,10 +290,10 @@ class PlantingModel:
                 errorMsg += 'PlantingModel: Error: scale        = ' + str(scale)        + '\n'
                 errorMsg += 'PlantingModel: Error: spCoverDict  = ' + str(spCoverDict)  + '\n'
                 errorMsg += 'PlantingModel: Error: plantingDict = ' + str(plantingDict) + '\n'
-                raise exceptions.RuntimeError(errorMsg)
+                raise RuntimeError(errorMsg)
 
             if total > 1.0:
-                for sp in spCoverDict.iterkeys():
+                for sp in iter(spCoverDict.keys()):
                     spCoverDict[sp] /= total
             else:
                 spCoverDict['BAREGRND'] += 1.0 - total

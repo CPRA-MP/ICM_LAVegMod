@@ -33,7 +33,7 @@ class Event(object):
         return str(self.time) + ' : ' + self.name
 
     def act(self):
-        print self.__str__()
+        print((self.__str__()))
 
 class GenericEvent(Event):
     def __init__(self, time, name = 'GenericEvent', callable=None):
@@ -41,7 +41,7 @@ class GenericEvent(Event):
         self.callable = callable
 
     def act(self):
-        print self.name
+        print((self.name))
         self.callable.act()
 
 class PauseEvent(Event):
@@ -62,7 +62,7 @@ class MsgEvent(Event):
         return self.msg
 
     def act(self):
-        print >> self.stream, self.__str__()
+        print(self.__str__(), file=self.stream)
 
 #class ReadCSVEvent(Event):
 #    def __init__(self, time, name = 'ReadCSVEvent', file=0):
@@ -101,4 +101,3 @@ class EventQueue(object):
         for elt in self.queue:
             ret += str(elt) + '\n'
         return ret
-
