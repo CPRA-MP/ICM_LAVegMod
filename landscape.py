@@ -93,7 +93,7 @@ class LandscapePlus(Landscape):
             raise NoDataValueException()
 
         try:
-            ret = self.table[ self.table['CELLID'] == address].to_dict('record')[0]
+            ret = self.table[ self.table['CELLID'] == address].to_dict('records')[0]
             del ret['CELLID']
             return(ret)
         except KeyError as error:
