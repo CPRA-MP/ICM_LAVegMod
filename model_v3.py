@@ -622,7 +622,7 @@ class SpeciesModelList(dict):
 
         for spSymbol in speciesList:
 
-            spInfo      = estData[ estData['Symbol'] == spSymbol ].to_dict('record')[0]
+            spInfo      = estData[ estData['Symbol'] == spSymbol ].to_dict('records')[0]
             spID        = spInfo['ID']
             spName      = spInfo['Common Name']
             spModelType = spInfo['ModelType']
