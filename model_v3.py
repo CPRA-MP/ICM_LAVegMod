@@ -1882,7 +1882,6 @@ class ModelUpdateEvent(event.Event):
         self.model = model
 
     def act(self):
-        print((self.name))
         self.model.update()
 
 
