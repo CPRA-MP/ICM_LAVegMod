@@ -1798,7 +1798,8 @@ class WetlandMorphModel:
         # Step 1: Figure out how much water there is currently (prior to 2023, Morph output the amount of land). 
         
         curWater = spCoverList['WATER'] 
-        
+        newWater *= (1 - spCoverList['NOTMOD'])#Morph treats NOTMOD as NoData, so the %water does not account for NOTMOD. Note: Morph Water + Morph Land + Veg NOTMOD = 100%
+       
         # Step 1.5: Reset the bareground ages and Dead flotant. New bareground should be zeroed and added to old
         spCoverList['BAREGRND_OLD'] += spCoverList['BAREGRND_NEW']
         spCoverList['BAREGRND_NEW'] = 0.0
