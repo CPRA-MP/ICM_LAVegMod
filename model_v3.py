@@ -1853,6 +1853,13 @@ class WetlandMorphModel:
                     else:
                         if deltaWater > 0.1:
                             print('WARNING: Ignored a change in land loss greater than 10%, even after reducing bareground.')
+                else: #bareground is 0, but there is land available to be reduced
+                    scaleLand = (newLand)/(curLand)# scaleLand < 1.0
+                    # because there is no BG, it's ok to exclude all NullModel_Coverage types from this loop: only vegetated land should be reduced
+                    for spName, spModel in itertools.filterfalse( lambda kv: kv[1].modelType == 'NullModel' or kv[1].modelType == 'NullModel_Coverage' or kv[1].modelType == 'FloatingMarshModel', iter(spModelList.items())):
+                        spCoverList[spName] *= scaleLand                        
+                    spCoverList['WATER'] += deltaWater #increase the water coverage
+                    
             else: #there are no categories that can be reduced here. The discrepancy is likely small and due to rounding or grid alignment. Ignore the changes. 
                 if deltaWater > 0.1:
                     print('WARNING: Ignored a change in land loss greater than 10% because there was nothing that could be reduced.')
