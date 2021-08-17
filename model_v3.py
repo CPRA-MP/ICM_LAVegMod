@@ -1794,9 +1794,8 @@ class WetlandMorphModel:
     def config(self, params):
         self.landWater = params.landWater
 
-    def update_patch(self, newWater, spCoverList, spModelList):
+    def update_patch(self, newWater, spCoverList, spModelList, loc):
         # Step 1: Figure out how much water there is currently (prior to 2023, Morph output the amount of land). 
-        
         curWater = spCoverList['WATER'] 
         newWater *= (1 - spCoverList['NOTMOD'])#Morph treats NOTMOD as NoData, so the %water does not account for NOTMOD. Note: Morph Water + Morph Land + Veg NOTMOD = 100%
        
@@ -1835,6 +1834,9 @@ class WetlandMorphModel:
             newLand = 1 - (newWater + spCoverList['NOTMOD'] + flotant)
             curLand = 1 - (curWater + spCoverList['NOTMOD'] + flotant)
             
+            if newLand < 0:
+                print('WARNING: Cell ID = ' + str(loc) + '. New land value is ' + str(newLand) + ' and will be set to 0. New water = ' + str(newWater) + ', NOTMOD is ' + str(spCoverList['NOTMOD']) + ', and flotant sum is ' + str(flotant))
+                newLand = 0
             if curLand>0: #if curLand is greater than 0, then there is land available to be reduced 
                 if spCoverList['BAREGRND_OLD']>= deltaWater: #If there's enough BG to cover the change, then take it out of BG
                     spCoverList['BAREGRND_OLD'] -= deltaWater
@@ -1851,11 +1853,17 @@ class WetlandMorphModel:
                             spCoverList[spName] *= scaleLand                        
                         spCoverList['WATER'] += deltaWater #increase the water coverage
                     else:
-                        if deltaWater > 0.1:
-                            print('WARNING: Ignored a change in land loss greater than 10%, even after reducing bareground.')
+                         print('WARNING: Cell ID = ' + str(loc) + '. Ignored a change in land loss after reducing bareground because current land is ' +  str(curLand))
+                else: #bareground is 0, but there is land available to be reduced
+                    scaleLand = (newLand)/(curLand)# scaleLand < 1.0
+                    # because there is no BG, it's ok to exclude all NullModel_Coverage types from this loop: only vegetated land should be reduced
+                    for spName, spModel in itertools.filterfalse( lambda kv: kv[1].modelType == 'NullModel' or kv[1].modelType == 'NullModel_Coverage' or kv[1].modelType == 'FloatingMarshModel', iter(spModelList.items())):
+                        spCoverList[spName] *= scaleLand                        
+                    spCoverList['WATER'] += deltaWater #increase the water coverage
+                    
             else: #there are no categories that can be reduced here. The discrepancy is likely small and due to rounding or grid alignment. Ignore the changes. 
-                if deltaWater > 0.1:
-                    print('WARNING: Ignored a change in land loss greater than 10% because there was nothing that could be reduced.')
+                print('WARNING: Cell ID = ' + str(loc) + '. Ignored a change in land loss because the current land is ' + str(curLand) + '. The change in water is = ' + str(deltaWater))
+
         return
 
     def update(self):
@@ -1865,7 +1873,7 @@ class WetlandMorphModel:
             newWater = self.landWater[pos]/100.0
 
 
-            self.update_patch(newWater, WetlandMorphModel.dynModel.table[loc], WetlandMorphModel.dynModel.spModelList)
+            self.update_patch(newWater, WetlandMorphModel.dynModel.table[loc], WetlandMorphModel.dynModel.spModelList, loc)
 
 
     def act(self):
