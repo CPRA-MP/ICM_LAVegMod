@@ -1809,9 +1809,10 @@ class WetlandMorphModel:
         # the current water cover and the new water cover provided by the land/water file.
         
         # Step 2.1: If the current water and new water are the same, there is nothing to do.
-        if curWater == newWater: return  
-        
-        
+        deltaWater = curWater - newWater
+        if abs(deltaWater)< 0.00390625: return #0.00390625 = (30*30)/(480*480) or the fraction of one morph cell in a veg grid cell
+        #if curWater == newWater: return
+                
         # Step 2.2: LAND GAIN - If there is more water in the current veg model state than indicated by the
         # land/water file, then increase the bareground and decrease the area
         # of water types. All the new land is classified as new bareground at this point.
