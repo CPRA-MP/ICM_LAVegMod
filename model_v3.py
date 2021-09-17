@@ -1311,10 +1311,10 @@ class PatchModel(dict):
         # establish, then convert the new bareground to old bareground.
         
         if spCoverList['BAREGRND_NEW']>0.0: 
-            for spName, spModel in itertools.filterfalse(lambda kv: kv[1].modelType == 'NullModel' or kv[1] == 'NullModel_Coverage' or kv[1].modelType == 'FloatingMarshModel', list(spModelList.items())):             
+            for spName, spModel in itertools.filterfalse(lambda kv: kv[1].modelType == 'NullModel' or kv[1].modelType == 'NullModel_Coverage' or kv[1].modelType == 'FloatingMarshModel', list(spModelList.items())):             
                 spreadLikelihood    += spModel.spread(loc)
             if spreadLikelihood:
-                for spName, spModel in itertools.filterfalse(lambda kv: kv[0] == 'BAREGRND_NEW' or kv[0]== 'BAREGRND_OLD' or kv[0]=='WATER' or kv[0] == 'FFIBS' or kv[1].modelType=='FloatingMarshModel', list(spModelList.items())):
+                for spName, spModel in itertools.filterfalse(lambda kv: kv[1].modelType == 'NullModel' or kv[1].modelType == 'NullModel_Coverage' or kv[1].modelType == 'FloatingMarshModel', list(spModelList.items())):
                     spread               = spModel.spread(loc)/spreadLikelihood
                     spCoverList[spName] += spread * spCoverList['BAREGRND_NEW']
             else:
@@ -1331,7 +1331,7 @@ class PatchModel(dict):
 
         spreadLikelihood = 0.0 #reset spreadLikelihood
 
-        for spName, spModel in itertools.filterfalse(lambda kv: kv[0] == 'BAREGRND_NEW' or kv[0] == 'BAREGRND_OLD' or kv[0] == 'WATER' or kv[0] == 'FFIBS' or kv[1].modelType == 'NullModel' or kv[1].modelType == 'FloatingMarshModel', list(spModelList.items())):
+        for spName, spModel in itertools.filterfalse(lambda kv: kv[1].modelType == 'NullModel_Coverage' or kv[1].modelType == 'NullModel' or kv[1].modelType == 'FloatingMarshModel', list(spModelList.items())):
             cover                = spCoverList[spName]
             death                = spModel.senescence(loc)
             lost                += death * cover
@@ -1357,14 +1357,14 @@ class PatchModel(dict):
         # Again, skip SAV, WATER and the floating marsh types because they do not
         # operate the same way as the other types.
         if growthLikelihood:
-            for spName, spModel in itertools.filterfalse(lambda kv: kv[0] == 'BAREGRND_NEW' or kv[0]== 'BAREGRND_OLD' or kv[0]=='WATER' or kv[1].modelType == 'NullModel' or kv[1].modelType=='FloatingMarshModel', list(spModelList.items())):
+            for spName, spModel in itertools.filterfalse(lambda kv: kv[1].modelType == 'NullModel_Coverage' or kv[1].modelType == 'NullModel' or kv[1].modelType=='FloatingMarshModel', list(spModelList.items())):
                 growth               = spModel.growth(loc)/growthLikelihood
                 spCoverList[spName] += growth * unoccupied_0
                 unoccupied          -= growth * unoccupied_0 #Should always end up at 0
 
         else:
             if spreadLikelihood and firstyear == 0:
-                for spName, spModel in itertools.filterfalse(lambda kv: kv[0] == 'BAREGRND_NEW' or kv[0]== 'BAREGRND_OLD' or kv[0]=='WATER' or kv[1].modelType == 'NullModel' or kv[1].modelType=='FloatingMarshModel', list(spModelList.items())):
+                for spName, spModel in itertools.filterfalse(lambda kv: kv[1].modelType == 'NullModel_Coverage' or kv[1].modelType == 'NullModel' or kv[1].modelType=='FloatingMarshModel', list(spModelList.items())):
                     spread               = spModel.spread(loc)/spreadLikelihood
                     spCoverList[spName] += spread * unoccupied_0
                     unoccupied          -= spread * unoccupied_0 #Should always end up at 0
@@ -1416,7 +1416,6 @@ class PatchModel(dict):
                 growth = spModel.growth(loc)/growthLikelihood
                 spCoverList[spName]    += growth * deadFloating_0
         else:
-            spCoverList['WATER']    += deadThinFloating + spCoverList['BAREGRND_Flt']
             spCoverList['DEAD_Flt'] += deadThinFloating + spCoverList['BAREGRND_Flt'] #passed to Morph, where it is set as water 1 m deep
             spCoverList['BAREGRND_Flt']    = deadThickFloating
 
@@ -1434,7 +1433,6 @@ class PatchModel(dict):
             deadThickFloating   = spCoverList['PAHE2_Flt']
             spCoverList['ELBA2_Flt'] = 0.0
             spCoverList['PAHE2_Flt'] = 0.0
-            spCoverList['WATER']    += deadThinFloating
             spCoverList['DEAD_Flt'] += deadThinFloating  #passed to Morph, where it is set as water 1 m deep
             spCoverList['BAREGRND_Flt']    += deadThickFloating
 
@@ -1450,10 +1448,9 @@ class PatchModel(dict):
         #######################################################
         
         for spName, spModel in itertools.filterfalse(lambda kv: kv[1].modelType == 'NullModel', iter(spModelList.items())):
-              if spCoverList[spName] < 4.34e-6 and spCoverList[spName] > 0: #hard-coded for a 480m grid cell
-            #  if spCoverList[spName] < 0.000004 and spCoverList[spName] > 0: #take the second part out once negative coverages are a thing of the past
-                spCoverList[spName]=0.0
-
+              if spCoverList[spName] < 4.34e-6: #hard-coded for a 480m grid cell, also wipes out any lingering negative values 
+                  spCoverList[spName]=0.0      
+        
         #######################################################
         # Step 5: Check sum
         #
@@ -1467,6 +1464,14 @@ class PatchModel(dict):
         if not( (1.0 - tol) < checkSum and checkSum < (1.0 + tol) ):
             print(('PatchMod: Error: checkSum is out of range. checkSum = ' + str(checkSum) + ' should be 1.0'))
 
+        #######################################################
+        # Step 5.5: Whole morph pixel dead flotant conversion to water
+        #
+        #######################################################
+
+        curDF = spCoverList['DEAD_Flt']
+        whole_pixel_DF = (curDF//(1/256))*(1/256) #there are 256 morph pixels in each veg grid cell
+        spCoverList['WATER'] += whole_pixel_DF
 
          #######################################################
         # Step 6: Calculate the FFIBS score
@@ -1795,14 +1800,21 @@ class WetlandMorphModel:
         self.landWater = params.landWater
 
     def update_patch(self, newWater, spCoverList, spModelList, loc):
-        # Step 1: Figure out how much water there is currently (prior to 2023, Morph output the amount of land). 
+        # Step 1: Reset the Dead flotant. Only the whole morph pixel value should be removed (it was added to water at the end of the last model year). The remainder gets carried over until a full pixel (1/256 of a veg grid cell) is reached. 
+        curDF = spCoverList['DEAD_Flt']
+        whole_pixel_DF = (curDF//(1/256))*(1/256)
+        remainder_DF = curDF - whole_pixel_DF
+        spCoverList['DEAD_Flt'] = remainder_DF       
+        
+        # Step 1.25: Figure out how much water there is currently (prior to 2023, Morph output the amount of land). 
         curWater = spCoverList['WATER'] 
         newWater *= (1 - spCoverList['NOTMOD'])#Morph treats NOTMOD as NoData, so the %water does not account for NOTMOD. Note: Morph Water + Morph Land + Veg NOTMOD = 100%
        
-        # Step 1.5: Reset the bareground ages and Dead flotant. New bareground should be zeroed and added to old
+        # Step 1.5: Reset the bareground ages. New bareground should be zeroed and added to old
         spCoverList['BAREGRND_OLD'] += spCoverList['BAREGRND_NEW']
         spCoverList['BAREGRND_NEW'] = 0.0
-        spCoverList['DEAD_Flt'] = 0.0 
+        
+
         
 
         # Step 2: Adjust the types based on the differences between
@@ -1831,6 +1843,7 @@ class WetlandMorphModel:
             flotant = 0.0
             for spName, spModel in filter( lambda kv: kv[1].modelType == 'FloatingMarshModel', iter(spModelList.items())):
                 flotant += spCoverList[spName]
+            flotant += spCoverList['DEAD_Flt']
                                 
             newLand = 1 - (newWater + spCoverList['NOTMOD'] + flotant)
             curLand = 1 - (curWater + spCoverList['NOTMOD'] + flotant)
