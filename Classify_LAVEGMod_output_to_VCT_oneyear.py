@@ -10,15 +10,14 @@ species_lookup = '/ocean/projects/bcs200002p/ewhite12/code/ICM_LAVegMod/cellxspe
 SOM_lookup     = '/ocean/projects/bcs200002p/ewhite12/code/ICM_LAVegMod/SOM_species.csv'
 BMU_lookup     = '/ocean/projects/bcs200002p/ewhite12/code/ICM_LAVegMod/BMU_to_community.csv'
 
-LVMout_file_excon = 'MP2023_S00_G000_C000_U00_V00_SLA_I_00_00_V_vegty.asc+'
+LVMout_file_excon = r'%s/MP2023_S00_G000_C000_U00_V00_SLA_I_00_00_V_vegty.asc+' % veg_dir
 if y == 0:
     LVMout_file = LVMout_file_excon
 else:
-    LVMout_file = 'MP2023_%s_%s_C000_U00_V00_SLA_O_%02d_%02d_V_vegty.asc+' % (S,G,y,y)
+    LVMout_file = r'%s/MP2023_%s_%s_C000_U00_V00_SLA_O_%02d_%02d_V_vegty.asc+' % (veg_dir,S,G,y,y)
 
 asc_out_file = r'%s/MP2023_%s_%s_C000_U00_V00_SLA_O_%02d_%02d_V_VCT.asc' % (veg_dir,S,G,y,y)
-
-os.chdir(veg_dir)  
+ 
 
 #for Y in years: # come back here when doing all 50 years
 #    print('On year '+ str(Y))
