@@ -39,7 +39,7 @@ LVMout = LVMout[LVMout[:, 0].argsort()]
 sp_names = np.genfromtxt(LVMout_file_excon,skip_header=371, skip_footer = 173898, delimiter=',', dtype='str')
 sp_names = (np.char.strip(sp_names,'"'))
 
-LVMgrid = np.genfromtxt(LVMout_file_excon,skip_header=6, skip_footer = 173899, delimiter=',', dtype=int) # skip the top portion of the asc+ files and only read in the column data starting on line 623
+LVMgrid = np.genfromtxt(LVMout_file_excon,skip_header=6, skip_footer = 173899, delimiter=' ', dtype=int) # skip the top portion of the asc+ files and only read in the column data starting on line 623
 
 cellxspecies = np.genfromtxt(species_lookup,delimiter=',',dtype='float') 
 SOM_species = np.genfromtxt(SOM_lookup,delimiter=',',skip_header=1,dtype='str') 
