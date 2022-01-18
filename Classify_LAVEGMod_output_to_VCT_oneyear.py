@@ -5,7 +5,7 @@ S = 'S07'
 G = 'G500'
 y = 0
 ## Location of all input files:
-veg_dir = r'%s/%s/veg' 
+veg_dir = r'%s/%s/veg' % (S,G)
 
 BMU_lookup = 'BMU_to_community.csv'
 
