@@ -1,10 +1,23 @@
 import numpy as np
 import os
 
-
+S = 'S07'
+G = 'G500'
+y = 0
 ## Location of all input files:
-path_asc = r'C:\Users\madel\Coastal Hydro Dropbox\Madeline Foster-Martinez\MRF_LAVegMod\Snedden_mapping_scheme' 
-os.chdir(path_asc)
+veg_dir = r'%s/%s/veg' 
+
+BMU_lookup = 'BMU_to_community.csv'
+
+LVMout_file_excon = 'MP2023_S07_G500_C000_U00_V00_SLA_O_03_03_V_vegty.asc+'
+if y == 0:
+    LVMout_file = LVMout_file_excon
+else:
+    LVMout_file = 'MP2023_%s_%s_C000_U00_V00_SLA_O_%02d_%02d_V_vegty.asc+' % (S,G,y,y)
+
+asc_out_file = r'%s/MP2023_%s_%s_C000_U00_V00_SLA_O_%02d_%02d_V_VCT.asc' % (veg_dir,S,G,y,y)
+
+os.chdir(veg_dir)  
 
 #for Y in years: # come back here when doing all 50 years
 #    print('On year '+ str(Y))
@@ -20,13 +33,13 @@ os.chdir(path_asc)
   #      sp_names = np.genfromtxt('MP2023_'+ S +'_'+ G+'_' + C+ '_' + U + '_' + V + '_SLA_O_' +str(Y)+'_'+str(Y)+'_V_vegty.asc+',skip_header=371, skip_footer = 173898, delimiter=',', dtype='str')
   #      LVMout = LVMout[LVMout[:, 0].argsort()]
 
-LVMout = np.genfromtxt('MP2023_S07_G500_C000_U00_V00_SLA_O_03_03_V_vegty.asc+',skip_header=372, delimiter=',', dtype='float') # skip the top portion of the asc+ files and only read in the column data starting on line 623
+LVMout = np.genfromtxt(LVMout_file,skip_header=372, delimiter=',', dtype='float') # skip the top portion of the asc+ files and only read in the column data starting on line 623
 LVMout = LVMout[LVMout[:, 0].argsort()]
 
-sp_names = np.genfromtxt('MP2023_S00_G000_C000_U00_V00_SLA_I_00_00_V_vegty.asc+',skip_header=371, skip_footer = 173898, delimiter=',', dtype='str')
+sp_names = np.genfromtxt(LVMout_file_excon,skip_header=371, skip_footer = 173898, delimiter=',', dtype='str')
 sp_names = (np.char.strip(sp_names,'"'))
 
-LVMgrid = np.genfromtxt('MP2023_S00_G000_C000_U00_V00_SLA_I_00_00_V_vegty.asc+',skip_header=6, skip_footer = 173899, delimiter=' ', dtype=int) # skip the top portion of the asc+ files and only read in the column data starting on line 623
+LVMgrid = np.genfromtxt(LVMout_file_excon,skip_header=6, skip_footer = 173899, delimiter=',', dtype=int) # skip the top portion of the asc+ files and only read in the column data starting on line 623
 
 cellxspecies = np.genfromtxt('cellxspecies.csv',delimiter=',',dtype='float') 
 SOM_species = np.genfromtxt('SOM_species.csv',delimiter=',',skip_header=1,dtype='str') 
@@ -45,7 +58,7 @@ for j in range(0,len(SOM_species)):
         SOM_indices_of_missing_species.append(j)    
     match = 0
 
-BMU_to_community = np.genfromtxt('BMU_to_community.csv',delimiter=',',skip_header=1,dtype='int') 
+BMU_to_community = np.genfromtxt(BMU_lookup,delimiter=',',skip_header=1,dtype='int') 
 
 cat = {}
 SOM_dist = {}
@@ -84,11 +97,9 @@ for row in LVMout:
             cat[cell_id] = BMU_to_community[int(BMU[cell_id])-1][1] 
 
 ## Location of output file:
-path = r'C:\Users\madel\Coastal Hydro Dropbox\Madeline Foster-Martinez\MRF_LAVegMod\Snedden_mapping_scheme'
 asc_header = 'ncols 1052\nnrows 365\nxllcorner 404710\nyllcorner 3199480\ncellsize 480\nNODATA_value 9999\n'
 
 ## Output file name: 
-asc_out_file = r'%s\%s.asc' % (path, 'trial_ICMyear3_SOMcategories_04Jan22')
 with open(asc_out_file, mode='w') as outf:
     outf.write(asc_header)
     for row in LVMgrid:
