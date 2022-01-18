@@ -10,7 +10,7 @@ species_lookup = '/ocean/projects/bcs200002p/ewhite12/code/ICM_LAVegMod/cellxspe
 SOM_lookup     = '/ocean/projects/bcs200002p/ewhite12/code/ICM_LAVegMod/SOM_species.csv'
 BMU_lookup     = '/ocean/projects/bcs200002p/ewhite12/code/ICM_LAVegMod/BMU_to_community.csv'
 
-LVMout_file_excon = 'MP2023_S00_G000_C000_U00_V00_SLA_O_00_00_V_vegty.asc+'
+LVMout_file_excon = 'MP2023_S00_G000_C000_U00_V00_SLA_I_00_00_V_vegty.asc+'
 if y == 0:
     LVMout_file = LVMout_file_excon
 else:
