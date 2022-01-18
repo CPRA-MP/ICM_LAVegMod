@@ -4,12 +4,13 @@ import os
 S = 'S07'
 G = 'G500'
 y = 0
-## Location of all input files:
 veg_dir = r'%s/%s/veg' % (S,G)
 
-BMU_lookup = 'BMU_to_community.csv'
+species_lookup = '/ocean/projects/bcs200002p/ewhite12/code/ICM_LAVegMod/cellxspecies.csv'
+SOM_lookup     = '/ocean/projects/bcs200002p/ewhite12/code/ICM_LAVegMod/SOM_species.csv'
+BMU_lookup     = '/ocean/projects/bcs200002p/ewhite12/code/ICM_LAVegMod/BMU_to_community.csv'
 
-LVMout_file_excon = 'MP2023_S07_G500_C000_U00_V00_SLA_O_03_03_V_vegty.asc+'
+LVMout_file_excon = 'MP2023_S00_G000_C000_U00_V00_SLA_O_00_00_V_vegty.asc+'
 if y == 0:
     LVMout_file = LVMout_file_excon
 else:
@@ -41,8 +42,9 @@ sp_names = (np.char.strip(sp_names,'"'))
 
 LVMgrid = np.genfromtxt(LVMout_file_excon,skip_header=6, skip_footer = 173899, delimiter=',', dtype=int) # skip the top portion of the asc+ files and only read in the column data starting on line 623
 
-cellxspecies = np.genfromtxt('cellxspecies.csv',delimiter=',',dtype='float') 
-SOM_species = np.genfromtxt('SOM_species.csv',delimiter=',',skip_header=1,dtype='str') 
+cellxspecies = np.genfromtxt(species_lookup,delimiter=',',dtype='float') 
+SOM_species = np.genfromtxt(SOM_lookup,delimiter=',',skip_header=1,dtype='str') 
+BMU_to_community = np.genfromtxt(BMU_lookup,delimiter=',',skip_header=1,dtype='int') 
 
 SOM_indices_of_missing_species = []
 SOM_match_indices = []
@@ -58,7 +60,7 @@ for j in range(0,len(SOM_species)):
         SOM_indices_of_missing_species.append(j)    
     match = 0
 
-BMU_to_community = np.genfromtxt(BMU_lookup,delimiter=',',skip_header=1,dtype='int') 
+
 
 cat = {}
 SOM_dist = {}
