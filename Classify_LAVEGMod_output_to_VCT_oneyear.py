@@ -1,6 +1,23 @@
 import numpy as np
 import os
 
+# Snedden Community Vegetation Types (integer values for SOM_species.csv)
+#  1: Maidencane          
+#  2: Three-Square        
+#  3: Rosseau Cane       
+#  4: Paspalum            
+#  5: Wiregrass         
+#  6: Bulltongue         
+#  7: Needlerush        
+#  8: Bulrush        
+#  9: Brackish Mix      
+# 10: Oystergrass    
+# 11: Saltgrass  
+# 12: majority barrier island 
+# 13: majority non-SOM bottomland hardwood forest + swamp forest
+# 14: No SOM species found (i.e. all water) 
+
+
 S = 'S07'
 G = 'G500'
 years = [2,12,22,32,42,52]
