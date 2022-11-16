@@ -21,7 +21,7 @@ import sys
 
 S = 'S%02d' % int(sys.argv[1]) # 'S07'
 G = 'G%03d' % int(sys.argv[2]) # 'G500'
-years = range(1,52) #[2,12,22,32,42,52]
+years = [int(sys.argv[3])] #range(1,52) #[2,12,22,32,42,52]
 
 veg_dir = r'%s/%s/veg' % (S,G)
 
