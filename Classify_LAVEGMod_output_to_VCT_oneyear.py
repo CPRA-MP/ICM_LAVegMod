@@ -1,5 +1,6 @@
 import numpy as np
 import os
+import sys
 
 # Snedden Community Vegetation Types (integer values for SOM_species.csv)
 #  1: Maidencane          
@@ -18,9 +19,10 @@ import os
 # 14: No SOM species found (i.e. all water) 
 
 
-S = 'S07'
-G = 'G500'
-years = [2,12,22,32,42,52]
+S = 'S%02d' % sys.argv(1) # 'S07'
+G = 'G%03d' % sys.argv(2) # 'G500'
+years = range(1,52) #[2,12,22,32,42,52]
+
 veg_dir = r'%s/%s/veg' % (S,G)
 
 species_lookup = '/ocean/projects/bcs200002p/ewhite12/code/ICM_LAVegMod/cellxspecies.csv'
