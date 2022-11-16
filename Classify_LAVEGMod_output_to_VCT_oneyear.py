@@ -19,8 +19,8 @@ import sys
 # 14: No SOM species found (i.e. all water) 
 
 
-S = 'S%02d' % sys.argv(1) # 'S07'
-G = 'G%03d' % sys.argv(2) # 'G500'
+S = 'S%02d' % sys.argv[1] # 'S07'
+G = 'G%03d' % sys.argv[2] # 'G500'
 years = range(1,52) #[2,12,22,32,42,52]
 
 veg_dir = r'%s/%s/veg' % (S,G)
