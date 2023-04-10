@@ -13,9 +13,9 @@ import sys
 #  8: Bulrush        
 #  9: Brackish Mix      
 # 10: Oystergrass    
-# 11: Saltgrass  
-# 12: majority barrier island 
-# 13: majority non-SOM bottomland hardwood forest + swamp forest
+# 11: Saltgrass   
+# 12: majority non-SOM bottomland hardwood forest + swamp forest
+# 13: majority barrier island
 # 14: No SOM species found (i.e. all water) 
 
 
