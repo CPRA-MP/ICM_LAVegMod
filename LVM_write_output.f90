@@ -74,7 +74,7 @@ subroutine write_output
     close(121)
 
 
-2345    format(I0,53(',',F0.4))
+2345    format(I0,F0.4,53(',',F0.4))
 
     return
 end
