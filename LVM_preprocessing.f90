@@ -68,7 +68,7 @@ subroutine preprocessing
     pct_vglnd_SM = 0.0
 
     open(unit=120, file=trim(adjustL(veg_in_file)))
-    read(120,1234) dump_txt         ! dump column header row ! format 1234 must match structure of veg_out_file column headers
+    read(120,1234) veg_coverage_file_header                 ! dump column header row ! format 1234 must match structure of veg_out_file column headers
 
     do i = 1,ngrid
         read(120,*) g,                               &      ! CELLID
