@@ -36,6 +36,7 @@ module params
     ! species coverage grid in: PREPROCESSING
     ! define variables used to define the vegetation species coverage at each grid cell that are read in from file
     ! these variables are 2D arrays [i,j] where the ith dimension represents the grid cell ID and the jth dimension represents the species coverage for the previous year [j=1] and for the current model year [j=2]
+    character*3000 :: veg_coverage_file_header                          ! text string that saves the first row of the veg input file to use as a header in the output file
     real(sp),dimension(:,:),allocatable :: water                        ! percent of ICM_LAVegMod grid cell that is water
     real(sp),dimension(:,:),allocatable :: upland                       ! percent of ICM-LAVegMod grid cell that is upland/developed (e.g., NotMod) and is too high and dry for wetland vegetation
     real(sp),dimension(:,:),allocatable :: bare_old                     ! percent of ICM-LAVegMod grid cell that is non-vegetated wetland and was bare in previous year (old bare ground)

@@ -12,7 +12,7 @@ subroutine write_output
 
 
     open(unit=121, file=trim(adjustL(veg_out_file)))
-
+    write(121,'A') trim(adjustL(veg_coverage_file_header))
     do g = 1,ngrid
         write(121,2345) g,                           &      ! CELLID
    &        water(g,2),                              &      ! WATER
