@@ -1,10 +1,10 @@
-subroutine preprocessing
+subroutine write_output
 
     use params
     implicit none
 
     ! local variables
-    integer :: i                        ! iterator
+    integer :: g                        ! iterator
 
     ! write ICM-LAVegMod grid output file to file
     write(  *,*) ' - writing out LAVegMod grid-level output for end of current model year'
@@ -13,8 +13,8 @@ subroutine preprocessing
 
     open(unit=121, file=trim(adjustL(veg_out_file)))
 
-    do i = 1,ngrid
-        write(121,2345) i,                           &      ! CELLID
+    do g = 1,ngrid
+        write(121,2345) g,                           &      ! CELLID
    &        water(g,2),                              &      ! WATER
    &        upland(g,2),                             &      ! NOTMOD
    &        bare_old(g,2),                           &      ! BAREGRND_OLD

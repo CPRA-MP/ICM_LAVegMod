@@ -12,14 +12,6 @@ subroutine preprocessing
     write(000,*) ' - reading in LAVegMod grid-level output from previous year'
 
     ! initialize grid data arrays to zero before reading in
-    grid_pct_water = 0.0
-    grid_pct_upland = 0.0
-    grid_pct_bare_old = 0.0
-    grid_pct_bare_new = 0.0
-    grid_pct_dead_flt = 0.0
-    grid_bed_z = 0.0
-    grid_land_z = 0.0
-    grid_FIBS_score = dem_NoDataVal
     water = 0.0
     upland = 0.0
     bare_old = 0.0
@@ -67,7 +59,7 @@ subroutine preprocessing
     SPVI3 = 0.0
     STHE9 = 0.0
     UNPA = 0.0
-    FIBS_score = 0.0
+    FFIBS_score = 0.0
     pct_vglnd_BLHF = 0.0
     pct_vglnd_SWF = 0.0
     pct_vglnd_FM = 0.0
