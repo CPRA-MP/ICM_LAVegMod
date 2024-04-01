@@ -19,7 +19,7 @@ module params
     integer :: ngrid                                                ! number of ICM-LAVegMod grid cells
 
     ! input files in subroutine: SET_IO
-    character*fn_len :: veg_in_file                                ! file name, with relative path, to *vegty.csv file from previous model year read in to set initial conditions for the current model year
+    character*fn_len :: veg_in_file                                 ! file name, with relative path, to *vegty.csv file from previous model year read in to set initial conditions for the current model year
 
     ! output files in subroutine: SET_IO
     character*fn_len :: veg_out_file                                ! file name, with relative path, to *vegty.csv file for current year written to disc for final landscape of the current model year
@@ -33,11 +33,30 @@ module params
     character*3 :: uterm                                            ! file naming convention uncertainty term
     character*3 :: vterm                                            ! file naming convention variance term
 
+    ! define variables read in or calculated from files in subroutine: PREPROCESSING
+    integer,dimension(:),allocatable ::  grid_comp                  ! ICM-Hydro compartment ID overlaying ICM-LAVegMod grid (-)
+    integer,dimension(:),allocatable ::  grid_x                     ! X coordinate of ICM-LAVegMod grid cell centroid (UTM Zone 15N meters)
+    integer,dimension(:),allocatable ::  grid_y                     ! Y coordinate of ICM-LAVegMod grid cell centroid (UTM Zone 15N meters) 
+
+    ! define variables read in from compartment_out ICM-Hydro summary file in subroutine: PREPROCESSING
+    real(sp),dimension(:),allocatable :: stg_mx_yr                  ! Maximum water surface elevation (stage) during the year (m NAVD88)
+    real(sp),dimension(:),allocatable :: stg_av_yr                  ! Mean water surface elevation (stage) during the year (m NAVD88)
+    real(sp),dimension(:),allocatable :: stg_av_smr                 ! Mean water surface elevation (stage) during growing season/summer  (m NAVD88) - growing season/summer defined as May 1 through Aug 31 (inclusive) defined in ICM-Hydro/2D_ICM_summaries.f 
+    real(sp),dimension(:),allocatable :: wlv_smr                    ! Water level variability during growing season/summer (m) - water level variability calculated from tidal range (see ICM-Hydro/2D_ICM_summaries.f) - growing season/summer defined as May 1 through Aug 31 (inclusive) defined in ICM-Hydro (2D_ICM_summaries.f)   
+    real(sp),dimension(:),allocatable :: sal_av_yr                  ! Mean water salinity during the year (ppt)    
+    real(sp),dimension(:),allocatable :: sal_av_smr                 ! Mean water salinity during growing season/summer (ppt) - growing season/summer defined as May 1 through Aug 31 (inclusive) defined in ICM-Hydro/2D_ICM_summaries.f
+    real(sp),dimension(:),allocatable :: sal_mx_14d_yr              ! Maximum 2-week mean salinity during the year (ppt)
+    real(sp),dimension(:),allocatable :: tmp_av_yr                  ! Mean water temperture during the year (deg C)  
+    real(sp),dimension(:),allocatable :: tmp_av_smr                 ! Mean water temperture during growing season/summer (deg C) - growing season/summer defined as May 1 through Aug 31 (inclusive) defined in ICM-Hydro/2D_ICM_summaries.f
+
+    ! define variables read in from ICM-Morph output files in subroutine: PREPROCESSING
+    real(sp),dimension(:),allocatable :: water_from_morph           ! percent of ICM-LAVegMod grid cell that is water, as calculated at end of previous year's ICM-Morph run
+    
     ! species coverage grid in: PREPROCESSING
     ! define variables used to define the vegetation species coverage at each grid cell that are read in from file
     ! these variables are 2D arrays [i,j] where the ith dimension represents the grid cell ID and the jth dimension represents the species coverage for the previous year [j=1] and for the current model year [j=2]
     character*3000 :: veg_coverage_file_header                          ! text string that saves the first row of the veg input file to use as a header in the output file
-    real(sp),dimension(:,:),allocatable :: water                        ! percent of ICM_LAVegMod grid cell that is water
+    real(sp),dimension(:,:),allocatable :: water                        ! percent of ICM_LAVegMod grid cell that is water (j=1 will be last year's ICM-LAVegMod % value, where as j=2 will store current year's % value as used by ICM-LAVegMod; not to be confused with 'water_from_morph' variable)
     real(sp),dimension(:,:),allocatable :: upland                       ! percent of ICM-LAVegMod grid cell that is upland/developed (e.g., NotMod) and is too high and dry for wetland vegetation
     real(sp),dimension(:,:),allocatable :: bare_old                     ! percent of ICM-LAVegMod grid cell that is non-vegetated wetland and was bare in previous year (old bare ground)
     real(sp),dimension(:,:),allocatable :: bare_new                     ! percent of ICM-LAVegMod grid cell that is non-vegetated wetland and is newly bare during current year (new bare ground)
