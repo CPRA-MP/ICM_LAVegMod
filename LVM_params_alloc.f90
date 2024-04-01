@@ -19,6 +19,26 @@ subroutine params_alloc
     use params
     implicit none
 
+    ! allocate memory for variables read in or clalculated in subroutine: PREPROCESSING
+    allocate(grid_comp(ngrid,1))
+    allocate(grid_x(ngrid,1))
+    allocate(grid_y(ngrid,1))
+
+    ! allocate memory for variables read in from compartment_out ICM-Hydro summary file in subroutine: PREPROCESSING
+    allocate(stg_mx_yr(ncomp))
+    allocate(stg_av_yr(ncomp))
+    allocate(stg_av_smr(ncomp))
+    allocate(wlv_smr(ncomp))
+    allocate(sal_av_yr(ncomp))
+    allocate(sal_av_smr(ncomp))
+    allocate(sal_mx_14d_yr(ncomp))
+    allocate(tmp_av_yr(ncomp))
+    allocate(tmp_av_smr(ncomp))
+
+    ! allocate memory for variables read in from ICM-Morph output files in subroutine: PREPROCESSING
+    allocate(water_from_morph(ngrid))
+
+    
     ! allocate memory for variables read and set in subroutine: PREPROCESSING
     ! these variables are 2D arrays [i,j] where the ith dimension represents the grid cell ID and the jth dimension represents the species coverage for the previous year [j=1] and for the current model year [j=2]
     allocate(water(ngrid,2))
