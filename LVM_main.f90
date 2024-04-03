@@ -64,7 +64,60 @@ program main
     write(  *,*) 'Preprocessing subroutine ended at: ',dtstr
     write(000,*) 'Preprocessing subroutine ended at: ',dtstr
 
-    
+    call reset_coverages
+    call date_and_time(VALUES=dtvalues)
+    write(dtstr,8889) dtvalues(1),'-',dtvalues(2),'-',dtvalues(3),' ',dtvalues(5),':',dtvalues(6),':',dtvalues(7)
+    write(  *,*) 'Reset Coverages subroutine ended at: ',dtstr
+    write(000,*) 'Reset Coverages subroutine ended at: ',dtstr
+
+    call land_change
+    call date_and_time(VALUES=dtvalues)
+    write(dtstr,8889) dtvalues(1),'-',dtvalues(2),'-',dtvalues(3),' ',dtvalues(5),':',dtvalues(6),':',dtvalues(7)
+    write(  *,*) 'Land Change subroutine ended at: ',dtstr
+    write(000,*) 'Land Change subroutine ended at: ',dtstr
+
+    call high_dispersal_est
+    call date_and_time(VALUES=dtvalues)
+    write(dtstr,8889) dtvalues(1),'-',dtvalues(2),'-',dtvalues(3),' ',dtvalues(5),':',dtvalues(6),':',dtvalues(7)
+    write(  *,*) 'High Dispersal Establishment subroutine ended at: ',dtstr
+    write(000,*) 'High Dispersal Establishment ended at: ',dtstr
+
+    call veg_mortality
+    call date_and_time(VALUES=dtvalues)
+    write(dtstr,8889) dtvalues(1),'-',dtvalues(2),'-',dtvalues(3),' ',dtvalues(5),':',dtvalues(6),':',dtvalues(7)
+    write(  *,*) 'Vegetation Mortality subroutine ended at: ',dtstr
+    write(000,*) 'Vegetation Mortality ended at: ',dtstr
+
+    call veg_establishment
+    call date_and_time(VALUES=dtvalues)
+    write(dtstr,8889) dtvalues(1),'-',dtvalues(2),'-',dtvalues(3),' ',dtvalues(5),':',dtvalues(6),':',dtvalues(7)
+    write(  *,*) 'Vegetation Establishment subroutine ended at: ',dtstr
+    write(000,*) 'Vegetation Establishment subroutine ended at: ',dtstr
+
+    call flotant_change
+    call date_and_time(VALUES=dtvalues)
+    write(dtstr,8889) dtvalues(1),'-',dtvalues(2),'-',dtvalues(3),' ',dtvalues(5),':',dtvalues(6),':',dtvalues(7)
+    write(  *,*) 'Flotant Change subroutine ended at: ',dtstr
+    write(000,*) 'Flotant Change subroutine ended at: ',dtstr
+
+    call acute_salinity
+    call date_and_time(VALUES=dtvalues)
+    write(dtstr,8889) dtvalues(1),'-',dtvalues(2),'-',dtvalues(3),' ',dtvalues(5),':',dtvalues(6),':',dtvalues(7)
+    write(  *,*) 'Acute Salinity subroutine ended at: ',dtstr
+    write(000,*) 'Acute Salinity subroutine ended at: ',dtstr
+
+    call check_sums
+    call date_and_time(VALUES=dtvalues)
+    write(dtstr,8889) dtvalues(1),'-',dtvalues(2),'-',dtvalues(3),' ',dtvalues(5),':',dtvalues(6),':',dtvalues(7)
+    write(  *,*) 'Check Sums subroutine ended at: ',dtstr
+    write(000,*) 'Check Sums subroutine ended at: ',dtstr
+
+    call coverage_calcs
+    call date_and_time(VALUES=dtvalues)
+    write(dtstr,8889) dtvalues(1),'-',dtvalues(2),'-',dtvalues(3),' ',dtvalues(5),':',dtvalues(6),':',dtvalues(7)
+    write(  *,*) 'Coverage calculations subroutine ended at: ',dtstr
+    write(000,*) 'Coverage calculations subroutine ended at: ',dtstr
+
     call write_output
     call date_and_time(VALUES=dtvalues)
     write(dtstr,8889) dtvalues(1),'-',dtvalues(2),'-',dtvalues(3),' ',dtvalues(5),':',dtvalues(6),':',dtvalues(7)
