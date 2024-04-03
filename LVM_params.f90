@@ -17,6 +17,7 @@ module params
     integer :: start_year                                           ! first year of model run
     integer :: elapsed_year                                         ! elapsed year of model simulation
     integer :: ngrid                                                ! number of ICM-LAVegMod grid cells
+    integer :: ncomp                                                ! number of ICM-Hydro compartments
 
     ! input files in subroutine: SET_IO
     character*fn_len :: veg_in_file                                 ! file name, with relative path, to *vegty.csv file from previous model year read in to set initial conditions for the current model year

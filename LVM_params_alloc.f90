@@ -20,9 +20,9 @@ subroutine params_alloc
     implicit none
 
     ! allocate memory for variables read in or clalculated in subroutine: PREPROCESSING
-    allocate(grid_comp(ngrid,1))
-    allocate(grid_x(ngrid,1))
-    allocate(grid_y(ngrid,1))
+    allocate(grid_comp(ngrid))
+    allocate(grid_x(ngrid))
+    allocate(grid_y(ngrid))
 
     ! allocate memory for variables read in from compartment_out ICM-Hydro summary file in subroutine: PREPROCESSING
     allocate(stg_mx_yr(ncomp))
