@@ -18,6 +18,8 @@ module params
     integer :: elapsed_year                                         ! elapsed year of model simulation
     integer :: ngrid                                                ! number of ICM-LAVegMod grid cells
     integer :: ncomp                                                ! number of ICM-Hydro compartments
+    integer :: grid_res                                             ! XY resolution of ICM-LAVegMod grid (meters) - only applicable for regular Cartesian grid
+    integer :: dem_res                                              ! XY resolution of DEM (meters)
 
     ! input files in subroutine: SET_IO
     character*fn_len :: veg_in_file                                 ! file name, with relative path, to *vegty.csv file from previous model year read in to set initial conditions for the current model year
