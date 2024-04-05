@@ -24,17 +24,17 @@ subroutine land_change
     
     ! Adjust the Morph water to be comparable to the Veg water (Morph treats NOTMOD as NoData, so the %water does not account for NOTMOD. Morph Water + Morph Land + Veg NOTMOD = 100%)
     water_from_morph = water_from_morph * (1 - upland(:,1))             ! NOTMOD is now called upland
-    no_change_threshold = dem_res**2 / grid_res**2                     ! portion of LAVegMod grid cell that is one DEM pixel !! MOVE TO PARAMS AND MOVE CALCULATION TO SET_IO IF NEEDED IN OTHER SUBROUTINES !!
+    no_change_threshold = dem_res**2 / grid_res**2                      ! portion of LAVegMod grid cell that is one DEM pixel !! MOVE TO PARAMS AND MOVE CALCULATION TO SET_IO IF NEEDED IN OTHER SUBROUTINES !!
     
     ! Loop through every grid cell comparing the amount of water and making the needed changes
     do ig = 1, ngrid
-        delta_water = water(ig,1) - water_from_morph(ig)                        ! Compare Morph water to Veg water and proceed accordingly
-                                                                                ! 1) No change; 0.00390625 = (30*30)/(480*480) is the fraction of one morph cell in a veg grid cell
-        if (delta_water > no_change_threshold) then                                  ! 2) Land gain; add new bareground and subtract water 
+        delta_water = water(ig,1) - water_from_morph(ig)                ! Compare Morph water to Veg water and proceed accordingly
+                                                                        ! 1) No change; 0.00390625 = (30*30)/(480*480) is the fraction of one morph cell in a veg grid cell
+        if (delta_water > no_change_threshold) then                     ! 2) Land gain; add new bareground and subtract water 
             bare_new(ig,2) = bare_new(ig,1) + delta_water
             water(ig,2) = water(ig,1) - delta_water
         
-        else if (delta_water < no_change_threshold) then                             ! 3) land loss; add to water, convert bareground to water, then convert vegetation to water
+        else if (delta_water < -1.0*no_change_threshold) then           ! 3) land loss; add to water, convert bareground to water, then convert vegetation to water
             delta_water = -1.0*delta_water                              ! redefining delta water so we're adding a positive rather than having to subtract a negative    
             ! calculate land in Veg cell and Morph cell
             total_flotant = ELBA2_Flt(ig,1) + PAHE2_Flt(ig,1) + bare_Flt(ig,1) + dead_Flt(ig,1)                    !
