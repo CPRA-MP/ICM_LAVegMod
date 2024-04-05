@@ -67,8 +67,8 @@ subroutine preprocessing
     pct_vglnd_BM = 0.0
     pct_vglnd_SM = 0.0
 
-    open(unit=120, file=trim(adjustL(veg_in_file)))
-    read(120,1234) veg_coverage_file_header                 ! dump column header row ! format 1234 must match structure of veg_out_file column headers
+    open(unit=100, file=trim(adjustL(veg_in_file)))
+    read(100,1234) veg_coverage_file_header                 ! dump column header row ! format 1234 must match structure of veg_out_file column headers
 
     do i = 1,ngrid
         read(120,*) g,                               &      ! CELLID
@@ -126,10 +126,41 @@ subroutine preprocessing
    &        pct_vglnd_IM(g,1),                       &      ! pL_IM
    &        pct_vglnd_BM(g,1),                       &      ! pL_BM
    &        pct_vglnd_SM(g,1)                               ! pL_SM
-
     end do
-    close(120)
+    close(100)
 
+    
+   ! read ICM-Hydro compartment hydro output data in from file
+    write(  *,*) ' - reading in annual ICM-Hydro compartment-level output'
+    write(000,*) ' - reading in annual ICM-Hydro compartment-level output'
+    
+    open(unit=101, file=trim(adjustL(hydro_comp_out_file)))
+    
+    read(101,*) dump_txt        ! dump header
+    do i = 1,ncomp
+        read(112,*) dump_txt,               &
+   &         stg_mx_yr(i),                  &
+   &         stg_av_yr(i),                  &
+   &         stg_av_smr(i),                 &
+   &         wlv_smr(i),                    &
+   &         sal_av_yr(i),                  &
+   &         sal_av_smr(i),                 &
+   &         sal_mx_14d_yr(i),              &
+   &         tmp_av_yr(i),                  &
+   &         tmp_av_smr(i),                 &
+   &         dump_flt,                      &
+   &         dump_flt,                      &
+   &         dump_flt,                      &
+   &         dump_flt,                      &
+   &         dump_flt,                      &
+   &         dump_flt,                      &
+   &         dump_flt,                      &
+   &         dump_flt,                      &
+   &         dump_flt,                      &
+   &         dump_flt
+    end do
+    close(101)
+    
 
 1234    format(A,53(',',A))
 

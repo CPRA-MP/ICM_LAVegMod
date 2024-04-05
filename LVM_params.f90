@@ -23,7 +23,8 @@ module params
 
     ! input files in subroutine: SET_IO
     character*fn_len :: veg_in_file                                 ! file name, with relative path, to *vegty.csv file from previous model year read in to set initial conditions for the current model year
-
+    character*fn_len :: hydro_comp_out_file                         ! file name, with relative path, to *compartment_out.csv from current model year's ICM-Hydro simulation
+    
     ! output files in subroutine: SET_IO
     character*fn_len :: veg_out_file                                ! file name, with relative path, to *vegty.csv file for current year written to disc for final landscape of the current model year
     
@@ -41,7 +42,7 @@ module params
     integer,dimension(:),allocatable ::  grid_x                     ! X coordinate of ICM-LAVegMod grid cell centroid (UTM Zone 15N meters)
     integer,dimension(:),allocatable ::  grid_y                     ! Y coordinate of ICM-LAVegMod grid cell centroid (UTM Zone 15N meters) 
 
-    ! define variables read in from compartment_out ICM-Hydro summary file in subroutine: PREPROCESSING
+    ! define ICM-Hydro variables read in from compartment_out summary file in subroutine: PREPROCESSING
     real(sp),dimension(:),allocatable :: stg_mx_yr                  ! Maximum water surface elevation (stage) during the year (m NAVD88)
     real(sp),dimension(:),allocatable :: stg_av_yr                  ! Mean water surface elevation (stage) during the year (m NAVD88)
     real(sp),dimension(:),allocatable :: stg_av_smr                 ! Mean water surface elevation (stage) during growing season/summer  (m NAVD88) - growing season/summer defined as May 1 through Aug 31 (inclusive) defined in ICM-Hydro/2D_ICM_summaries.f 
@@ -113,6 +114,5 @@ module params
     real(sp),dimension(:,:),allocatable :: pct_vglnd_IM                 ! percent of vegetated land that is intermediate marsh
     real(sp),dimension(:,:),allocatable :: pct_vglnd_BM                 ! percent of vegetated land that is brackish marsh
     real(sp),dimension(:,:),allocatable :: pct_vglnd_SM                 ! percent of vegetated land that is saline marsh
-                                                                        
 
 end module params
