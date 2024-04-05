@@ -161,6 +161,24 @@ subroutine preprocessing
     end do
     close(101)
     
+    ! read ICM-Morph landscape data for grid in from file
+    write(  *,*) ' - reading in annual ICM-Morph landscape data output'
+    write(000,*) ' - reading in annual ICM-Morph landscape data output'
+    
+    open(unit=102, file=trim(adjustL(morph_grid_out_file)))
+    
+    read(102,*) dump_txt        ! dump header
+    do i = 1,ngrid
+        read(102,*) g,                          &
+   &            dump_flt,                       &
+   &            dump_flt,                       &
+   &            dump_flt,                       &
+   &            dump_flt,                       &
+   &            water_from_morph(g)             ! in the output grid file, this is from 0-100%
+    end do
+    close(102)
+    ! convert from 0-100% to 0.0-1.0 proportion
+    water_from_morph = water_from_morph/100.0
 
 1234    format(A,53(',',A))
 

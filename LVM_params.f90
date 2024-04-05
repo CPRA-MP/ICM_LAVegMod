@@ -24,6 +24,7 @@ module params
     ! input files in subroutine: SET_IO
     character*fn_len :: veg_in_file                                 ! file name, with relative path, to *vegty.csv file from previous model year read in to set initial conditions for the current model year
     character*fn_len :: hydro_comp_out_file                         ! file name, with relative path, to *compartment_out.csv from current model year's ICM-Hydro simulation
+    character*fn_len :: morph_grid_out_file                         ! file name, with relative path, to *grid_data.csv file from previous model year's ICM-Morph simulation
     
     ! output files in subroutine: SET_IO
     character*fn_len :: veg_out_file                                ! file name, with relative path, to *vegty.csv file for current year written to disc for final landscape of the current model year
@@ -54,7 +55,7 @@ module params
     real(sp),dimension(:),allocatable :: tmp_av_smr                 ! Mean water temperture during growing season/summer (deg C) - growing season/summer defined as May 1 through Aug 31 (inclusive) defined in ICM-Hydro/2D_ICM_summaries.f
 
     ! define variables read in from ICM-Morph output files in subroutine: PREPROCESSING
-    real(sp),dimension(:),allocatable :: water_from_morph           ! percent of ICM-LAVegMod grid cell that is water, as calculated at end of previous year's ICM-Morph run
+    real(sp),dimension(:),allocatable :: water_from_morph           ! proportion of ICM-LAVegMod grid cell that is water, as calculated at end of previous year's ICM-Morph run (0.0 - 1.0)
     
     ! species coverage grid in: PREPROCESSING
     ! define variables used to define the vegetation species coverage at each grid cell that are read in from file

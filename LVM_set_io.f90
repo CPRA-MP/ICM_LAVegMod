@@ -20,6 +20,7 @@ subroutine set_io
     ! input files
     read(001,*) veg_in_file,dump_txt        ! we can have this set automatically via the elapsed_year variable internal to the code instead of having it written to an input file
     read(001,*) hydro_comp_out_file 
+    read(001,*) morph_grid_out_file 
     ! output files     
     read(001,*) veg_out_file,dump_txt       ! we can have this set automatically via the elapsed_year variable internal to the code instead of having it written to an input file
     
