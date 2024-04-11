@@ -1,0 +1,15 @@
+2019, start_year - first year of model run
+1, elapsed_year - elapsed year of model run
+173898, ngrid - number of ICM-LAVegMod grid cells - will be an array dimension for all grid-level data
+1778, ncomp - number of ICM-Hydro compartmenets - will be an array dimension for all compartment-level data
+480,grid_res - XY resolution of ICM-LAVegMod grid (meters) - only applicable for regular Cartesian grid
+30, dem_res - XY resolution of DEM (meters)
+1, build_neighbors - flag, set to 1 if near and nearest neighbor lists need to be built from Grid XY data, set to 0 if neighbor files already exist
+'veg/MP2023_S00_G000_C000_U00_V00_SLA_I_00_00_V_neighbor_grids_480m.csv',nearest_neighbors_file - text file with list of grid cells that are the defined nearest neighbors
+480, nearest_neighbors_dist - distance in which a neighboring grid cell is considered a nearest neighbor (meters)
+'veg/MP2023_S00_G000_C000_U00_V00_SLA_I_00_00_V_neighbor_grids_960m.csv',near_neighbors_file -  text file with list of grid cells that are the defined near neighbors
+960, near_neighbors_dist - distance in which a neighboring grid cell is considered a near neighbor (meters)
+
+'veg/MP2023_S00_G000_C000_U00_V00_SLA_I_00_00_V_vegty.csv', veg_in_file - file name with relative path to *vegty.asc+ file saved by ICM-LAVegMod
+'veg/MP2023_S07_G514_C000_U00_V00_SLA_O_01_01_V_vegty.csv', veg_out_file - file name with relative path to *vegty.asc+ file saved by ICM-LAVegMod
+MP2023_S07_G514_C000_U00_V00_SLA, file naming convention prefix

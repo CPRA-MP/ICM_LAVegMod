@@ -20,8 +20,14 @@ module params
     integer :: ncomp                                                ! number of ICM-Hydro compartments
     integer :: grid_res                                             ! XY resolution of ICM-LAVegMod grid (meters) - only applicable for regular Cartesian grid
     integer :: dem_res                                              ! XY resolution of DEM (meters)
+    integer :: build_neighbors                                      ! flag - set to 1 if near and nearest neighbor lists need to be built from Grid XY data, set to 0 if neighbor files already exist
+    integer :: nearest_neighbors_dist                               ! distance in which a neighboring grid cell is considered a nearest neighbor (meters)
+    integer :: near_neighbors_dist                                  ! distance in which a neighboring grid cell is considered a near neighbor (meters)
 
     ! input files in subroutine: SET_IO
+    character*fn_len :: grid_file                                   ! file name, with relative path, to csv with X and Y coordinates (UTM meters) of grid cell centroids and the grid cell area (sq meters)
+    character*fn_len :: nearest_neighbors_file                      ! file name, with relative path, to csv with list of grid cells that are the defined nearest neighbors
+    character*fn_len :: near_neighbors_file                         ! file name, with relative path, to csv with list of grid cells that are the defined near neighbors
     character*fn_len :: veg_in_file                                 ! file name, with relative path, to *vegty.csv file from previous model year read in to set initial conditions for the current model year
     character*fn_len :: hydro_comp_out_file                         ! file name, with relative path, to *compartment_out.csv from current model year's ICM-Hydro simulation
     character*fn_len :: morph_grid_out_file                         ! file name, with relative path, to *grid_data.csv file from previous model year's ICM-Morph simulation
@@ -40,8 +46,9 @@ module params
 
     ! define variables read in or calculated from files in subroutine: PREPROCESSING
     integer,dimension(:),allocatable ::  grid_comp                  ! ICM-Hydro compartment ID overlaying ICM-LAVegMod grid (-)
-    integer,dimension(:),allocatable ::  grid_x                     ! X coordinate of ICM-LAVegMod grid cell centroid (UTM Zone 15N meters)
-    integer,dimension(:),allocatable ::  grid_y                     ! Y coordinate of ICM-LAVegMod grid cell centroid (UTM Zone 15N meters) 
+    real(sp),dimension(:),allocatable ::  grid_x                     ! X coordinate of ICM-LAVegMod grid cell centroid (UTM Zone 15N meters)
+    real(sp),dimension(:),allocatable ::  grid_y                     ! Y coordinate of ICM-LAVegMod grid cell centroid (UTM Zone 15N meters)
+    real(sp),dimension(:),allocatable :: grid_a                     ! area of ICM_LAVegMod grid cell (sq meters)
 
     ! define ICM-Hydro variables read in from compartment_out summary file in subroutine: PREPROCESSING
     real(sp),dimension(:),allocatable :: stg_mx_yr                  ! Maximum water surface elevation (stage) during the year (m NAVD88)

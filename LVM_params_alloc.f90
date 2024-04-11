@@ -23,6 +23,7 @@ subroutine params_alloc
     allocate(grid_comp(ngrid))
     allocate(grid_x(ngrid))
     allocate(grid_y(ngrid))
+    allocate(grid_a(ngrid))
 
     ! allocate memory for variables read in from compartment_out ICM-Hydro summary file in subroutine: PREPROCESSING
     allocate(stg_mx_yr(ncomp))
