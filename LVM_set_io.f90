@@ -23,6 +23,8 @@ subroutine set_io
     read(001,*) nearest_neighbors_dist
     read(001,*) near_neighbors_file
     read(001,*) near_neighbors_dist
+    read(001,*) max_neighbors
+    
     ! input files that change for each model year
     read(001,*) veg_in_file,dump_txt        ! we can have this set automatically via the elapsed_year variable internal to the code instead of having it written to an input file
     read(001,*) hydro_comp_out_file 

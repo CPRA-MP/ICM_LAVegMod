@@ -22,18 +22,39 @@
 program main
     
     use params
+    use sort
+    
     implicit none
-
+    
     ! local variables
     integer,dimension(8) :: dtvalues                ! variable to store date time values
     
     character*17 :: dtstrf                          ! string to hold formatted datetime
     character*19 :: dtstr                           ! string to hold formatted datetime
 
+    real(sp),dimension(:),allocatable :: dummy_array
+    allocate(dummy_array(10))
+    dummy_array(1) = 111.1
+    dummy_array(2) = 100.2
+    dummy_array(3) = 11.3
+    dummy_array(4) = -1000.4
+    dummy_array(5) = 1.5
+    dummy_array(6) = 0.006
+    dummy_array(7) = 11.7
+    dummy_array(8) = 1000.8
+    dummy_array(9) = 1.9
+    dummy_array(10) = 0.0
+    
+    write(*,*)'unsorted:'
+    write(*,*) dummy_array
+    call SHELLSORT(dummy_array,10)
+    write(*,*)'sorted:'
+    write(*,*) dummy_array
+    
     call date_and_time(VALUES=dtvalues)             ! grab simulation start time
     write(dtstrf,8888) dtvalues(1),dtvalues(2),dtvalues(3),'_',dtvalues(5),'.',dtvalues(6),'.',dtvalues(7)
     write(dtstr,8889) dtvalues(1),'-',dtvalues(2),'-',dtvalues(3),' ',dtvalues(5),':',dtvalues(6),':',dtvalues(7)
-    open(unit=000, file=trim(adjustL('_ICM-LAVegMod_runlog_')//dtstr//trim('.log')))
+    open(unit=000, file=trim(adjustL('log.log')))!'_ICM-LAVegMod_runlog_')//dtstr//trim('.log')))
     
     write(  *,*)
     write(  *,*) '*************************************************************'

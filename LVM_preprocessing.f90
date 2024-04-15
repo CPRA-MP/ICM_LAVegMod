@@ -71,7 +71,7 @@ subroutine preprocessing
     read(100,1234) veg_coverage_file_header                 ! dump column header row ! format 1234 must match structure of veg_out_file column headers
 
     do i = 1,ngrid
-        read(120,*) g,                               &      ! CELLID
+        read(100,*) g,                               &      ! CELLID
    &        water(g,1),                              &      ! WATER
    &        upland(g,1),                             &      ! NOTMOD
    &        bare_old(g,1),                           &      ! BAREGRND_OLD
@@ -138,7 +138,7 @@ subroutine preprocessing
     
     read(101,*) dump_txt        ! dump header
     do i = 1,ncomp
-        read(112,*) dump_txt,               &
+        read(101,*) dump_txt,               &
    &         stg_mx_yr(i),                  &
    &         stg_av_yr(i),                  &
    &         stg_av_smr(i),                 &
