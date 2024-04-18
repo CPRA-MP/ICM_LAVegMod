@@ -97,5 +97,10 @@ subroutine params_alloc
     allocate(pct_vglnd_BM(ngrid,2))
     allocate(pct_vglnd_SM(ngrid,2))
 
+    
+    ! allocate memory for variables read and set in subroutine: NEIGHBORS
+    allocate(nearest_neighbors(ngrid,max_neighbors))
+    allocate(near_neighbors(ngrid,max_neighbors))
+    
     return
 end

@@ -23,7 +23,7 @@ module params
     integer :: build_neighbors                                      ! flag - set to 1 if near and nearest neighbor lists need to be built from Grid XY data, set to 0 if neighbor files already exist
     integer :: nearest_neighbors_dist                               ! distance in which a neighboring grid cell is considered a nearest neighbor (meters) *must be smaller magnitude than "near_neighbor_dist"*
     integer :: near_neighbors_dist                                  ! distance in which a neighboring grid cell is considered a near neighbor (meters) *must be larger magnitude than "nearest_neighbor_dist"*
-    integer :: max_neighbors                                        ! maximum number of grid cells that will be allowed in the near and nearest neighbor lists - 
+    integer :: max_neighbors                                        ! maximum number of grid cells that will be allowed in the near and nearest neighbor lists
     
     ! input files in subroutine: SET_IO
     character*fn_len :: grid_file                                   ! file name, with relative path, to csv with X and Y coordinates (UTM meters) of grid cell centroids and the grid cell area (sq meters)
@@ -124,4 +124,8 @@ module params
     real(sp),dimension(:,:),allocatable :: pct_vglnd_BM                 ! percent of vegetated land that is brackish marsh
     real(sp),dimension(:,:),allocatable :: pct_vglnd_SM                 ! percent of vegetated land that is saline marsh
 
+    ! define variables read in or calculated from files in subroutine: NEIGHBORS
+    integer,dimension(:,:),allocatable ::  nearest_neighbors            ! list of grid cell IDs that are the nearest neighbors to each grid cell
+    integer,dimension(:,:),allocatable ::  near_neighbors               ! list of grid cell IDs that are the near neighbors to each grid cell
+    
 end module params

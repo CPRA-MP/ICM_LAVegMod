@@ -11,10 +11,10 @@ subroutine write_output
     write(000,*) ' - writing out LAVegMod grid-level output for end of current model year'
 
 
-    open(unit=121, file=trim(adjustL(veg_out_file)))
-    write(121,'(A)') trim(adjustL(veg_coverage_file_header))
+    open(unit=901, file=trim(adjustL(veg_out_file)))
+    write(901,'(A)') trim(adjustL(veg_coverage_file_header))
     do g = 1,ngrid
-        write(121,2345) g,                           &      ! CELLID
+        write(901,3456) g,                           &      ! CELLID
    &        water(g,2),                              &      ! WATER
    &        upland(g,2),                             &      ! NOTMOD
    &        bare_old(g,2),                           &      ! BAREGRND_OLD
@@ -71,10 +71,10 @@ subroutine write_output
    &        pct_vglnd_SM(g,2)                               ! pL_SM
 
     end do
-    close(121)
+    close(901)
 
 
-2345    format(I0,54(',',F0.4))
+3456    format(I0,54(',',F0.4))
 
     return
 end

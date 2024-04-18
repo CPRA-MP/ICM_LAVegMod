@@ -4,9 +4,10 @@ subroutine neighbors
     implicit none
 
     ! PARAMS variables used:
+    !   build_neighbors
     !   grid_x
     !   grid_y
-    !   build_neighbors
+    !   max_neighbors
     !   nearest_neighbors
     !   nearest_neighbors_file
     !   nearest_neighbors_dist
@@ -15,6 +16,7 @@ subroutine neighbors
     !   near_neighbors_dist
 
     ! local variables
+    integer :: g                            ! iterator
     integer :: g0                           ! iterator to store the grid cell of interest
     integer :: gi                           ! iterator to store all other grid cells (not g0)
     integer :: maxcount                     ! count of the largest number of neighbors for any grid cell (used in output file formatting)
@@ -27,6 +29,10 @@ subroutine neighbors
     allocate(d(ngrid))
     
     arbitrary_max = near_neighbors_dist**2
+    
+    ! initialize arrays of nearest and near neighbors to negative value so each grid cell can have a unique number of neighbors - will require >0 filter when looking up neighboring grid cell IDs
+    nearest_neighbors = -9999
+    near_neighbors = -9999
     
     if (build_neighbors == 1) then
         write(  *,*) ' - calculating centroid-to-centroid distances for all grid cells and finding neighbors'
@@ -43,10 +49,10 @@ subroutine neighbors
                 write(  *,*) ' - found the maximum number of neighbors (set in input_params). Stopping neighbor analysis.'
                 write(000,*) ' - found the maximum number of neighbors (set in input_params). Stopping neighbor analysis.'
                 
-                open(unit=999, file=trim(adjustL('veg/__NEIGHBORING_GRID_CELL_ERRORS__.txt')))
-                write(999,*) 'Found the maximum number of neighbors (set in input_params). Stopping neighbor analysis. Run continued.'
-                write(999,*) 'Maximum number of neighbors was set to: ', max_neighbors
-                close(999)
+                open(unit=201, file=trim(adjustL('veg/__NEIGHBORING_GRID_CELL_ERRORS__.txt')))
+                write(201,*) 'Found the maximum number of neighbors (set in input_params). Stopping neighbor analysis. Run continued.'
+                write(201,*) 'Maximum number of neighbors was set to: ', max_neighbors
+                close(201)
                 
                 exit
             end if
@@ -54,7 +60,7 @@ subroutine neighbors
             
             ! calculate distance from current grid cell of interest (g0) to all other grid cells (gi)
             do gi = 1,ngrid
-                d(gi) = ( ( grid_x(g0) - grid_x(gi) )**2 + ( ( grid_y(g0) - grid_y(gi) )**2 )**0.5
+                d(gi) = ( ( grid_x(g0) - grid_x(gi) )**2 + ( ( grid_y(g0) - grid_y(gi) )**2 ) )**0.5
             end do
             
             ! determine list of all NEAREST NEIGHBOR grid cells to current grid cell of interest (g0)
@@ -91,22 +97,58 @@ subroutine neighbors
             end do
             maxcount = MAX(count,maxcount)
         end do
-                    
-
         
+        ! write lists of NEAREST and NEAR NEIGHBOR grid cells to file
+        write(  *,*) ' - writing nearest neighbor file: ', nearest_neighbors_file
+        write(000,*) ' - writing nearest neighbor file: ', nearest_neighbors_file
+        
+        open(unit=202, file=trim(adjustL(nearest_neighbors_file)))
+        write(202,'(A,I0,A)') 'gridID,nearest neighbors within ',nearest_neighbors_dist,' m:'
+        do g0 = 1,ngrid
+            write(202,2345) g0, nearest_neighbors(g0,:)
+        end do
+        close(202)
+        
+        write(  *,*) ' - writing near neighbor file: ', near_neighbors_file
+        write(000,*) ' - writing near neighbor file: ', near_neighbors_file
+    
+        open(unit=203, file=trim(adjustL(near_neighbors_file)))
+        write(202,'(A,I0,A)') 'gridID,near neighbors within ',near_neighbors_dist,' m:'
+        do g0 = 1,ngrid
+            write(203,2345) g0, near_neighbors(g0,:)
+        end do
+        close(203)
+    
     else
-        write(  *,*) ' - reading list of neighboring cells from file'
-        write(000,*) ' - reading list of neighboring cells from file'
+        ! read lists of NEAREST and NEAR NEIGHBOR grid cells to file
+        write(  *,*) ' - reading list of nearest neighboring cells from file: ', nearest_neighbors_file
+        write(000,*) ' - reading list of nearest neighboring cells from file: ', nearest_neighbors_file
         
+        open(unit=202, file=trim(adjustL(nearest_neighbors_file)))
+        read(202,*) dump_txt
+        do g = 1,ngrid
+            read(202,*)
+            write(202,2345) g0, nearest_neighbors(g0,:)   ! read in grid cell of interest from file and assign list of nearest neighbors to array
+        end do
+        close(202)
         
+        write(  *,*) ' - reading list of near neighboring cells from file: ', near_neighbors_file
+        write(000,*) ' - reading list of near neighboring cells from file: ', near_neighbors_file
+    
+        open(unit=203, file=trim(adjustL(near_neighbors_file)))
+        write(202,'(A,I0,A)') 'gridID,near neighbors within ',near_neighbors_dist,' m:'
+        do g = 1,ngrid
+            write(203,2345) g0, near_neighbors(g0,:)   ! read in grid cell of interest from file and assign list of nearest neighbors to array
+        end do
+        close(203)
         
     
     end if
 
 
  
+2345 format(I0,<max_neighbors>(',',I0))
 
-2345    format(I0,54(',',F0.4))
 
     return
 end
