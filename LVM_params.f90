@@ -55,7 +55,8 @@ module params
     real(sp),dimension(:),allocatable :: grid_a                     ! area of ICM_LAVegMod grid cell (sq meters)
 
     ! define coverage attribute variables read in from input attribute table in subroutine: PREPROCESSING
-    character*20,dimension(:),allocatable ::  cov_symbol            ! USDA code/symbol for each vegetation coverage type (e.g., SPPA, SPAL, etc.)
+    character*20,dimension(:),allocatable ::  cov_symbol            ! USDA code/symbol for each vegetation coverage type (e.g., SPPA, SPAL, etc.) - from *coverage_attribute_file*
+    character*20,dimension(:),allocatable ::  cov_symbol_check      ! USDA code/symbol for each vegetation coverage type used to check consistency in input files - from *veg_in_file*
     integer,dimension(:),allocatable ::  cov_grp                    ! model group ID for LAVegMod process model assigned to each respective coverage type
                                                                     !       cov_grp =  0; water
                                                                     !       cov_grp =  1; not modeled/developed

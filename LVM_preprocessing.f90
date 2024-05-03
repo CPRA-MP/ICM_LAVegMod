@@ -82,14 +82,25 @@ subroutine preprocessing
         read(102,*) g, coverages(g,:,1)
     end do
     close(102)
-    !write(*,*) trim(adjustL(veg_coverage_file_header))
+    
+    read(veg_coverage_file_header,*) dump_txt,cov_symbol_check
+    
+    do i=1,ncov
+        if (cov_symbol(i) /= cov_symbol_check(i)) then
+            write(*,'(4A)') '    - column-order of ',trim(adjustL(veg_in_file)),' DOES NOT match row-order of ', trim(adjustL(coverage_attribute_file))
+            write(*,'(A)') '    - EXITING SIMULATION NOW! Correct input files and re-submit run.'
+            stop
+        end if
+    end do
+    
+    write(*,'(4A)') '    - column-order of ',trim(adjustL(veg_in_file)),' matches row-order of ', trim(adjustL(coverage_attribute_file))
+    write(*,'(A)') '    - continuing on with run'
     
    ! read ICM-Hydro compartment hydro output data in from file
     write(  *,*) ' - reading in annual ICM-Hydro compartment-level output'
     write(000,*) ' - reading in annual ICM-Hydro compartment-level output'
     
     open(unit=103, file=trim(adjustL(hydro_comp_out_file)))
-    
     read(103,*) dump_txt        ! dump header
     do i = 1,ncomp
         read(103,*) dump_txt,               &

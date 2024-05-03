@@ -35,8 +35,8 @@ subroutine neighbors
     near_neighbors = -9999
     
     if (build_neighbors == 1) then
-        write(  *,*) ' - calculating centroid-to-centroid distances for all grid cells and finding neighbors'
-        write(000,*) ' - calculating centroid-to-centroid distances for all grid cells and finding neighbors'
+        write(  *,'(A)') ' - calculating centroid-to-centroid distances for all grid cells and finding neighbors'
+        write(000,'(A)') ' - calculating centroid-to-centroid distances for all grid cells and finding neighbors'
 
         maxcount = 0
         
@@ -46,11 +46,11 @@ subroutine neighbors
             
             ! check to see if maximum number of neighboring cells has already been found - if so, report out error message but continue on
             if (maxcount == max_neighbors) then
-                write(  *,*) ' - found the maximum number of neighbors (set in input_params). Stopping neighbor analysis.'
-                write(000,*) ' - found the maximum number of neighbors (set in input_params). Stopping neighbor analysis.'
+                write(  *,'(A)') ' - found the maximum number of neighbors (set in input_params). Stopping neighbor analysis.'
+                write(000,'(A)') ' - found the maximum number of neighbors (set in input_params). Stopping neighbor analysis.'
                 
                 open(unit=201, file=trim(adjustL('veg/__NEIGHBORING_GRID_CELL_ERRORS__.txt')))
-                write(201,*) 'Found the maximum number of neighbors (set in input_params). Stopping neighbor analysis. Run continued.'
+                write(201,'(A)') 'Found the maximum number of neighbors (set in input_params). Stopping neighbor analysis. Run continued.'
                 write(201,*) 'Maximum number of neighbors was set to: ', max_neighbors
                 close(201)
                 

@@ -27,6 +27,7 @@ subroutine params_alloc
     
     ! allocate memory for coverage attribute variables read in from input attribute table in subroutine: PREPROCESSING
     allocate(cov_symbol(ncov))
+    allocate(cov_symbol_check(ncov))
     allocate(cov_grp(ncov))
     allocate(cov_disp_class(ncov))
     allocate(FFIBS(ncov))
