@@ -16,6 +16,7 @@ module params
     ! I/O settings in subroutine: SET_IO
     integer :: start_year                                           ! first year of model run
     integer :: elapsed_year                                         ! elapsed year of model simulation
+    integer :: ncov                                                 ! number of grid cell coverages included in the model (e.g., water, new_bareground, old_bareground, UNPA, SPPA, etc.)
     integer :: ngrid                                                ! number of ICM-LAVegMod grid cells
     integer :: ncomp                                                ! number of ICM-Hydro compartments
     integer :: grid_res                                             ! XY resolution of ICM-LAVegMod grid (meters) - only applicable for regular Cartesian grid
@@ -26,7 +27,8 @@ module params
     integer :: max_neighbors                                        ! maximum number of grid cells that will be allowed in the near and nearest neighbor lists
     
     ! input files in subroutine: SET_IO
-    character*fn_len :: grid_file                                   ! file name, with relative path, to csv with X and Y coordinates (UTM meters) of grid cell centroids and the grid cell area (sq meters)
+    character*fn_len :: coverage_attribute_file                     ! file name, with relative path, to csv with model attributes for each coverage type - this file row-order must match the column-order of veg_in_file, below
+    character*fn_len :: grid_file                                   ! file name, with relative path, to csv with X and Y coordinates (UTM meters) of grid cell centroids - also includes the grid cell area (sq meters) and the overlaid ICM-Hydro compartment ID
     character*fn_len :: nearest_neighbors_file                      ! file name, with relative path, to csv with list of grid cells that are the defined nearest neighbors
     character*fn_len :: near_neighbors_file                         ! file name, with relative path, to csv with list of grid cells that are the defined near neighbors
     character*fn_len :: veg_in_file                                 ! file name, with relative path, to *vegty.csv file from previous model year read in to set initial conditions for the current model year
@@ -34,7 +36,8 @@ module params
     character*fn_len :: morph_grid_out_file                         ! file name, with relative path, to *grid_data.csv file from previous model year's ICM-Morph simulation
     
     ! output files in subroutine: SET_IO
-    character*fn_len :: veg_out_file                                ! file name, with relative path, to *vegty.csv file for current year written to disc for final landscape of the current model year
+    character*fn_len :: veg_out_file                                ! file name, with relative path, to *vegty.csv file for current year written to disk for final landscape of the current model year
+    character*fn_len :: veg_summary_file                            ! file name, with relative path, to *vegsm.csv file for current year written to disk for final landscape of the current model year
     
     ! QAQC save point information in subroutine: SET_IO
     character*fn_len :: fnc_tag                                     ! file naming convention tag
@@ -47,10 +50,39 @@ module params
 
     ! define variables read in or calculated from files in subroutine: PREPROCESSING
     integer,dimension(:),allocatable ::  grid_comp                  ! ICM-Hydro compartment ID overlaying ICM-LAVegMod grid (-)
-    real(sp),dimension(:),allocatable ::  grid_x                     ! X coordinate of ICM-LAVegMod grid cell centroid (UTM Zone 15N meters)
-    real(sp),dimension(:),allocatable ::  grid_y                     ! Y coordinate of ICM-LAVegMod grid cell centroid (UTM Zone 15N meters)
+    real(sp),dimension(:),allocatable ::  grid_x                    ! X coordinate of ICM-LAVegMod grid cell centroid (UTM Zone 15N meters)
+    real(sp),dimension(:),allocatable ::  grid_y                    ! Y coordinate of ICM-LAVegMod grid cell centroid (UTM Zone 15N meters)
     real(sp),dimension(:),allocatable :: grid_a                     ! area of ICM_LAVegMod grid cell (sq meters)
 
+    ! define coverage attribute variables read in from input attribute table in subroutine: PREPROCESSING
+    character*20,dimension(:),allocatable ::  cov_symbol            ! USDA code/symbol for each vegetation coverage type (e.g., SPPA, SPAL, etc.)
+    integer,dimension(:),allocatable ::  cov_grp                    ! model group ID for LAVegMod process model assigned to each respective coverage type
+                                                                    !       cov_grp =  0; water
+                                                                    !       cov_grp =  1; not modeled/developed
+                                                                    !       cov_grp =  2; old bareground
+                                                                    !       cov_grp =  3; new bareground
+                                                                    !       cov_grp =  4; flotant marsh
+                                                                    !       cov_grp =  5; dead flotant marsh
+                                                                    !       cov_grp =  6; bottomland hardwood forest
+                                                                    !       cov_grp =  7; swamp forest
+                                                                    !       cov_grp =  8; fresh emergent wetland vegetation
+                                                                    !       cov_grp =  9; intermediate emergent wetland vegetation
+                                                                    !       cov_grp = 10; brackish emergent wetland vegetation
+                                                                    !       cov_grp = 11; saline emergent wetland vegetation
+                                                                    !       cov_grp = 12; barrier island vegetation
+    integer,dimension(:),allocatable ::  cov_disp_class             ! disperal class ID for each respective coverage type
+                                                                    !       cov_disp_class =  0; no dispersal - used for non-vegetative coverage types (e.g., water)
+                                                                    !       cov_disp_class =  1; nearest disperal - species can disperse only from "nearest neighboring" areas (distance is assigned in SET_IO from "veg/LAVegMod_input_params.csv")
+                                                                    !       cov_disp_class =  2; near disperal - species can disperse only from "near and nearest neighboring" areas (distances are assigned in SET_IO from "veg/LAVegMod_input_params.csv")
+                                                                    !       cov_disp_class =  3; always available - "weedy" species that are assumed always available for establishment/infinite dispersal distance
+    real(sp),dimension(:),allocatable ::  FFIBS                     ! FFIBS score assigned to each respective coverage type
+    
+    ! species coverage grid in: PREPROCESSING
+    ! define variables used to define the vegetation species coverage at each grid cell that are read in from file
+    ! these variables are 3D arrays [i,j,k] where the ith dimension represents the grid cell ID and the jth dimension represents the coverage type column, and the kth dimension represents the coverage value of type j for the previous coverage state [k=1] and for the current coverage state [j=2]
+    character*3000 :: veg_coverage_file_header                          ! text string that saves the first row of the veg input file to use as a header in the output file
+    real(sp),dimension(:,:,:),allocatable :: coverages                  ! percent of ICM_LAVegMod grid cell that is each coverage type (k=1 will be the previous state ICM-LAVegMod % value, where as k=2 will store state % value as used by ICM-LAVegMod; not to be confused with 'water_from_morph' variable)
+ 
     ! define ICM-Hydro variables read in from compartment_out summary file in subroutine: PREPROCESSING
     real(sp),dimension(:),allocatable :: stg_mx_yr                  ! Maximum water surface elevation (stage) during the year (m NAVD88)
     real(sp),dimension(:),allocatable :: stg_av_yr                  ! Mean water surface elevation (stage) during the year (m NAVD88)
@@ -65,57 +97,7 @@ module params
     ! define variables read in from ICM-Morph output files in subroutine: PREPROCESSING
     real(sp),dimension(:),allocatable :: water_from_morph           ! proportion of ICM-LAVegMod grid cell that is water, as calculated at end of previous year's ICM-Morph run (0.0 - 1.0)
     
-    ! species coverage grid in: PREPROCESSING
-    ! define variables used to define the vegetation species coverage at each grid cell that are read in from file
     ! these variables are 2D arrays [i,j] where the ith dimension represents the grid cell ID and the jth dimension represents the species coverage for the previous year [j=1] and for the current model year [j=2]
-    character*3000 :: veg_coverage_file_header                          ! text string that saves the first row of the veg input file to use as a header in the output file
-    real(sp),dimension(:,:),allocatable :: water                        ! percent of ICM_LAVegMod grid cell that is water (j=1 will be last year's ICM-LAVegMod % value, where as j=2 will store current year's % value as used by ICM-LAVegMod; not to be confused with 'water_from_morph' variable)
-    real(sp),dimension(:,:),allocatable :: upland                       ! percent of ICM-LAVegMod grid cell that is upland/developed (e.g., NotMod) and is too high and dry for wetland vegetation
-    real(sp),dimension(:,:),allocatable :: bare_old                     ! percent of ICM-LAVegMod grid cell that is non-vegetated wetland and was bare in previous year (old bare ground)
-    real(sp),dimension(:,:),allocatable :: bare_new                     ! percent of ICM-LAVegMod grid cell that is non-vegetated wetland and is newly bare during current year (new bare ground)
-    real(sp),dimension(:,:),allocatable :: QULA3                        !
-    real(sp),dimension(:,:),allocatable :: QULE                         !
-    real(sp),dimension(:,:),allocatable :: QUNI                         !
-    real(sp),dimension(:,:),allocatable :: QUTE                         !
-    real(sp),dimension(:,:),allocatable :: QUVI                         !
-    real(sp),dimension(:,:),allocatable :: ULAM                         !
-    real(sp),dimension(:,:),allocatable :: NYAQ2                        !
-    real(sp),dimension(:,:),allocatable :: SANI                         !
-    real(sp),dimension(:,:),allocatable :: TADI2                        !
-    real(sp),dimension(:,:),allocatable :: ELBA2_Flt                    !
-    real(sp),dimension(:,:),allocatable :: PAHE2_Flt                    !
-    real(sp),dimension(:,:),allocatable :: bare_Flt                     !
-    real(sp),dimension(:,:),allocatable :: dead_Flt                     !
-    real(sp),dimension(:,:),allocatable :: COES                         !
-    real(sp),dimension(:,:),allocatable :: MOCE2                        !
-    real(sp),dimension(:,:),allocatable :: PAHE2                        !
-    real(sp),dimension(:,:),allocatable :: SALA2                        !
-    real(sp),dimension(:,:),allocatable :: ZIMI                         !
-    real(sp),dimension(:,:),allocatable :: CLMA10                       !
-    real(sp),dimension(:,:),allocatable :: ELCE                         !
-    real(sp),dimension(:,:),allocatable :: IVFR                         !
-    real(sp),dimension(:,:),allocatable :: PAVA                         !
-    real(sp),dimension(:,:),allocatable :: PHAU7                        !
-    real(sp),dimension(:,:),allocatable :: POPU5                        !
-    real(sp),dimension(:,:),allocatable :: SALA                         !
-    real(sp),dimension(:,:),allocatable :: SCCA11                       !
-    real(sp),dimension(:,:),allocatable :: TYDO                         !
-    real(sp),dimension(:,:),allocatable :: SCAM6                        !
-    real(sp),dimension(:,:),allocatable :: SCRO5                        !
-    real(sp),dimension(:,:),allocatable :: SPCY                         !
-    real(sp),dimension(:,:),allocatable :: SPPA                         !
-    real(sp),dimension(:,:),allocatable :: AVGE                         !
-    real(sp),dimension(:,:),allocatable :: DISP                         !
-    real(sp),dimension(:,:),allocatable :: JURO                         !
-    real(sp),dimension(:,:),allocatable :: SPAL                         !
-    real(sp),dimension(:,:),allocatable :: BAHABI                       !
-    real(sp),dimension(:,:),allocatable :: DISPBI                       !
-    real(sp),dimension(:,:),allocatable :: PAAM2                        !
-    real(sp),dimension(:,:),allocatable :: SOSE                         !
-    real(sp),dimension(:,:),allocatable :: SPPABI                       !
-    real(sp),dimension(:,:),allocatable :: SPVI3                        !
-    real(sp),dimension(:,:),allocatable :: STHE9                        !
-    real(sp),dimension(:,:),allocatable :: UNPA                         !
     real(sp),dimension(:,:),allocatable :: FFIBS_score                  ! weighted FFIBS score of ICM-LAVegMod grid cell - used for accretion
     real(sp),dimension(:,:),allocatable :: pct_vglnd_BLHF               ! percent of vegetated land that is bottomland hardwood forest
     real(sp),dimension(:,:),allocatable :: pct_vglnd_SWF                ! percent of vegetated land that is swamp forest

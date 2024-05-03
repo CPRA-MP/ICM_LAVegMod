@@ -24,7 +24,18 @@ subroutine params_alloc
     allocate(grid_x(ngrid))
     allocate(grid_y(ngrid))
     allocate(grid_a(ngrid))
-
+    
+    ! allocate memory for coverage attribute variables read in from input attribute table in subroutine: PREPROCESSING
+    allocate(cov_symbol(ncov))
+    allocate(cov_grp(ncov))
+    allocate(cov_disp_class(ncov))
+    allocate(FFIBS(ncov))
+    
+    
+    ! allocate memory for variables read and set in subroutine: PREPROCESSING
+    ! these variables are 3D arrays [i,j,k] where the ith dimension represents the grid cell ID and the jth dimension represents the coverage type column, and the kth dimension represents the coverage value of type j for the previous coverage state [k=1] and for the current coverage state [j=2]
+    allocate(coverages(ngrid,ncov,2))
+    
     ! allocate memory for variables read in from compartment_out ICM-Hydro summary file in subroutine: PREPROCESSING
     allocate(stg_mx_yr(ncomp))
     allocate(stg_av_yr(ncomp))
@@ -39,56 +50,7 @@ subroutine params_alloc
     ! allocate memory for variables read in from ICM-Morph output files in subroutine: PREPROCESSING
     allocate(water_from_morph(ngrid))
 
-    
-    ! allocate memory for variables read and set in subroutine: PREPROCESSING
     ! these variables are 2D arrays [i,j] where the ith dimension represents the grid cell ID and the jth dimension represents the species coverage for the previous year [j=1] and for the current model year [j=2]
-    allocate(water(ngrid,2))
-    allocate(upland(ngrid,2))
-    allocate(bare_old(ngrid,2))
-    allocate(bare_new(ngrid,2))
-    allocate(QULA3(ngrid,2))
-    allocate(QULE(ngrid,2))
-    allocate(QUNI(ngrid,2))
-    allocate(QUTE(ngrid,2))
-    allocate(QUVI(ngrid,2))
-    allocate(ULAM(ngrid,2))
-    allocate(NYAQ2(ngrid,2))
-    allocate(SANI(ngrid,2))
-    allocate(TADI2(ngrid,2))
-    allocate(ELBA2_Flt(ngrid,2))
-    allocate(PAHE2_Flt(ngrid,2))
-    allocate(bare_Flt(ngrid,2))
-    allocate(dead_Flt(ngrid,2))
-    allocate(COES(ngrid,2))
-    allocate(MOCE2(ngrid,2))
-    allocate(PAHE2(ngrid,2))
-    allocate(SALA2(ngrid,2))
-    allocate(ZIMI(ngrid,2))
-    allocate(CLMA10(ngrid,2))
-    allocate(ELCE(ngrid,2))
-    allocate(IVFR(ngrid,2))
-    allocate(PAVA(ngrid,2))
-    allocate(PHAU7(ngrid,2))
-    allocate(POPU5(ngrid,2))
-    allocate(SALA(ngrid,2))
-    allocate(SCCA11(ngrid,2))
-    allocate(TYDO(ngrid,2))
-    allocate(SCAM6(ngrid,2))
-    allocate(SCRO5(ngrid,2))
-    allocate(SPCY(ngrid,2))
-    allocate(SPPA(ngrid,2))
-    allocate(AVGE(ngrid,2))
-    allocate(DISP(ngrid,2))
-    allocate(JURO(ngrid,2))
-    allocate(SPAL(ngrid,2))
-    allocate(BAHABI(ngrid,2))
-    allocate(DISPBI(ngrid,2))
-    allocate(PAAM2(ngrid,2))
-    allocate(SOSE(ngrid,2))
-    allocate(SPPABI(ngrid,2))
-    allocate(SPVI3(ngrid,2))
-    allocate(STHE9(ngrid,2))
-    allocate(UNPA(ngrid,2))
     allocate(FFIBS_score(ngrid,2))
     allocate(pct_vglnd_BLHF(ngrid,2))
     allocate(pct_vglnd_SWF(ngrid,2))

@@ -128,7 +128,7 @@ subroutine neighbors
         read(202,*) dump_txt
         do g = 1,ngrid
             read(202,*)
-            write(202,2345) g0, nearest_neighbors(g0,:)   ! read in grid cell of interest from file and assign list of nearest neighbors to array
+            read(202,2345) g0, nearest_neighbors(g0,:)   ! read in grid cell of interest from file and assign list of nearest neighbors to array
         end do
         close(202)
         
@@ -138,7 +138,7 @@ subroutine neighbors
         open(unit=203, file=trim(adjustL(near_neighbors_file)))
         write(202,'(A,I0,A)') 'gridID,near neighbors within ',near_neighbors_dist,' m:'
         do g = 1,ngrid
-            write(203,2345) g0, near_neighbors(g0,:)   ! read in grid cell of interest from file and assign list of nearest neighbors to array
+            read(203,2345) g0, near_neighbors(g0,:)   ! read in grid cell of interest from file and assign list of nearest neighbors to array
         end do
         close(203)
         

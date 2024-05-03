@@ -1,5 +1,6 @@
 2019, start_year - first year of model run
 1, elapsed_year - elapsed year of model run
+47, ncov - the number of coverage types included in the model
 173898, ngrid - number of ICM-LAVegMod grid cells - will be an array dimension for all grid-level data
 1778, ncomp - number of ICM-Hydro compartmenets - will be an array dimension for all compartment-level data
 480,grid_res - XY resolution of ICM-LAVegMod grid (meters) - only applicable for regular Cartesian grid
@@ -10,9 +11,10 @@
 679, nearest_neighbors_dist - distance in which a neighboring grid cell is considered a nearest neighbor (meters) *must be smaller magnitude than "near_neighbor_dist"*
 'veg/MP2023_S00_G000_C000_U00_V00_SLA_I_00_00_V_neighbor_grids_960m.csv',near_neighbors_file -  text file with list of grid cells that are the defined near neighbors
 1358, near_neighbors_dist - distance in which a neighboring grid cell is considered a near neighbor (meters) *must be larger magnitude than "nearest_neighbor_dist"*
-100, max_neighbors - maximum number of grid cells that will be allowed in the near and nearest neighbor lists - this will be the number of columns in the neighbor files
+16, max_neighbors - maximum number of grid cells that will be allowed in the near and nearest neighbor lists - this will be the number of columns in the neighbor files
 'veg/MP2023_S00_G000_C000_U00_V00_SLA_I_00_00_V_vegty.csv', veg_in_file - file name with relative path to *vegty.asc+ file saved by ICM-LAVegMod
 'hydro/TempFiles/compartment_out_2021.csv', hydro_comp_out_file - file name, with relative path, to compartment_out.csv from current model year's ICM-Hydro simulation
 'hydro/TempFiles/grid_data_500m_2020.csv', morph_grid_out_file - file name, with relative path, to grid_data.csv file from previous model year's ICM-Morph simulation
 'veg/MP2023_S07_G514_C000_U00_V00_SLA_O_01_01_V_vegty.csv', veg_out_file - file name with relative path to *vegty.asc+ file saved by ICM-LAVegMod
+'veg/MP2023_S07_G514_C000_U00_V00_SLA_O_01_01_V_vegsm.csv', veg_summary_out_file - file name with relative path to *veg_summary.csv file for current year written to disk for final landscape of the current model year
 MP2023_S07_G514_C000_U00_V00_SLA, file naming convention prefix
