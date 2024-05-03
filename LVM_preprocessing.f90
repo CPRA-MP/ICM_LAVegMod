@@ -82,7 +82,7 @@ subroutine preprocessing
         read(102,*) g, coverages(g,:,1)
     end do
     close(102)
-   
+    !write(*,*) trim(adjustL(veg_coverage_file_header))
     
    ! read ICM-Hydro compartment hydro output data in from file
     write(  *,*) ' - reading in annual ICM-Hydro compartment-level output'
@@ -92,7 +92,7 @@ subroutine preprocessing
     
     read(103,*) dump_txt        ! dump header
     do i = 1,ncomp
-        read(102,*) dump_txt,               &
+        read(103,*) dump_txt,               &
    &         stg_mx_yr(i),                  &
    &         stg_av_yr(i),                  &
    &         stg_av_smr(i),                 &
