@@ -30,7 +30,8 @@ subroutine params_alloc
     allocate(cov_grp(ncov))
     allocate(cov_disp_class(ncov))
     allocate(FFIBS(ncov))
-    
+    allocate(flt_thn_indices(ncov))
+    allocate(flt_thk_indices(ncov))
     
     ! allocate memory for variables read and set in subroutine: PREPROCESSING
     ! these variables are 3D arrays [i,j,k] where the ith dimension represents the grid cell ID and the jth dimension represents the coverage type column, and the kth dimension represents the coverage value of type j for the previous coverage state [k=1] and for the current coverage state [j=2]

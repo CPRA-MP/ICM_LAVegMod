@@ -61,28 +61,42 @@ module params
                                                                     !       cov_grp =  1; not modeled/developed
                                                                     !       cov_grp =  2; old bareground
                                                                     !       cov_grp =  3; new bareground
-                                                                    !       cov_grp =  4; flotant marsh
-                                                                    !       cov_grp =  5; dead flotant marsh
-                                                                    !       cov_grp =  6; bottomland hardwood forest
-                                                                    !       cov_grp =  7; swamp forest
-                                                                    !       cov_grp =  8; fresh emergent wetland vegetation
-                                                                    !       cov_grp =  9; intermediate emergent wetland vegetation
-                                                                    !       cov_grp = 10; brackish emergent wetland vegetation
-                                                                    !       cov_grp = 11; saline emergent wetland vegetation
-                                                                    !       cov_grp = 12; barrier island vegetation
+                                                                    !       cov_grp =  4; flotant marsh - thin mat
+                                                                    !       cov_grp =  5; flotant marsh - thick mat
+                                                                    !       cov_grp =  6; flotant marsh - bare mat
+                                                                    !       cov_grp =  7; flotant marsh - dead
+                                                                    !       cov_grp =  8; bottomland hardwood forest
+                                                                    !       cov_grp =  9; swamp forest
+                                                                    !       cov_grp = 10; fresh emergent wetland vegetation
+                                                                    !       cov_grp = 11; intermediate emergent wetland vegetation
+                                                                    !       cov_grp = 12; brackish emergent wetland vegetation
+                                                                    !       cov_grp = 13; saline emergent wetland vegetation
+                                                                    !       cov_grp = 14; barrier island vegetation
     integer,dimension(:),allocatable ::  cov_disp_class             ! disperal class ID for each respective coverage type
                                                                     !       cov_disp_class =  0; no dispersal - used for non-vegetative coverage types (e.g., water)
                                                                     !       cov_disp_class =  1; nearest disperal - species can disperse only from "nearest neighboring" areas (distance is assigned in SET_IO from "veg/LAVegMod_input_params.csv")
                                                                     !       cov_disp_class =  2; near disperal - species can disperse only from "near and nearest neighboring" areas (distances are assigned in SET_IO from "veg/LAVegMod_input_params.csv")
                                                                     !       cov_disp_class =  3; always available - "weedy" species that are assumed always available for establishment/infinite dispersal distance
     real(sp),dimension(:),allocatable ::  FFIBS                     ! FFIBS score assigned to each respective coverage type
-    
+    integer :: wti                                                  ! index in coverages(ngrid,ncov,2) for water coverage group
+    integer :: nmi                                                  ! index in coverages(ngrid,ncov,2) for NotMod coverage group
+    integer :: boi                                                  ! index in coverages(ngrid,ncov,2) for old bareground coverage group
+    integer :: bni                                                  ! index in coverages(ngrid,ncov,2) for new bareground coverage group
+    integer :: dfi                                                  ! index in coverages(ngrid,ncov,2) for dead flotant marsh coverage group
+    integer :: bfi                                                  ! index in coverages(ngrid,ncov,2) for bare mat flotant marsh coverage group
+    integer :: flt_thn_cnt                                          ! count of species included in the thin mat flotant marsh coverage group, excluding dead flotant
+    integer,dimension(:),allocatable ::  flt_thn_indices            ! 1D array that stores the coverage group indices of thin mat flotant marsh coverage types in coverages(ngrid,ncov,2), excluding dead flotant
+    integer :: flt_thk_cnt                                          ! count of species included in the thick mat flotant marsh coverage group, excluding dead flotant
+    integer,dimension(:),allocatable ::  flt_thk_indices            ! 1D array that stores the coverage group indices of thin mat flotant marsh coverage types in coverages(ngrid,ncov,2), excluding dead flotant
+
+
     ! species coverage grid in: PREPROCESSING
     ! define variables used to define the vegetation species coverage at each grid cell that are read in from file
     ! these variables are 3D arrays [i,j,k] where the ith dimension represents the grid cell ID and the jth dimension represents the coverage type column, and the kth dimension represents the coverage value of type j for the previous coverage state [k=1] and for the current coverage state [j=2]
-    character*3000 :: veg_coverage_file_header                          ! text string that saves the first row of the veg input file to use as a header in the output file
-    real(sp),dimension(:,:,:),allocatable :: coverages                  ! percent of ICM_LAVegMod grid cell that is each coverage type (k=1 will be the previous state ICM-LAVegMod % value, where as k=2 will store state % value as used by ICM-LAVegMod; not to be confused with 'water_from_morph' variable)
- 
+    character*3000 :: veg_coverage_file_header                      ! text string that saves the first row of the veg input file to use as a header in the output file
+    real(sp),dimension(:,:,:),allocatable :: coverages              ! percent of ICM_LAVegMod grid cell that is each coverage type (k=1 will be the previous state ICM-LAVegMod % value, where as k=2 will store state % value as used by ICM-LAVegMod; not to be confused with 'water_from_morph' variable)
+
+    
     ! define ICM-Hydro variables read in from compartment_out summary file in subroutine: PREPROCESSING
     real(sp),dimension(:),allocatable :: stg_mx_yr                  ! Maximum water surface elevation (stage) during the year (m NAVD88)
     real(sp),dimension(:),allocatable :: stg_av_yr                  ! Mean water surface elevation (stage) during the year (m NAVD88)
@@ -98,16 +112,16 @@ module params
     real(sp),dimension(:),allocatable :: water_from_morph           ! proportion of ICM-LAVegMod grid cell that is water, as calculated at end of previous year's ICM-Morph run (0.0 - 1.0)
     
     ! these variables are 2D arrays [i,j] where the ith dimension represents the grid cell ID and the jth dimension represents the species coverage for the previous year [j=1] and for the current model year [j=2]
-    real(sp),dimension(:,:),allocatable :: FFIBS_score                  ! weighted FFIBS score of ICM-LAVegMod grid cell - used for accretion
-    real(sp),dimension(:,:),allocatable :: pct_vglnd_BLHF               ! percent of vegetated land that is bottomland hardwood forest
-    real(sp),dimension(:,:),allocatable :: pct_vglnd_SWF                ! percent of vegetated land that is swamp forest
-    real(sp),dimension(:,:),allocatable :: pct_vglnd_FM                 ! percent of vegetated land that is fresh (attached) marsh
-    real(sp),dimension(:,:),allocatable :: pct_vglnd_IM                 ! percent of vegetated land that is intermediate marsh
-    real(sp),dimension(:,:),allocatable :: pct_vglnd_BM                 ! percent of vegetated land that is brackish marsh
-    real(sp),dimension(:,:),allocatable :: pct_vglnd_SM                 ! percent of vegetated land that is saline marsh
+    real(sp),dimension(:,:),allocatable :: FFIBS_score              ! weighted FFIBS score of ICM-LAVegMod grid cell - used for accretion
+    real(sp),dimension(:,:),allocatable :: pct_vglnd_BLHF           ! percent of vegetated land that is bottomland hardwood forest
+    real(sp),dimension(:,:),allocatable :: pct_vglnd_SWF            ! percent of vegetated land that is swamp forest
+    real(sp),dimension(:,:),allocatable :: pct_vglnd_FM             ! percent of vegetated land that is fresh (attached) marsh
+    real(sp),dimension(:,:),allocatable :: pct_vglnd_IM             ! percent of vegetated land that is intermediate marsh
+    real(sp),dimension(:,:),allocatable :: pct_vglnd_BM             ! percent of vegetated land that is brackish marsh
+    real(sp),dimension(:,:),allocatable :: pct_vglnd_SM             ! percent of vegetated land that is saline marsh
 
     ! define variables read in or calculated from files in subroutine: NEIGHBORS
-    integer,dimension(:,:),allocatable ::  nearest_neighbors            ! list of grid cell IDs that are the nearest neighbors to each grid cell
-    integer,dimension(:,:),allocatable ::  near_neighbors               ! list of grid cell IDs that are the near neighbors to each grid cell
+    integer,dimension(:,:),allocatable ::  nearest_neighbors        ! list of grid cell IDs that are the nearest neighbors to each grid cell
+    integer,dimension(:,:),allocatable ::  near_neighbors           ! list of grid cell IDs that are the near neighbors to each grid cell
     
 end module params
