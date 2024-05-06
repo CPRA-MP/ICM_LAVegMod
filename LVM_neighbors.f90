@@ -71,8 +71,8 @@ subroutine neighbors
                 if (current_dist <= nearest_neighbors_dist) then
                     if (gi /= g0) then                  ! do not include g0 in the list of neighbors
                         nearest_neighbors(gi,count) = closest_index
-                        count = count + 1
                     end if
+                    count = count + 1
                     d(closest_index) = arbitrary_max    ! replace current minimum distance with max so it is no longer a candidate for MINLOC
                 else    
                     exit                                ! this ELSE will be triggered when the minimum distance returned from MINLOC is greater than nearest_neighbors_dist

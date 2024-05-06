@@ -3,7 +3,6 @@
 47, ncov - the number of coverage types included in the model
 173898, ngrid - number of ICM-LAVegMod grid cells - will be an array dimension for all grid-level data
 1778, ncomp - number of ICM-Hydro compartmenets - will be an array dimension for all compartment-level data
-480,grid_res - XY resolution of ICM-LAVegMod grid (meters) - only applicable for regular Cartesian grid
 30, dem_res - XY resolution of DEM (meters)
 'veg/MP2023_S00_G000_C000_U00_V00_SLA_I_00_00_V_grid_XYAreaComp.csv', grid_file - csv with X and Y coordinates (UTM meters) of grid cell centroids and the grid cell area (sq meters)
 1, build_neighbors - flag - set to 1 if near and nearest neighbor lists need to be built from Grid XY data, set to 0 if neighbor files already exist

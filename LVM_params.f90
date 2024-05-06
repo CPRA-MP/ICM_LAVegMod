@@ -19,7 +19,6 @@ module params
     integer :: ncov                                                 ! number of grid cell coverages included in the model (e.g., water, new_bareground, old_bareground, UNPA, SPPA, etc.)
     integer :: ngrid                                                ! number of ICM-LAVegMod grid cells
     integer :: ncomp                                                ! number of ICM-Hydro compartments
-    integer :: grid_res                                             ! XY resolution of ICM-LAVegMod grid (meters) - only applicable for regular Cartesian grid
     integer :: dem_res                                              ! XY resolution of DEM (meters)
     integer :: build_neighbors                                      ! flag - set to 1 if near and nearest neighbor lists need to be built from Grid XY data, set to 0 if neighbor files already exist
     integer :: nearest_neighbors_dist                               ! distance in which a neighboring grid cell is considered a nearest neighbor (meters) *must be smaller magnitude than "near_neighbor_dist"*

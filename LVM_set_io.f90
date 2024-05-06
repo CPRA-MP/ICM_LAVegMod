@@ -16,7 +16,6 @@ subroutine set_io
     read(001,*) ncov,dump_txt    
     read(001,*) ngrid,dump_txt
     read(001,*) ncomp,dump_txt
-    read(001,*) grid_res,dump_txt
     read(001,*) dem_res,dump_txt
     read(001,*) grid_file,dump_txt
     read(001,*) build_neighbors
