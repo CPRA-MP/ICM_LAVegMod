@@ -57,7 +57,12 @@ subroutine params_alloc
     ! allocate memory for variables read in in subroutine: PREPROCESSING
     allocate(barrier_island(ngrid)) 
     allocate(tree_establishment(ngrid))
-
+    
+    ! allocate memory for variables read in for establishment and mortability tables in subroutine: PREPROCESSING
+    allocate(est_X_bins(n_X_bins,ncov)
+    allocate(est_Y_bins(n_Y_bins,ncov)
+    allocate(establish_tables(n_X_bins,n_Y_bins,ncov)
+   
     ! these variables are 2D arrays [i,j] where the ith dimension represents the grid cell ID and the jth dimension represents the species coverage for the previous year [j=1] and for the current model year [j=2]
     allocate(FFIBS_score(ngrid,2))
     allocate(pct_vglnd_BLHF(ngrid,2))

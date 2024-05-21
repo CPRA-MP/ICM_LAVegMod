@@ -24,6 +24,8 @@ module params
     integer :: nearest_neighbors_dist                               ! distance in which a neighboring grid cell is considered a nearest neighbor (meters) *must be smaller magnitude than "near_neighbor_dist"*
     integer :: near_neighbors_dist                                  ! distance in which a neighboring grid cell is considered a near neighbor (meters) *must be larger magnitude than "nearest_neighbor_dist"*
     integer :: max_neighbors                                        ! maximum number of grid cells that will be allowed in the near and nearest neighbor lists
+    integer :: n_X_bins                                             ! number of bins definiing the X-axis of the establishment and mortability input tables
+    integer :: n_Y_bins                                             ! number of bins definiing the Y-axis of the establishment and mortability input tables
     
     ! input files in subroutine: SET_IO
     character*fn_len :: coverage_attribute_file                     ! file name, with relative path, to csv with model attributes for each coverage type - this file row-order must match the column-order of veg_in_file, below
@@ -116,6 +118,13 @@ module params
     ! define variables read in in subroutine: PREPROCESSING
     integer,dimension(:),allocatable ::  barrier_island             ! flag indicating whether the grid cell is located in a barrier island domain or not (1 if island; 0 if not)
     integer,dimension(:),allocatable ::  tree_establishment         ! flag indicating whether the grid cell has met hydrologic tree establishment criteria for the year (1 if conditions met; 0 if not)
+    
+    ! define variables read in for establishment and mortability tables in subroutine: PREPROCESSING
+    real(sp),dimension(:,:),allocatable :: est_X_bins               ! array holding the values used to define the X-axis of each species establishent tables - the first dimension is the location in the X-axis, the second dimension is the coverage index, ic
+    real(sp),dimension(:,:),allocatable :: est_Y_bins               ! array holding the values used to define the Y-axis of each species establishent tables - the first dimension is the location in the X-axis, the second dimension is the coverage index, ic
+    real(sp),dimension(:,:,:),allocatable :: establish_tables       ! 2-dimensional establishment probablity table for each species - first dimension is X value of table, second dimension is Y value, third dimension is the coverage index, ic
+   
+    
     
     ! these variables are 2D arrays [i,j] where the ith dimension represents the grid cell ID and the jth dimension represents the species coverage for the previous year [j=1] and for the current model year [j=2]
     real(sp),dimension(:,:),allocatable :: FFIBS_score              ! weighted FFIBS score of ICM-LAVegMod grid cell - used for accretion

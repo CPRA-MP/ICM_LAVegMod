@@ -172,6 +172,18 @@ subroutine preprocessing
     end do
     close(106)
     
+    
+    do ic = 1,ncov
+        open(unit=107, file=trim(adjustL('veg/tables/establishment_'//trim(adjustL(cov_symbol(ic)))))//'.csv' )
+        read(107,*) dump_txt,est_X_bins(:,ic)       ! first row of establisment table is the X-variable values defining each establishment 'bin'
+        do y = 1,n_Y_bins
+            read(107,*) est_Y_bins(y,ic),       &   ! first column of establishment table is Y-variable value defining each establishment 'bin'
+   &            establish_tables(:,y,ic)            ! read the rest of the columns into the establishment probability array for given y value and coverage type, ic
+        end do
+        close(107)
+    end do
+    
+ 
 1234    format(A,<ncov>(',',A))
 
     return
