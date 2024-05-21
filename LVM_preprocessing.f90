@@ -66,9 +66,10 @@ subroutine preprocessing
     read(101,1234) dump_txt                 ! dump column header row
     do i = 1,ngrid
         read(101,*) g, grid_x(g), grid_y(g), grid_a(g), grid_comp(g)
+        dem_pixel_proportion(g) = dem_res**2 / grid_a(g)
     end do
     close(101)
-
+    
 
     
     ! read ICM-LAVegMod grid output file into arrays
@@ -134,17 +135,43 @@ subroutine preprocessing
     
     read(104,*) dump_txt        ! dump header
     do i = 1,ngrid
-        read(104,*) g,                          &
-   &            dump_flt,                       &
-   &            dump_flt,                       &
-   &            dump_flt,                       &
-   &            dump_flt,                       &
-   &            water_from_morph(g)             ! in the output grid file, this is from 0-100%
+        read(104,*) g,                          &   ! grid cell ID
+   &            dump_flt,                       &   ! elevation of water bottom portion of grid cell, as calculated in ICM-Morph    
+   &            grid_elev(g),                   &   ! elevation of land portion of grid cell, as calculated in ICM-Morph
+   &            dump_flt,                       &   ! percent land (wetland+upland) of grid cell, as calculated in ICM-Morph, in the output grid file this is from 0-100%
+   &            dump_flt,                       &   ! percent wetland of grid cell, as calculated in ICM-Morph, in the output grid file this is from 0-100%
+   &            water_from_morph(g)                 ! percent water of grid cell, as calculated in ICM-Morph, in the output grid file this is from 0-100%
     end do
     close(104)
-    ! convert from 0-100% to 0.0-1.0 proportion
-    water_from_morph = water_from_morph/100.0
+    
+    water_from_morph = water_from_morph/100.0       ! convert from 0-100% to 0.0-1.0 proportion
 
+    ! read barrier island domain
+    write(  *,*) ' - reading in barrier island domain map'
+    write(000,*) ' - reading in barrier island domain map'
+    
+    open(unit=105, file=trim(adjustL(morph_grid_out_file)))
+    
+    read(105,*) dump_txt                            ! dump header
+    do i = 1,ngrid
+        read(105,*) g,                          &   ! grid cell ID
+   &            barrier_island(g)                   ! barrier island flag (1 if grid cell is in barrier island domain; 0, if not)
+    end do
+    close(105)
+    
+    ! read barrier island domain
+    write(  *,*) ' - reading in tree establishment criteria'
+    write(000,*) ' - reading in tree establishment criteria'
+    
+    open(unit=106, file=trim(adjustL(morph_grid_out_file)))
+    
+    read(106,*) dump_txt                            ! dump header
+    do i = 1,ngrid
+        read(106,*) g,                          &   ! grid cell ID
+   &            tree_establishment(g)               ! tree establishment criteria (1 if conditions are met; 0, if not)
+    end do
+    close(106)
+    
 1234    format(A,<ncov>(',',A))
 
     return

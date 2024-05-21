@@ -30,7 +30,7 @@ subroutine land_change
     water_from_morph = water_from_morph * (1 - coverages(:,nmi,1))                                  ! Adjust the Morph water to be comparable to the Veg water (Morph treats NOTMOD as NoData, so the %water does not account for NOTMOD. Morph Water + Morph Land + Veg NOTMOD = 100%)
    
     do ig = 1, ngrid                                                                                ! Loop through every grid cell comparing the amount of water and making the needed changes
-        no_change_threshold = dem_res**2 / grid_a(ig)                                               ! portion of LAVegMod grid cell that is one DEM pixel !! MOVE TO PARAMS AND MOVE CALCULATION TO SET_IO IF NEEDED IN OTHER SUBROUTINES !!
+        no_change_threshold = dem_pixel_proportion(ig)                                              ! portion of LAVegMod grid cell that is one DEM pixel - can't have land change less than one pixel
         delta_water = coverages(ig,wti,1) - water_from_morph(ig)                                    ! Compare Morph water to Veg water and proceed accordingly
                                                                                                     ! Check if change in water area is greater *in magnitude* than the no_change_threshold; the first IF is met when land gain occurs, the ELSE IF is land loss
                                                                                                     ! 1) NO LAND CHANGE

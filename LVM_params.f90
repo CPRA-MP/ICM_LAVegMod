@@ -52,7 +52,8 @@ module params
     real(sp),dimension(:),allocatable ::  grid_x                    ! X coordinate of ICM-LAVegMod grid cell centroid (UTM Zone 15N meters)
     real(sp),dimension(:),allocatable ::  grid_y                    ! Y coordinate of ICM-LAVegMod grid cell centroid (UTM Zone 15N meters)
     real(sp),dimension(:),allocatable :: grid_a                     ! area of ICM_LAVegMod grid cell (sq meters)
-
+    real(sp),dimension(:),allocatable :: dem_pixel_proportion       ! proportion of each ICM-LAVegGrid cell that is occupied by ONE ICM-Morph DEM pixel (-); for the 2023 grid this was equal to 1/256 = (30*30)/(480*480)
+    
     ! define coverage attribute variables read in from input attribute table in subroutine: PREPROCESSING
     character*20,dimension(:),allocatable ::  cov_symbol            ! USDA code/symbol for each vegetation coverage type (e.g., SPPA, SPAL, etc.) - from *coverage_attribute_file*
     character*20,dimension(:),allocatable ::  cov_symbol_check      ! USDA code/symbol for each vegetation coverage type used to check consistency in input files - from *veg_in_file*
@@ -109,7 +110,12 @@ module params
     real(sp),dimension(:),allocatable :: tmp_av_smr                 ! Mean water temperture during growing season/summer (deg C) - growing season/summer defined as May 1 through Aug 31 (inclusive) defined in ICM-Hydro/2D_ICM_summaries.f
 
     ! define variables read in from ICM-Morph output files in subroutine: PREPROCESSING
+    real(sp),dimension(:),allocatable :: grid_elev                  ! elevation of land portion of grid cell, as calculated at end of previous year's ICM-Morph run (m, NAVD88)
     real(sp),dimension(:),allocatable :: water_from_morph           ! proportion of ICM-LAVegMod grid cell that is water, as calculated at end of previous year's ICM-Morph run (0.0 - 1.0)
+    
+    ! define variables read in in subroutine: PREPROCESSING
+    integer,dimension(:),allocatable ::  barrier_island             ! flag indicating whether the grid cell is located in a barrier island domain or not (1 if island; 0 if not)
+    integer,dimension(:),allocatable ::  tree_establishment         ! flag indicating whether the grid cell has met hydrologic tree establishment criteria for the year (1 if conditions met; 0 if not)
     
     ! these variables are 2D arrays [i,j] where the ith dimension represents the grid cell ID and the jth dimension represents the species coverage for the previous year [j=1] and for the current model year [j=2]
     real(sp),dimension(:,:),allocatable :: FFIBS_score              ! weighted FFIBS score of ICM-LAVegMod grid cell - used for accretion

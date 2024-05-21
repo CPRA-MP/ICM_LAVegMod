@@ -24,6 +24,7 @@ subroutine params_alloc
     allocate(grid_x(ngrid))
     allocate(grid_y(ngrid))
     allocate(grid_a(ngrid))
+    allocate(dem_pixel_proportion(ngrid))
     
     ! allocate memory for coverage attribute variables read in from input attribute table in subroutine: PREPROCESSING
     allocate(cov_symbol(ncov))
@@ -50,7 +51,12 @@ subroutine params_alloc
     allocate(tmp_av_smr(ncomp))
 
     ! allocate memory for variables read in from ICM-Morph output files in subroutine: PREPROCESSING
+    allocate(grid_elev(ngrid))
     allocate(water_from_morph(ngrid))
+    
+    ! allocate memory for variables read in in subroutine: PREPROCESSING
+    allocate(barrier_island(ngrid)) 
+    allocate(tree_establishment(ngrid))
 
     ! these variables are 2D arrays [i,j] where the ith dimension represents the grid cell ID and the jth dimension represents the species coverage for the previous year [j=1] and for the current model year [j=2]
     allocate(FFIBS_score(ngrid,2))
