@@ -1,4 +1,4 @@
-subroutine oneway_interp(variable1,table,variable1bins, yint)
+subroutine oneway_interp(variable1,table,variable1bins, var1bin_n yint)
     
     ! inputs to the subroutine:
         ! variable1 = the value of the input variable specific to the grid cell. For 2023 LAVegMod, the variable is elevation of the land portion of the grid cell. 
@@ -11,9 +11,6 @@ subroutine oneway_interp(variable1,table,variable1bins, yint)
 
     ! global arrays updated by subroutine:
     !   establish_P or mortality_P -- but not directly updated here, but rather the output updates one of those arrays
-
-    ! global arrays used by subroutine:
-    ! n_X_bins
 
     ! This subroutine interpolates the establishment or mortality probability based on one input. It acts on one species for one grid cell.
     ! For 2023 LAVegMod, this subroutine applies to barrier island and bottomland hardwood species only. The est and mort probabilities
@@ -39,7 +36,7 @@ subroutine oneway_interp(variable1,table,variable1bins, yint)
     ! Find the variable1 bin value closest to variable1 
     min_dif = 3000                                          ! arbitary value, just must be larger than any expected differences
     dif = 0                                                 ! initialize as 0 
-    do ib = 1, n_X_bins                                     ! loop through the bin values
+    do ib = 1, var1bin_n                                    ! loop through the bin values
         dif = abs(variable1bins(ib) - variable1)            ! calculate the absolte value of the difference between each bin and the given value
         if dif < min_dif then
             closest_index = ib                              ! index for the value closest to the given value
