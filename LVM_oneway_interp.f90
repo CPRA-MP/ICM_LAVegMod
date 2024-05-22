@@ -29,8 +29,14 @@ subroutine oneway_interp(variable1,table,variable1bins, yint)
     real(sp)  :: min_dif                          ! the smallest difference of the differences between variable1 and each variable1bins values
     real(sp)  :: dif                              ! difference between variable1 and each variable1bins values
     integer   :: closest_index                    ! index within variable1bins for either the above or below value
+    real(sp)  :: y1                               ! variable used in the linear interpolation formula 
+    real(sp)  :: x1                               ! variable used in the linear interpolation formula 
+    real(sp)  :: y2                               ! variable used in the linear interpolation formula 
+    real(sp)  :: x2                               ! variable used in the linear interpolation formula 
+    real(sp)  :: xint                             ! variable used in the linear interpolation formula 
+    real(sp)  :: yint                             ! variable used in the linear interpolation formula and output for the subroutine
 
-    ! add comment    
+    ! Find the variable1 bin value closest to variable1 
     min_dif = 3000                                          ! arbitary value, just must be larger than any expected differences
     dif = 0                                                 ! initialize as 0 
     do ib = 1, n_X_bins                                     ! loop through the bin values
