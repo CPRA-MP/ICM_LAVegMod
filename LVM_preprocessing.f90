@@ -7,6 +7,7 @@ subroutine preprocessing
     integer :: i                                                                                    ! iterator
     integer :: g                                                                                    ! local ICM-LAVegMod grid ID variable
     integer :: ic                                                                                   ! iterator over coverage types
+    integer :: y                                                                                    ! iterator over establishment/mortality table columns
 
     
     ! initialize grid data arrays to zero before reading in
