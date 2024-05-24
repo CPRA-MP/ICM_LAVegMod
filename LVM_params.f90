@@ -140,6 +140,6 @@ module params
     integer,dimension(:,:),allocatable ::  near_neighbors           ! list of grid cell IDs that are the near neighbors to each grid cell
     
     ! define variables read in or calculated from files in subroutine: establishment_Pcalc
-    real(sp),dimension(:,:),allocatable :: establishment_P          ! the establishment probability for every cell and species in this model year based on the species-specific variables
+    real(sp),dimension(:,:),allocatable :: establish_p              ! the establishment probability for every cell and species in this model year based on the species-specific variables
 
 end module params
