@@ -127,8 +127,9 @@ program main
     write(dtstr,8889) dtvalues(1),'-',dtvalues(2),'-',dtvalues(3),' ',dtvalues(5),':',dtvalues(6),':',dtvalues(7)
     write(  *,*) 'Coverage calculations subroutine ended at: ',dtstr
     write(000,*) 'Coverage calculations subroutine ended at: ',dtstr
-
-    call write_output
+    
+    ! write final coverage file for End of Year landscape - also write summary output file
+    call write_output('eoy',1)
     call date_and_time(VALUES=dtvalues)
     write(dtstr,8889) dtvalues(1),'-',dtvalues(2),'-',dtvalues(3),' ',dtvalues(5),':',dtvalues(6),':',dtvalues(7)
     write(  *,*) 'Write Output subroutine ended at: ',dtstr
