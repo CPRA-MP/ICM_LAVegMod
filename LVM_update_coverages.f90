@@ -14,14 +14,13 @@ subroutine update_coverages
 ! To-Do:
 ! add intermediate print outs
 ! figure out the 1s and 2s
-! add all local variables 
-! acute salinity 
-! tree and barrier island things
-! flotant
-! check sum
+! add all local variables and/or revise for additional subroutines
+
 
 
     ! Calculate the establishment and mortality probabilities for every species and grid cell 
+
+    ! could be call mort_est_prob
     establish_P = 0                                     ! initialize with all 0s; for coverages that do not calculate an establishment probability, the value will remain 0 (nothing will establish)
     mortality_P = 0                                     ! initialize with all 0s; for coverages that do not calculate an mortality probability, the value will remain 0 (nothing will die)
 
@@ -73,6 +72,9 @@ subroutine update_coverages
 
 
     ! Allow class three dispersal species ("weedy") to establish on any new bareground
+
+    ! could be a call weedy_establish
+
     do ig=1,ngrid
         if (coverages(ig,bni,2) > 0) then
             total_est_P = 0.0
@@ -95,25 +97,28 @@ subroutine update_coverages
         endif
     end do
 
-    ! Apply the mortality probabilty 
-    coverages(:,:,2) = coverages(:,:,1) * (1 - mortality_p) ! Need to come back to this -- this is where the 1 and 2s get tricky -- 2 has been updated for bareground
-  
     ! Sum the total unoccupied land 
+    ! could be call sum_unoccupied_land 
     do ic=1,ncov
-        if (FFIBS(ic)>0)
-            newly_unoccupied_lnd = newly_unoccupied_lnd + coverages(:,ic,2)             ! If statement excludes flotant and non-veg coverages
+        cover_group = cov_grp(ic)                           ! Excludes flotant and non-veg coverages (cover groups 1-7)
+        if (cover_group > 7) then
+            newly_unoccupied_lnd = newly_unoccupied_lnd + (coverages(:,ic,2)*mortality(:,ic))
+            ! incorrect: newly_unoccupied_lnd = newly_unoccupied_lnd + coverages(:,ic,2)                 ! newly unoccupied land is a 1D array of size ngrid
         end if
     end do
     total_unoccupied_lnd = newly_unoccupied_lnd + coverages(:,bni,2) + coverages(:,boi,2)   ! add the new barground and old bareground to it 
    
-    ! Sum the unoccupied flotant 
+    ! Sum the unoccupied flotant; needs to keep track of the different types (dead thin, dead thick, and bareground flotant)
     do il=i,size(flt_thn_indices)
-        newly_unoccupied_flt = newly_unoccupied_flt + coverages(:,flt_thn_indices(il),2)
+        newly_unoccupied_thn_flt = newly_unoccupied_thn_flt + (coverages(:,flt_thn_indices(il),2)*mortality(:,ic))
     end do
     do il=i,size(flt_thk_indices)
-        newly_unoccupied_flt = newly_unoccupied_flt + coverages(:,flt_thk_indices(il),2)
+        newly_unoccupied_flt = newly_unoccupied_flt + (coverages(:,flt_thk_indices(il),2)*mortality(:,ic))
     end do
-    total_unoccupied_flt = newly_unoccupied_flt + coverages(:,bfi,2)
+    total_unoccupied_flt = newly_unoccupied_thn_flt + newly_unoccupied_thk_flt + coverages(:,bfi,2)
+
+    ! Apply the mortality probabilty 
+    coverages(:,:,2) = coverages(:,:,1) * (1 - mortality_p) ! Need to come back to this -- this is where the 1 and 2s get tricky -- 2 has been updated for bareground
 
 
     ! Calculate the dispersal coverage for each species ! D_i = total coverage of that vegetation in those cells / the area of those cells (remember those cells may not be the same size)
@@ -159,7 +164,8 @@ subroutine update_coverages
 
     ! Sum expansion likelihood across all non-flotant species
     do ic=1,ncov
-        if (FFIBS(ic)>0) then
+        cover_group = cov_grp(ic)
+        if (cover_group > 7) then                                                  ! excludes all flotant and non-veg coverages (cover groups 1-7)
             exp_lkd_total = exp_lkd_total + exp_lkd(:,ic)
         end if
     end do
@@ -190,22 +196,88 @@ subroutine update_coverages
             coverages(ig,bni,2) = 0.0                                       ! reset the new bareground 
             coverages(ig,boi,2) = 0.0                                       ! reset the old bareground 
             do ic=1,ncov
-                if (FFIBS(ic)>0) then
-                    coverages(ig,ic,2) = coverages(ig,ic,2) + ((exp_lkd(ig,ic)/exp_lkd_total(ig))*total_unoccupied_lnd)
+            cover_group = cov_grp(ic)                                     ! Identify which coverage group this coverage (column) belongs to
+                if (cover_group > 7) then                                 ! Excludes all flotant types and non-veg coverages (cover groups 1-7)
+                    coverages(ig,ic,2) = coverages(ig,ic,2) + ((exp_lkd(ig,ic)/exp_lkd_total(ig))*total_unoccupied)
                 end if
             end do
         end if
     end do
 
     ! Sum expansion liklihood across flotant species
-    do il=i,size(flt_thn_indices)
+    do il=i,flt_thn_cnt
         exp_lkd_total_flt = exp_lkd_total_flt + exp_lkd(:,flt_thn_indices(il))
     end do
-    do il=i,size(flt_thk_indices)
+    do il=i,flt_thk_cnt
         exp_lkd_total_flt = exp_lkd_total_flt + exp_lkd(:,flt_thk_indices(il))
     end do
     
-    ! Do the flotant stuff
+
+    ! sum the flotant in the cell
+    total_flt = total_unoccupied_flt 
+    do il=i,flt_thn_cnt
+        total_flt = total_flt + coverages(:,flt_thn_indices(il),2)
+    end do
+    do il=i,flt_thk_cnt
+        total_flt = total_flt + coverages(:,flt_thn_indices(il),2)
+    end do
+
+    do ig=1,ngrid
+        if (total_flt(ig) > 0.0) then                           ! There is flotant in the cell 
+            if (exp_lkd_total_flt(ig) == 0.0) then              ! Flotant cannot establish in current conditions
+                coverages(ig,dfi,2) = coverages(ig,dfi,2) + coverages(ig,bfi,2)             ! Dead thin mat is added to dead flotant
+                coverages(ig,bfi,2) = 0.0                                                   ! Reset bareground flotant
+                coverages(ig,dfi,2) = coverages(ig,dfi,2) + newly_unoccupied_thn_flt(ig)              ! Dead thin mat is added to dead flotant
+                coverages(ig,bfi,2) = newly_unoccupied_thk_flt(ig)                                    ! Dead thick mat becomes bareground flotant
+            else                                                ! Flotant can establish in current conditions 
+                do il=i,flt_thn_cnt
+                    coverages(ig,flt_thn_indices(il),2) = coverages(ig,flt_thn_indices(il),2)+ ((exp_lkd(ig,flt_thn_indices(il))/exp_lkd_total(ig))*total_unoccupied_flt)
+                end do
+                do il=i,flt_thk_cnt
+                    coverages(ig,flt_thk_indices(il),2) = coverages(ig,flt_thk_indices(il),2)+ ((exp_lkd(ig,flt_thk_indices(il))/exp_lkd_total(ig))*total_unoccupied_flt)
+                end do
+            end if 
+        end if
+    end do
+
     ! call acute salinity ? or leave it here
-    ! call check_sum and round to nearest 1 m2
+    do ig=1,ngrid
+        if (sal_mx_14d_yr(grid_comp(ig)) >= 5.5) then
+            do ic=1,ncov
+                coverage_group=cov_grp(ic)
+                if (coverage_group == 10) then
+                    coverages(ig,bni,2) = coverages(ig,bni,2) + coverages(ig,ic,2)
+                    coverages(ig,ic,2) = 0.0
+                end if
+            end do
+        end if 
+    end do
+
+    ! do acute salinity for the flotant
+    do ig=1,ngrid
+        if (sal_mx_14d_yr(grid_comp(ig)) >= 5.5) then
+            do il=i,flt_thn_cnt
+                coverages(ig,dfi,2) = coverages(ig,dfi,2) + coverages(ig,flt_thn_indices(il),2)        ! Thin mat is added to dead flotant
+                coverages(ig,flt_thn_indices(il),2) = 0.0                                              ! Zero-out thin mat
+            end do
+            do il=i,flt_thk_cnt
+                coverages(ig,bfi,2) = coverages(ig,bfi,2) + coverages(ig,flt_thk_indices(il),2)        ! Thick mat is added to bareground flotant
+                coverages(ig,flt_thk_indices(il),2) = 0.0                                              ! Zero-out thick mat            
+            end do            
+        end if 
+    end do
+
+    ! Decide what this function will do and describe it here
+    call round_coverages
+
+    call check_sum
+
+    ! Check sum needs to be called before adding the whole pixel portion of dead flotant to water so it is not double counted in dead flotant and water
+
+    ! Add the whole Morph pixel portion of the dead flotant to water
+    coverages(:,wti,2) = coverages(:,wti,2) + (dem_pixel_proportion*floor(coverages(:,dfi,1)/dem_pixel_proportion))
+
+    
+
+
 end
