@@ -1,7 +1,7 @@
 ###########################################################################
-#                 CMake Build File for ICM-Morph
+#                 CMake Build File for ICM-LAVegMod
 #
-#    Written By: Zach Cobell & Eric White
+#    Written By: Zach Cobell & Eric White & Maddie Foster-Martinez
 #
 ###########################################################################
 #
