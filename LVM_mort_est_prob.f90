@@ -54,8 +54,8 @@ subroutine mort_est_prob
 
     ! Zero-out establish_P for barrier island species not in barrier island cells and keep it in barrier island cells
     do ic=1,ncov
-        if (cov_grp == 14) then                          ! if it's a barrier island species (cover group 14), then the expansion liklihood stays in the barrier island cells (multiplied by 1) and is removed from non-barrier island cells (multiplied by 0)
-            establish_P(:,ic) = establish_P(:,ic) * barrier_land ! barrier island is a 1D array of size ngrid (1 if island; 0 if not)
+        if (cov_grp(ic) == 14) then                          ! if it's a barrier island species (cover group 14), then the expansion liklihood stays in the barrier island cells (multiplied by 1) and is removed from non-barrier island cells (multiplied by 0)
+            establish_P(:,ic) = establish_P(:,ic) * barrier_island ! barrier island is a 1D array of size ngrid (1 if island; 0 if not)
         end if
     end do
 

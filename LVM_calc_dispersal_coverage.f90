@@ -20,7 +20,6 @@ subroutine calc_dispersal_coverage(disp_cov)
 
      ! dummy local variables populated with arrays passed into subroutine
     real(sp),dimension(ngrid,ncov), intent(inout) :: disp_cov               ! dummy variable to hold the dispersal coverage of each coverage in each veg cell; it is returned to parent subroutine
-  
 
     ! local variables
     integer :: ig                               ! iterator over vegetation grid 
@@ -32,10 +31,8 @@ subroutine calc_dispersal_coverage(disp_cov)
     integer :: inb                              ! iterator over the list of neighbor cells (near or nearest neighbor)
     integer :: neighbor                         ! the grid cell ID of the current neighbor 
     integer :: dispersal_class                  ! the dispersal class to which the current coverage belongs
-    real(sp) :: disp_cov(ngrid,ncov)            ! the total dispersal coverage for each coverage in each grid cell 
 
-
-    do ig=i,ngid
+    do ig=1,ngrid
         do ic=1,ncov
             disp_cov(ig,ic)= coverages(ig,ic,2)                            ! dispersal coverage for the coverages within the central cell 
 
@@ -45,7 +42,7 @@ subroutine calc_dispersal_coverage(disp_cov)
                 neighbor = nearest_neighbors(ig,inb)                    ! neighbor is a grid cell ID 
                 if (neighbor < 0) then                                    ! if neighbor index is -9999, then it has reached the end of nearest neighbors
                     return
-                elseif
+                else
                     numerator = numerator + (coverages(neighbor,ic,2) * grid_a(neighbor))
                     denominator = denominator + grid_a(neighbor)
                 endif
@@ -60,7 +57,7 @@ subroutine calc_dispersal_coverage(disp_cov)
                     neighbor = near_neighbors(ig,inb)                       ! neighbor is a grid cell ID 
                     if (neighbor < 0) then                                    ! if neighbor index is -9999, then it has reached the end of near neighbors
                         return
-                    elseif
+                    else
                         numerator = numerator + (coverages(neighbor,ic,2) * grid_a(neighbor))
                         denominator = denominator + grid_a(neighbor)
                     endif

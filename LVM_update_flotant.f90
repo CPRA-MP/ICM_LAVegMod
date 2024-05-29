@@ -31,19 +31,19 @@ subroutine update_flotant(exp_lkd,total_unoccupied_flt,newly_unoccupied_thn_flt,
     integer :: ig                               ! iterator over the veg grid cell 
 
     ! Sum expansion liklihood across flotant species
-    do il=i,flt_thn_cnt
+    do il=1,flt_thn_cnt
         exp_lkd_total_flt = exp_lkd_total_flt + exp_lkd(:,flt_thn_indices(il))
     end do
-    do il=i,flt_thk_cnt
+    do il=1,flt_thk_cnt
         exp_lkd_total_flt = exp_lkd_total_flt + exp_lkd(:,flt_thk_indices(il))
     end do
     
     ! Sum the flotant in the cell; helpful to have in the next step so we can skip over cells with no flotant
     total_flt = total_unoccupied_flt 
-    do il=i,flt_thn_cnt
+    do il=1,flt_thn_cnt
         total_flt = total_flt + coverages(:,flt_thn_indices(il),2)
     end do
-    do il=i,flt_thk_cnt
+    do il=1,flt_thk_cnt
         total_flt = total_flt + coverages(:,flt_thn_indices(il),2)
     end do
 
@@ -55,10 +55,10 @@ subroutine update_flotant(exp_lkd,total_unoccupied_flt,newly_unoccupied_thn_flt,
                 coverages(ig,dfi,2) = coverages(ig,dfi,2) + newly_unoccupied_thn_flt(ig)              ! Dead thin mat is added to dead flotant
                 coverages(ig,bfi,2) = newly_unoccupied_thk_flt(ig)                                    ! Dead thick mat becomes bareground flotant
             else                                                ! Flotant can establish in current conditions 
-                do il=i,flt_thn_cnt
+                do il=1,flt_thn_cnt
                     coverages(ig,flt_thn_indices(il),2) = coverages(ig,flt_thn_indices(il),2)+ ((exp_lkd(ig,flt_thn_indices(il))/exp_lkd_total_flt(ig))*total_unoccupied_flt)
                 end do
-                do il=i,flt_thk_cnt
+                do il=1,flt_thk_cnt
                     coverages(ig,flt_thk_indices(il),2) = coverages(ig,flt_thk_indices(il),2)+ ((exp_lkd(ig,flt_thk_indices(il))/exp_lkd_total_flt(ig))*total_unoccupied_flt)
                 end do
             end if 

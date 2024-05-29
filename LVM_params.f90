@@ -123,7 +123,9 @@ module params
     real(sp),dimension(:,:),allocatable :: est_X_bins               ! array holding the values used to define the X-axis of each species establishent tables - the first dimension is the location in the X-axis, the second dimension is the coverage index, ic
     real(sp),dimension(:,:),allocatable :: est_Y_bins               ! array holding the values used to define the Y-axis of each species establishent tables - the first dimension is the location in the X-axis, the second dimension is the coverage index, ic
     real(sp),dimension(:,:,:),allocatable :: establish_tables       ! 2-dimensional establishment probablity table for each species - first dimension is X value of table, second dimension is Y value, third dimension is the coverage index, ic
-   
+    real(sp),dimension(:,:),allocatable :: mort_X_bins              ! array holding the values used to define the X-axis of each species mortality tables - the first dimension is the location in the X-axis, the second dimension is the coverage index, ic
+    real(sp),dimension(:,:),allocatable :: mort_Y_bins              ! array holding the values used to define the Y-axis of each species mortality tables - the first dimension is the location in the X-axis, the second dimension is the coverage index, ic
+    real(sp),dimension(:,:,:),allocatable :: mortality_tables       ! 2-dimensional mortality probablity table for each species - first dimension is X value of table, second dimension is Y value, third dimension is the coverage index, ic
     
     
     ! these variables are 2D arrays [i,j] where the ith dimension represents the grid cell ID and the jth dimension represents the species coverage for the previous year [j=1] and for the current model year [j=2]

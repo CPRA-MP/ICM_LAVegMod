@@ -92,7 +92,7 @@ subroutine update_coverages
             do ic=1,ncov
             cover_group = cov_grp(ic)                                     ! Identify which coverage group this coverage (column) belongs to
                 if (cover_group > 7) then                                 ! Excludes all flotant types and non-veg coverages (cover groups 1-7)
-                    coverages(ig,ic,2) = coverages(ig,ic,2) + ((exp_lkd(ig,ic)/exp_lkd_total(ig))*total_unoccupied)
+                    coverages(ig,ic,2) = coverages(ig,ic,2) + ((exp_lkd(ig,ic)/exp_lkd_total(ig))*total_unoccupied_lnd)
                 end if
             end do
         end if
