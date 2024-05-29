@@ -77,8 +77,9 @@ subroutine params_alloc
     allocate(nearest_neighbors(ngrid,max_neighbors))
     allocate(near_neighbors(ngrid,max_neighbors))
     
-    ! allocate memory for variables read and set in subroutine: establishment_Pcalc
+    ! allocate memory for variables read and set in subroutine: mort_est_prob
     allocate(establish_P(ngrid,ncov))
+    allocate(mortality_P(ngrid,ncov))
 
     return
 end
