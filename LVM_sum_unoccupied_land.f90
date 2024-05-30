@@ -29,9 +29,9 @@ subroutine sum_unoccupied_lnd(total_unoccupied_lnd)
     do ic=1,ncov
         cover_group = cov_grp(ic)                                                           ! Excludes flotant and non-veg coverages (cover groups 1-7)
         if (cover_group > 7) then
-            newly_unoccupied_lnd = newly_unoccupied_lnd + (coverages(:,ic,2)*mortality_p(:,ic))
+            newly_unoccupied_lnd = newly_unoccupied_lnd + (coverages(:,ic)*mortality_p(:,ic))
         end if
     end do
-    total_unoccupied_lnd = newly_unoccupied_lnd + coverages(:,bni,2) + coverages(:,boi,2)   ! add the new barground and old bareground to the newly unoccupied land to give the total 
+    total_unoccupied_lnd = newly_unoccupied_lnd + coverages(:,bni) + coverages(:,boi)   ! add the new barground and old bareground to the newly unoccupied land to give the total 
 
 end 
