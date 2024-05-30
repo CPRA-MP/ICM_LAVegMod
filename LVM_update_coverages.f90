@@ -78,21 +78,21 @@ subroutine update_coverages
                 do ic=1,ncov
                     dispersal_class = cov_disp_class(ic)
                     if (dispersal_class == 3) then
-                        coverages(ig,ic,2) = coverages(ig,ic,1) +  ((establish_P(ig,ic)/total_est_P)*total_unoccupied_lnd)         ! sum the estalishment Ps of the weedy species 
+                        coverages(ig,ic) = coverages(ig,ic) +  ((establish_P(ig,ic)/total_est_P)*total_unoccupied_lnd)         ! sum the estalishment Ps of the weedy species 
                     end if
                 end do          
-                coverages(ig,bni,2) = 0.0                                   ! reset the new bareground 
-                coverages(ig,boi,2) = 0.0                                   ! reset the old bareground                 
+                coverages(ig,bni) = 0.0                                   ! reset the new bareground 
+                coverages(ig,boi) = 0.0                                   ! reset the old bareground                 
             else
                 ! leave bareground intact 
             end if
         else
-            coverages(ig,bni,2) = 0.0                                       ! reset the new bareground 
-            coverages(ig,boi,2) = 0.0                                       ! reset the old bareground 
+            coverages(ig,bni) = 0.0                                       ! reset the new bareground 
+            coverages(ig,boi) = 0.0                                       ! reset the old bareground 
             do ic=1,ncov
             cover_group = cov_grp(ic)                                     ! Identify which coverage group this coverage (column) belongs to
                 if (cover_group > 7) then                                 ! Excludes all flotant types and non-veg coverages (cover groups 1-7)
-                    coverages(ig,ic,2) = coverages(ig,ic,2) + ((exp_lkd(ig,ic)/exp_lkd_total(ig))*total_unoccupied_lnd)
+                    coverages(ig,ic) = coverages(ig,ic) + ((exp_lkd(ig,ic)/exp_lkd_total(ig))*total_unoccupied_lnd)
                 end if
             end do
         end if
@@ -116,7 +116,7 @@ subroutine update_coverages
     ! Check sum needs to be called before adding the whole pixel portion of dead flotant to water so it is not double counted in dead flotant and water
 
     ! Add the whole Morph pixel portion of the dead flotant to water
-    coverages(:,wti,2) = coverages(:,wti,2) + (dem_pixel_proportion*floor(coverages(:,dfi,1)/dem_pixel_proportion))
+    coverages(:,wti) = coverages(:,wti) + (dem_pixel_proportion*floor(coverages(:,dfi)/dem_pixel_proportion))
 
     
 end
