@@ -48,7 +48,7 @@ subroutine update_coverages
     call sum_unoccupied_flt(total_unoccupied_flt, newly_unoccupied_thn_flt, newly_unoccupied_thk_flt)
 
     ! Apply the mortality probabilty to the coverages
-    coverages(:,:,2) = coverages(:,:,2) * (1 - mortality_p) 
+    coverages(:,:) = coverages(:,:) * (1 - mortality_p) 
 
     ! Calculate the dispersal coverage for each species ! D_i = total coverage of that vegetation in those cells / the area of those cells (remember those cells may not be the same size)
     call calc_dispersal_coverage(disp_cov)
