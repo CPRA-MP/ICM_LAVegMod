@@ -86,7 +86,7 @@ subroutine preprocessing
     open(unit=102, file=trim(adjustL(veg_in_file)))
     read(102,1234) veg_coverage_file_header                                                         ! dump column header row ! format 1234 must match structure of veg_out_file column headers
     do i = 1,ngrid
-        read(102,*) g, coverages(g,:,1)
+        read(102,*) g, coverages(g,:)
     end do
     close(102)
     

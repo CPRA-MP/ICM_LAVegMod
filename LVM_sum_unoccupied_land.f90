@@ -1,6 +1,7 @@
-subroutine sum_unoccupied_lnd(total_unoccupied_lnd)
+subroutine sum_unoccupied_lnd
     ! global arrays updated by subroutine:
-    !   
+    !   newly_unoccupied_lnd
+    !   total_unoccupied_lnd   
     
     ! global arrays used by subroutine:
     !   ngrid
@@ -11,21 +12,21 @@ subroutine sum_unoccupied_lnd(total_unoccupied_lnd)
     !   boi
     !   mortality_p
 
+    
+    
     ! This subroutine sums the amount of unoccupied land in each veg grid cell
    
     use params
     implicit none
 
-     ! dummy local variables populated with arrays passed into subroutine
-     real(sp),dimension(ngrid), intent(inout) :: total_unoccupied_lnd                       ! dummy variable to hold the total amount of unoccupied land in each veg grid cell; it is returned to parent subroutine
-
 
     ! local variables
     integer :: ic                                                                           ! iterator over veg grid coverages (columns)
     integer :: cover_group                                                                  ! cover group value;  e.g., cover_group = 13 is saline emergent wetland vegetation
-    real(sp) :: newly_unoccupied_lnd(ngrid)                                                 ! portion of each grid cell that is unoccupied due to veg-mortality
 
-
+    total_unoccupied_lnd = 0.0                                                              ! initialize array to zero before first used
+    newly_unoccupied_lnd = 0.0                                                              ! initialize array to zero before first used
+    
     do ic=1,ncov
         cover_group = cov_grp(ic)                                                           ! Excludes flotant and non-veg coverages (cover groups 1-7)
         if (cover_group > 7) then

@@ -37,7 +37,7 @@ subroutine params_alloc
     
     ! allocate memory for variables read and set in subroutine: PREPROCESSING
     ! these variables are 3D arrays [i,j,k] where the ith dimension represents the grid cell ID and the jth dimension represents the coverage type column, and the kth dimension represents the coverage value of type j for the previous coverage state [k=1] and for the current coverage state [j=2]
-    allocate(coverages(ngrid,ncov,2))
+    allocate(coverages(ngrid,ncov))
     
     ! allocate memory for variables read in from compartment_out ICM-Hydro summary file in subroutine: PREPROCESSING
     allocate(stg_mx_yr(ncomp))
@@ -75,14 +75,32 @@ subroutine params_alloc
     allocate(pct_vglnd_BM(ngrid,2))
     allocate(pct_vglnd_SM(ngrid,2))
 
-    
     ! allocate memory for variables read and set in subroutine: NEIGHBORS
     allocate(nearest_neighbors(ngrid,max_neighbors))
     allocate(near_neighbors(ngrid,max_neighbors))
     
-    ! allocate memory for variables read and set in subroutine: mort_est_prob
+    ! allocate memory for variables calculated in subroutine: MORT_EST_PROB
     allocate(establish_P(ngrid,ncov))
     allocate(mortality_P(ngrid,ncov))
-
+    
+    ! allocate memory for variables calculated in subroutine: UPDATE_COVERAGES
+    allocate(disp_cov(ngrid,ncov))
+    allocate(exp_lkd(ngrid,ncov))
+    allocate(exp_lkd_total(ngrid))
+    
+    ! allocate memory for variables calculated in subroutine: UPDATE_FLOTANT
+    allocate(exp_lkd_total_flt(ngrid))
+    allocate(total_flt(ngrid))
+    
+    ! allocate memory for variables calculated in subroutine: : SUM_UNOCCUPIED_LAND
+    allocate(newly_unoccupied_lnd(ngrid))
+    allocate(total_unoccupied_lnd(ngrid))
+    
+    ! allocate memory for variables calculated in subroutine: SUM_UNOCCUPIED_FLT
+    allocate(total_unoccupied_flt(ngrid))  
+    allocate(newly_unoccupied_thn_flt(ngrid))   
+    allocate(newly_unoccupied_thk_flt(ngrid))   
+    
+    
     return
 end

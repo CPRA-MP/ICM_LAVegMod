@@ -1,6 +1,8 @@
 subroutine update_coverages
     ! global arrays updated by subroutine:
     !   coverages
+    !   exp_lkd
+    !   exp_lkd_total
     
     ! global arrays used by subroutine:
     !   ngrid
@@ -17,49 +19,43 @@ subroutine update_coverages
     implicit none
 
     ! local variables 
-    real(sp) :: total_unoccupied_lnd(ngrid)           ! Output from sum_unoccupied_lnd -- does it need to be declared here? 
-    integer :: ig                                     ! iterator over Veg grid cells
-    integer :: ic                                     ! iterator over coverage types (columns)
-    real(sp) :: total_unoccupied_flt(ngrid)           ! Output from sum_unoccupied_flt -- does it need to be declared here? 
-    real(sp) :: newly_unoccupied_thn_flt(ngrid)       ! Output from sum_unoccupied_flt -- does it need to be declared here? 
-    real(sp) :: newly_unoccupied_thk_flt(ngrid)       ! Output from sum_unoccupied_flt -- does it need to be declared here? 
-    real(sp) :: disp_cov(ngrid,ncov)                  ! Output from calc_dispersal_coverage
-    real(sp) :: exp_lkd(ngrid,ncov)                   ! 
-    real(sp) :: exp_lkd_total(ngrid)
+    integer :: ig                                                                   ! iterator over Veg grid cells
+    integer :: ic                                                                   ! iterator over coverage types (columns)
     integer :: cover_group
     integer :: dispersal_class
     real(sp) :: total_est_P
 
-! To-Do:
-! add intermediate print outs
-! figure out the 1s and 2s
-! add all local variables and/or revise for additional subroutines
-
+    
+    
     ! Calculate the establishment and mortality probabilities for every species and grid cell 
     call mort_est_prob
 
     ! Allow class three dispersal species ("weedy") to establish on any new bareground
     call weedy_establishment
 
-    ! Sum the total unoccupied land 
-    call sum_unoccupied_lnd(total_unoccupied_lnd)
+    ! Sum the total unoccupied land
+    call sum_unoccupied_lnd
       
     ! Sum the unoccupied flotant, keeping track of the different types (dead thin, dead thick, and bareground flotant)
-    call sum_unoccupied_flt(total_unoccupied_flt, newly_unoccupied_thn_flt, newly_unoccupied_thk_flt)
+    
+    call sum_unoccupied_flt
 
     ! Apply the mortality probabilty to the coverages
     coverages(:,:) = coverages(:,:) * (1 - mortality_p) 
 
     ! Calculate the dispersal coverage for each species ! D_i = total coverage of that vegetation in those cells / the area of those cells (remember those cells may not be the same size)
-    call calc_dispersal_coverage(disp_cov)
+    call calc_dispersal_coverage
 
     ! Calculate expansion likelihood 
-    exp_lkd = establish_P * disp_cov                                               ! includes all species with a establishment probabilty (e.g., flotant)
+    exp_lkd = 0.0                                                                   ! initialize array to zero before first used
+    exp_lkd = establish_P * disp_cov                                                ! includes all species with a establishment probabilty (e.g., flotant)
 
     ! Sum expansion likelihood across all non-flotant species
+    exp_lkd_total = 0.0                                                             ! initialize array to zero before first used
+    
     do ic=1,ncov
         cover_group = cov_grp(ic)
-        if (cover_group > 7) then                                                  ! excludes all flotant and non-veg coverages (cover groups 1-7)
+        if (cover_group > 7) then                                                   ! excludes all flotant and non-veg coverages (cover groups 1-7)
             exp_lkd_total = exp_lkd_total + exp_lkd(:,ic)
         end if
     end do
@@ -78,7 +74,7 @@ subroutine update_coverages
                 do ic=1,ncov
                     dispersal_class = cov_disp_class(ic)
                     if (dispersal_class == 3) then
-                        coverages(ig,ic) = coverages(ig,ic) +  ((establish_P(ig,ic)/total_est_P)*total_unoccupied_lnd)         ! sum the estalishment Ps of the weedy species 
+                        coverages(ig,ic) = coverages(ig,ic) +  ((establish_P(ig,ic)/total_est_P)*total_unoccupied_lnd(ig))         ! sum the estalishment Ps of the weedy species 
                     end if
                 end do          
                 coverages(ig,bni) = 0.0                                   ! reset the new bareground 
@@ -92,14 +88,14 @@ subroutine update_coverages
             do ic=1,ncov
             cover_group = cov_grp(ic)                                     ! Identify which coverage group this coverage (column) belongs to
                 if (cover_group > 7) then                                 ! Excludes all flotant types and non-veg coverages (cover groups 1-7)
-                    coverages(ig,ic) = coverages(ig,ic) + ((exp_lkd(ig,ic)/exp_lkd_total(ig))*total_unoccupied_lnd)
+                    coverages(ig,ic) = coverages(ig,ic) + ((exp_lkd(ig,ic)/exp_lkd_total(ig))*total_unoccupied_lnd(ig))
                 end if
             end do
         end if
     end do
 
     ! Apply flotant changes 
-    call update_flotant(exp_lkd,total_unoccupied_flt,newly_unoccupied_thn_flt,newly_unoccupied_thk_flt)
+    call update_flotant
 
     ! Apply acute salinity coverage changes
     call acute_salinity

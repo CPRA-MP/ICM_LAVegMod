@@ -20,10 +20,10 @@ subroutine round_coverages
 
     do ig=1,ngrid
         do ic=1,ncov
-            if (coverages(ig,ic,2) > 0.0) then                      ! If that cell contains that coverage, then round it. 
-                coverage_area_m2 = coverages(ig,ic,2)*grid_a(ig)    
+            if (coverages(ig,ic) > 0.0) then                      ! If that cell contains that coverage, then round it. 
+                coverage_area_m2 = coverages(ig,ic)*grid_a(ig)    
                 
-                coverages(ig,ic,2) = aint(coverage_area_m2)/grid_a(ig)
+                coverages(ig,ic) = aint(coverage_area_m2)/grid_a(ig)
                 
 !                coverage_area_flr = floor(coverage_area_m2)
 !

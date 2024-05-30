@@ -92,13 +92,11 @@ module params
     integer :: flt_thk_cnt                                          ! count of species included in the thick mat flotant marsh coverage group, excluding dead flotant
     integer,dimension(:),allocatable ::  flt_thk_indices            ! 1D array that stores the coverage group indices of thin mat flotant marsh coverage types in coverages(ngrid,ncov,2), excluding dead flotant
 
-
     ! species coverage grid in: PREPROCESSING
     ! define variables used to define the vegetation species coverage at each grid cell that are read in from file
     ! these variables are 3D arrays [i,j,k] where the ith dimension represents the grid cell ID and the jth dimension represents the coverage type column, and the kth dimension represents the coverage value of type j for the previous coverage state [k=1] and for the current coverage state [j=2]
     character*3000 :: veg_coverage_file_header                      ! text string that saves the first row of the veg input file to use as a header in the output file
-    real(sp),dimension(:,:,:),allocatable :: coverages              ! percent of ICM_LAVegMod grid cell that is each coverage type (k=1 will be the previous state ICM-LAVegMod % value, where as k=2 will store state % value as used by ICM-LAVegMod; not to be confused with 'water_from_morph' variable)
-
+    real(sp),dimension(:,:),allocatable :: coverages              ! percent of ICM_LAVegMod grid cell that is each coverage type (0.0 1.0)
     
     ! define ICM-Hydro variables read in from compartment_out summary file in subroutine: PREPROCESSING
     real(sp),dimension(:),allocatable :: stg_mx_yr                  ! Maximum water surface elevation (stage) during the year (m NAVD88)
@@ -127,7 +125,6 @@ module params
     real(sp),dimension(:,:),allocatable :: mort_Y_bins              ! array holding the values used to define the Y-axis of each species mortality tables - the first dimension is the location in the X-axis, the second dimension is the coverage index, ic
     real(sp),dimension(:,:,:),allocatable :: mortality_tables       ! 2-dimensional mortality probablity table for each species - first dimension is X value of table, second dimension is Y value, third dimension is the coverage index, ic
     
-    
     ! these variables are 2D arrays [i,j] where the ith dimension represents the grid cell ID and the jth dimension represents the species coverage for the previous year [j=1] and for the current model year [j=2]
     real(sp),dimension(:,:),allocatable :: FFIBS_score              ! weighted FFIBS score of ICM-LAVegMod grid cell - used for accretion
     real(sp),dimension(:,:),allocatable :: pct_vglnd_BLHF           ! percent of vegetated land that is bottomland hardwood forest
@@ -141,9 +138,28 @@ module params
     integer,dimension(:,:),allocatable ::  nearest_neighbors        ! list of grid cell IDs that are the nearest neighbors to each grid cell
     integer,dimension(:,:),allocatable ::  near_neighbors           ! list of grid cell IDs that are the near neighbors to each grid cell
     
-    ! define variables read in or calculated from files in subroutine: subroutine mort_est_prob
-    real(sp),dimension(:,:),allocatable :: establish_p              ! the establishment probability for every cell and species in this model year based on the species-specific variables
-    real(sp),dimension(:,:),allocatable :: mortality_p              ! the mortality probability for every cell and species in this model year based on the species-specific variables
+    ! define variables calculated in subroutine: MORT_EST_PROB
+    real(sp),dimension(:,:),allocatable :: establish_p              ! the establishment probability for every cell and species in this model year based on the species-specific variables (0.0 - 1.0)
+    real(sp),dimension(:,:),allocatable :: mortality_p              ! the mortality probability for every cell and species in this model year based on the species-specific variables (0.0 - 1.0)
+
+    ! define variables calculated in subroutine: UPDATE_COVERAGES
+    real(sp),dimension(:,:),allocatable :: disp_cov                 ! dispersal coverage for every coverage in every cell (0.0 - 1.0)
+    real(sp),dimension(:,:),allocatable :: exp_lkd                  ! expansion likelihood for each grid cell for each species coverage  (0.0 - 1.0)
+    real(sp),dimension(:),allocatable :: exp_lkd_total              ! total expansion likelihood for each grid cell  (0.0 - 1.0)
+    
+    ! define variables calculated in subroutine: UPDATE_FLOTANT
+    real(sp),dimension(:),allocatable :: exp_lkd_total_flt          ! total expansion likelihood for flotant each grid cell  (0.0 - 1.0)
+    real(sp),dimension(:),allocatable :: total_flt                  ! total area of flotant for each grid cell (0.0 - 1.0)
+    
+    ! define variables calculated in subroutine: SUM_UNOCCUPIED_LAND
+    real(sp),dimension(:),allocatable :: newly_unoccupied_lnd       ! portion of each grid cell that is unoccupied due to veg-mortality (0.0 - 1.0)
+    real(sp),dimension(:),allocatable :: total_unoccupied_lnd       ! the total amount of unoccupied land in each veg grid cell (0.0 - 1.0)
+
+    ! define variables calculated in subroutine: SUM_UNOCCUPIED_FLT
+    real(sp),dimension(:),allocatable :: total_unoccupied_flt       ! the total amount of unoccupied flotant in each veg grid cell (0.0 - 1.0)
+    real(sp),dimension(:),allocatable :: newly_unoccupied_thn_flt   ! portion of each grid cell that is unoccupied due to thin mat flotant mortality (0.0 - 1.0)
+    real(sp),dimension(:),allocatable :: newly_unoccupied_thk_flt   ! portion of each grid cell that is unoccupied due to thick mat flotant mortality (0.0 - 1.0)
 
 
+    
 end module params

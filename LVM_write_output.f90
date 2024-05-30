@@ -16,7 +16,7 @@ subroutine write_output(filetag,write_summary)
     open(unit=901, file=trim(adjustL(veg_out_file))//trim(adjustL(filetag)) )
     write(901,'(A)') trim(adjustL(veg_coverage_file_header))
     do g = 1,ngrid
-        write(901,3456) g, coverages(g,:,2)
+        write(901,3456) g, coverages(g,:)
     end do
     close(901)
     

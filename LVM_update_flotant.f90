@@ -1,6 +1,9 @@
-subroutine update_flotant(exp_lkd,total_unoccupied_flt,newly_unoccupied_thn_flt,newly_unoccupied_thk_flt)
+subroutine update_flotant
     ! global arrays updated by subroutine:
     !   coverages
+    !   exp_lkd_total_flt
+    !   total_flt
+
     
     ! global arrays used by subroutine:
     !   flt_thn_cnt
@@ -18,15 +21,12 @@ subroutine update_flotant(exp_lkd,total_unoccupied_flt,newly_unoccupied_thn_flt,
     use params
     implicit none
 
-    ! dummy local variables populated with arrays passed into subroutine
-    integer,dimension(ngrid,ncov),intent(in) :: exp_lkd                                 ! dummy variable to pass in the expansion liklihood 2D array
-    integer,dimension(ngrid),intent(in) :: total_unoccupied_flt                         ! dummy variable to pass in the total unoccupied flotant area of each grid cell
-    integer,dimension(ngrid),intent(in) :: newly_unoccupied_thn_flt                     ! dummy variable to pass in the newly unoccupied thin flotant area of each grid cell
-    integer,dimension(ngrid),intent(in) :: newly_unoccupied_thk_flt                     ! dummy variable to pass in the newly unoccupied thick flotant area of each grid cell
-
     ! local variables
     integer :: il                                                                       ! iterator over flotant species within the thin and thick mat categories
     integer :: ig                                                                       ! iterator over the veg grid cell 
+
+    exp_lkd_total_flt = 0.0                                                             ! initialize array before first use
+    total_flt = 0.0                                                                     ! initialize array before first use
 
     ! Sum expansion liklihood across flotant species
     do il=1,flt_thn_cnt
@@ -54,10 +54,10 @@ subroutine update_flotant(exp_lkd,total_unoccupied_flt,newly_unoccupied_thn_flt,
                 coverages(ig,bfi) = newly_unoccupied_thk_flt(ig)                        ! Dead thick mat becomes bareground flotant
             else                                                                        ! Flotant can establish in current conditions 
                 do il=1,flt_thn_cnt
-                    coverages(ig,flt_thn_indices(il)) = coverages(ig,flt_thn_indices(il))+ ((exp_lkd(ig,flt_thn_indices(il))/exp_lkd_total_flt(ig))*total_unoccupied_flt)
+                    coverages(ig,flt_thn_indices(il)) = coverages(ig,flt_thn_indices(il))+ ((exp_lkd(ig,flt_thn_indices(il))/exp_lkd_total_flt(ig))*total_unoccupied_flt(ig))
                 end do
                 do il=1,flt_thk_cnt
-                    coverages(ig,flt_thk_indices(il)) = coverages(ig,flt_thk_indices(il))+ ((exp_lkd(ig,flt_thk_indices(il))/exp_lkd_total_flt(ig))*total_unoccupied_flt)
+                    coverages(ig,flt_thk_indices(il)) = coverages(ig,flt_thk_indices(il))+ ((exp_lkd(ig,flt_thk_indices(il))/exp_lkd_total_flt(ig))*total_unoccupied_flt(ig))
                 end do
             end if 
         end if
