@@ -50,16 +50,16 @@ subroutine update_flotant(exp_lkd,total_unoccupied_flt,newly_unoccupied_thn_flt,
     do ig=1,ngrid
         if (total_flt(ig) > 0.0) then                           ! There is flotant in the cell 
             if (exp_lkd_total_flt(ig) == 0.0) then              ! Flotant cannot establish in current conditions
-                coverages(ig,dfi,2) = coverages(ig,dfi,2) + coverages(ig,bfi,2)             ! Dead thin mat is added to dead flotant
-                coverages(ig,bfi,2) = 0.0                                                   ! Reset bareground flotant
-                coverages(ig,dfi,2) = coverages(ig,dfi,2) + newly_unoccupied_thn_flt(ig)              ! Dead thin mat is added to dead flotant
-                coverages(ig,bfi,2) = newly_unoccupied_thk_flt(ig)                                    ! Dead thick mat becomes bareground flotant
+                coverages(ig,dfi) = coverages(ig,dfi) + coverages(ig,bfi)             ! Dead thin mat is added to dead flotant
+                coverages(ig,bfi) = 0.0                                                   ! Reset bareground flotant
+                coverages(ig,dfi) = coverages(ig,dfi) + newly_unoccupied_thn_flt(ig)              ! Dead thin mat is added to dead flotant
+                coverages(ig,bfi) = newly_unoccupied_thk_flt(ig)                                    ! Dead thick mat becomes bareground flotant
             else                                                ! Flotant can establish in current conditions 
                 do il=1,flt_thn_cnt
-                    coverages(ig,flt_thn_indices(il),2) = coverages(ig,flt_thn_indices(il),2)+ ((exp_lkd(ig,flt_thn_indices(il))/exp_lkd_total_flt(ig))*total_unoccupied_flt)
+                    coverages(ig,flt_thn_indices(il)) = coverages(ig,flt_thn_indices(il))+ ((exp_lkd(ig,flt_thn_indices(il))/exp_lkd_total_flt(ig))*total_unoccupied_flt)
                 end do
                 do il=1,flt_thk_cnt
-                    coverages(ig,flt_thk_indices(il),2) = coverages(ig,flt_thk_indices(il),2)+ ((exp_lkd(ig,flt_thk_indices(il))/exp_lkd_total_flt(ig))*total_unoccupied_flt)
+                    coverages(ig,flt_thk_indices(il)) = coverages(ig,flt_thk_indices(il))+ ((exp_lkd(ig,flt_thk_indices(il))/exp_lkd_total_flt(ig))*total_unoccupied_flt)
                 end do
             end if 
         end if
