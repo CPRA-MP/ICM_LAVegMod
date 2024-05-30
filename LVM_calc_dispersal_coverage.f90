@@ -34,7 +34,7 @@ subroutine calc_dispersal_coverage(disp_cov)
 
     do ig=1,ngrid
         do ic=1,ncov
-            disp_cov(ig,ic)= coverages(ig,ic,2)                            ! dispersal coverage for the coverages within the central cell 
+            disp_cov(ig,ic)= coverages(ig,ic)                            ! dispersal coverage for the coverages within the central cell 
 
             numerator = 0
             denominator = 0            
@@ -43,7 +43,7 @@ subroutine calc_dispersal_coverage(disp_cov)
                 if (neighbor < 0) then                                    ! if neighbor index is -9999, then it has reached the end of nearest neighbors
                     return
                 else
-                    numerator = numerator + (coverages(neighbor,ic,2) * grid_a(neighbor))
+                    numerator = numerator + (coverages(neighbor,ic) * grid_a(neighbor))
                     denominator = denominator + grid_a(neighbor)
                 endif
                 disp_cov(ig,ic) = disp_cov(ig,ic) + (numerator/denominator)       ! add to it the dispersal coverage for the coverages in the surrounding cells (nearest neighbors)
@@ -58,7 +58,7 @@ subroutine calc_dispersal_coverage(disp_cov)
                     if (neighbor < 0) then                                    ! if neighbor index is -9999, then it has reached the end of near neighbors
                         return
                     else
-                        numerator = numerator + (coverages(neighbor,ic,2) * grid_a(neighbor))
+                        numerator = numerator + (coverages(neighbor,ic) * grid_a(neighbor))
                         denominator = denominator + grid_a(neighbor)
                     endif
                     disp_cov(ig,ic) = disp_cov(ig,ic) + (numerator/denominator)   ! add to it the dispersal coverage for the coverages in the surrounding cells (nearest neighbors)

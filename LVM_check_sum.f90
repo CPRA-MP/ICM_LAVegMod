@@ -16,8 +16,11 @@ subroutine check_sum
     tol = 0.005
 
     do ig=1,ngrid
-        if (((1.0 - tol) > sum(coverages(ig,:,2))) .or. ((1.0 + tol) < sum(coverages(ig,:,2)))) then
-            ! print an error message that it's out of bounds 
+        if (((1.0 - tol) > sum(coverages(ig,:))) .or. ((1.0 + tol) < sum(coverages(ig,:)))) then
+           ! print an error message that it's out of bounds 
+            write(*,*) '*****************WARNING************************'                       
+            write(*,*) 'Check sum error: Grid Cell ID ',ig,' is ',sum(coverages(ig,:)), ', which is beyond the tolerated total sum coverage.'
+            write(*,*) '************************************************'
         end if 
     end do
 

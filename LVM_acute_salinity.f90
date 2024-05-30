@@ -27,8 +27,8 @@ subroutine acute_salinity
             do ic=1,ncov
                 coverage_group=cov_grp(ic)
                 if (coverage_group == 10) then
-                    coverages(ig,bni,2) = coverages(ig,bni,2) + coverages(ig,ic,2)
-                    coverages(ig,ic,2) = 0.0
+                    coverages(ig,bni) = coverages(ig,bni) + coverages(ig,ic)
+                    coverages(ig,ic) = 0.0
                 end if
             end do
         end if 

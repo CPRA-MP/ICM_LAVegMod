@@ -27,12 +27,12 @@ subroutine acute_salinity_flt
     do ig=1,ngrid
         if (sal_mx_14d_yr(grid_comp(ig)) >= acute_sal_threshold) then
             do il=1,flt_thn_cnt
-                coverages(ig,dfi,2) = coverages(ig,dfi,2) + coverages(ig,flt_thn_indices(il),2)        ! Thin mat is added to dead flotant
-                coverages(ig,flt_thn_indices(il),2) = 0.0                                              ! Zero-out thin mat
+                coverages(ig,dfi) = coverages(ig,dfi) + coverages(ig,flt_thn_indices(il))        ! Thin mat is added to dead flotant
+                coverages(ig,flt_thn_indices(il)) = 0.0                                              ! Zero-out thin mat
             end do
             do il=1,flt_thk_cnt
-                coverages(ig,bfi,2) = coverages(ig,bfi,2) + coverages(ig,flt_thk_indices(il),2)        ! Thick mat is added to bareground flotant
-                coverages(ig,flt_thk_indices(il),2) = 0.0                                              ! Zero-out thick mat            
+                coverages(ig,bfi) = coverages(ig,bfi) + coverages(ig,flt_thk_indices(il))        ! Thick mat is added to bareground flotant
+                coverages(ig,flt_thk_indices(il)) = 0.0                                              ! Zero-out thick mat            
             end do            
         end if 
     end do
