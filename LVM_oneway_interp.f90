@@ -1,12 +1,12 @@
 subroutine oneway_interp(variable1,table,variable1bins,var1bin_n,yint)
     
     ! inputs to the subroutine:
-        ! variable1 = the value of the input variable specific to the grid cell. For 2023 LAVegMod, the variable is elevation of the land portion of the grid cell. 
-        ! table = establishment or mortality table for one species (1D)
-        ! variable1bins = the slice of est_X_bins (or mort_X_bins, etc) for one species (1D)
+    !   variable1 = the value of the input variable specific to the grid cell. For 2023 LAVegMod, the variable is elevation of the land portion of the grid cell. 
+    !   table = establishment or mortality table for one species (1D)
+    !   variable1bins = the slice of est_X_bins (or mort_X_bins, etc) for one species (1D)
     
     !output of the subroutine:
-        ! yint = the interpolated value of establishment or mortality probability for the value of variable1 
+    !   yint = the interpolated value of establishment or mortality probability for the value of variable1 
 
 
     ! global arrays updated by subroutine:

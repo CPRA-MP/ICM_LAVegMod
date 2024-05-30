@@ -7,20 +7,20 @@ subroutine reset_coverages
 
     use params
     implicit none
-!
-!    ! local variables
 
-!    ! Add all new bareground to old bareground 
+    ! local variables
+
+    ! Add all new bareground to old bareground 
     coverages(:,boi,2) = coverages(:,boi,1) + coverages(:,bni,1)
-!
-!    ! Dump previous values of old bareground and shift new values to state 1 for the next processing step
+
+    ! Dump previous values of old bareground and shift new values to state 1 for the next processing step
     coverages(:,boi,1) = coverages(:,boi,2)
     coverages(:,boi,2) = 0
     
-!    ! Remove the whole Morph pixel portion of the dead flotant
+    ! Remove the whole Morph pixel portion of the dead flotant
     coverages(:,dfi,2) = coverages(:,dfi,1) - dem_pixel_proportion(:)*floor(coverages(:,dfi,1)/dem_pixel_proportion(:))
-!
-!    ! Dump previous values of dead flotant and shift new values to state 1 for the next processing step
+
+    ! Dump previous values of dead flotant and shift new values to state 1 for the next processing step
     coverages(:,dfi,1) = coverages(:,dfi,2)
     coverages(:,dfi,2) = 0 
 
