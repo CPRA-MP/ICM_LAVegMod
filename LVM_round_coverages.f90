@@ -22,15 +22,21 @@ subroutine round_coverages
         do ic=1,ncov
             if (coverages(ig,ic,2) > 0.0) then                      ! If that cell contains that coverage, then round it. 
                 coverage_area_m2 = coverages(ig,ic,2)*grid_a(ig)    
-                coverage_area_flr = floor(coverage_area_m2)
-                dif = coverage_area_m2 - coverage_area_flr
-                if (dif > 0.5) then   
-                    coverages(ig,ic,2) = coverage_area_flr + 1      ! round up
-                else                                                
-                    coverages(ig,ic,2) = coverage_area_flr          ! round down
-                end if 
+                
+                coverages(ig,ic,2) = aint(coverage_area_m2)/grid_a(ig)
+                
+!                coverage_area_flr = floor(coverage_area_m2)
+!
+!                dif = coverage_area_m2 - coverage_area_flr
+!                if (dif > 0.5) then   
+!                    coverages(ig,ic,2) = coverage_area_flr + 1      ! round up
+!                else                                                
+!                    coverages(ig,ic,2) = coverage_area_flr          ! round down
+!                end if 
             else
-               ! print an error message - why do we have a negative coverage value? 
+                write(*,*) '*****************WARNING************************************'
+                write(*,*) 'Grid Cell ID ',ig,' has negative coverage value for',cov_symbol(ic)
+                write(*,*) '************************************************************'
             end if
         end do
     end do
