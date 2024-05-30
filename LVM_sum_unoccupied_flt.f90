@@ -30,11 +30,11 @@ subroutine sum_unoccupied_flt(total_unoccupied_flt, newly_unoccupied_thn_flt, ne
 
 
     do il=1,flt_thn_cnt
-        newly_unoccupied_thn_flt = newly_unoccupied_thn_flt + (coverages(:,flt_thn_indices(il),2)*mortality_p(:,flt_thn_indices(il)))
+        newly_unoccupied_thn_flt = newly_unoccupied_thn_flt + (coverages(:,flt_thn_indices(il))*mortality_p(:,flt_thn_indices(il)))
     end do
     do il=1,flt_thk_cnt
-        newly_unoccupied_thk_flt = newly_unoccupied_thk_flt + (coverages(:,flt_thk_indices(il),2)*mortality_p(:,flt_thk_indices(il)))
+        newly_unoccupied_thk_flt = newly_unoccupied_thk_flt + (coverages(:,flt_thk_indices(il))*mortality_p(:,flt_thk_indices(il)))
     end do
-    total_unoccupied_flt = newly_unoccupied_thn_flt + newly_unoccupied_thk_flt + coverages(:,bfi,2)
+    total_unoccupied_flt = newly_unoccupied_thn_flt + newly_unoccupied_thk_flt + coverages(:,bfi)
 
 end 
