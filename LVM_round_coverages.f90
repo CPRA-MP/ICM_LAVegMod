@@ -16,7 +16,7 @@ subroutine round_coverages
     real(sp)  :: dif                        ! Portion of the m2 being rounded; Difference between overage_area_m2 and coverage_area_flr
 
 
-    ! Round everything to the nearest 1 m^2
+    ! Round everything to the nearest 1 m^2 and give an error if anything is negative -> note, it does not fix the negatives (with the python did do)
 
     do ig=1,ngrid
         do ic=1,ncov
@@ -33,7 +33,7 @@ subroutine round_coverages
 !                else                                                
 !                    coverages(ig,ic,2) = coverage_area_flr          ! round down
 !                end if 
-            else
+            elseif (coverages(ig,ic) < 0.0) then
                 write(*,*) '*****************WARNING************************************'
                 write(*,*) 'Grid Cell ID ',ig,' has negative coverage value for',cov_symbol(ic)
                 write(*,*) '************************************************************'

@@ -36,7 +36,7 @@ subroutine params_alloc
     allocate(flt_thk_indices(ncov))
     
     ! allocate memory for variables read and set in subroutine: PREPROCESSING
-    ! these variables are 3D arrays [i,j,k] where the ith dimension represents the grid cell ID and the jth dimension represents the coverage type column, and the kth dimension represents the coverage value of type j for the previous coverage state [k=1] and for the current coverage state [j=2]
+    ! these variables are 2D arrays [i,j] where the ith dimension represents the grid cell ID and the jth dimension represents the coverage type column
     allocate(coverages(ngrid,ncov))
     
     ! allocate memory for variables read in from compartment_out ICM-Hydro summary file in subroutine: PREPROCESSING
