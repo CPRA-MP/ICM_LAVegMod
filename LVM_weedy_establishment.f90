@@ -10,7 +10,7 @@ subroutine weedy_establishment
     !   cov_disp_class
     !   establish_P
 
-    ! This subroutine calculates the establishment and mortality probability for each species/coverage in each grid cell
+    ! This subroutine allows Class 3 (weedy) dispersal vegetation to estbalish on new bareground at the start of the model year
    
     use params
     implicit none
@@ -38,9 +38,7 @@ subroutine weedy_establishment
                     endif
                 end do          
                 coverages(ig,bni,2) = 0.0               ! reset the new bareground 
-                end do 
             end if
-        else 
         endif
     end do
 
