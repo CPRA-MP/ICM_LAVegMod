@@ -16,24 +16,23 @@ subroutine round_coverages
     real(sp)  :: dif                        ! Portion of the m2 being rounded; Difference between overage_area_m2 and coverage_area_flr
 
 
-    ! Round everything to the nearest 1 m^2
+    ! Round everything to the nearest 1 m^2 and give an error if anything is negative -> note, it does not fix the negatives (which the python did do)
 
     do ig=1,ngrid
         do ic=1,ncov
-            if (coverages(ig,ic,2) > 0.0) then                      ! If that cell contains that coverage, then round it. 
-                coverage_area_m2 = coverages(ig,ic,2)*grid_a(ig)    
-                
-                coverages(ig,ic,2) = aint(coverage_area_m2)/grid_a(ig)
+            if (coverages(ig,ic) > 0.0) then                      ! If that cell contains that coverage, then round it. 
+                coverage_area_m2 = coverages(ig,ic)*grid_a(ig)    
+                coverages(ig,ic) = aint(coverage_area_m2)/grid_a(ig)
                 
 !                coverage_area_flr = floor(coverage_area_m2)
 !
 !                dif = coverage_area_m2 - coverage_area_flr
 !                if (dif > 0.5) then   
-!                    coverages(ig,ic,2) = coverage_area_flr + 1      ! round up
+!                    coverages(ig,ic) = coverage_area_flr + 1      ! round up
 !                else                                                
-!                    coverages(ig,ic,2) = coverage_area_flr          ! round down
+!                    coverages(ig,ic) = coverage_area_flr          ! round down
 !                end if 
-            else
+            elseif (coverages(ig,ic) < 0.0) then
                 write(*,*) '*****************WARNING************************************'
                 write(*,*) 'Grid Cell ID ',ig,' has negative coverage value for',cov_symbol(ic)
                 write(*,*) '************************************************************'

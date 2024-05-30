@@ -81,23 +81,23 @@ module params
                                                                     !       cov_disp_class =  2; near disperal - species can disperse only from "near and nearest neighboring" areas (distances are assigned in SET_IO from "veg/LAVegMod_input_params.csv")
                                                                     !       cov_disp_class =  3; always available - "weedy" species that are assumed always available for establishment/infinite dispersal distance
     real(sp),dimension(:),allocatable ::  FFIBS                     ! FFIBS score assigned to each respective coverage type
-    integer :: wti                                                  ! index in coverages(ngrid,ncov,2) for water coverage group
-    integer :: nmi                                                  ! index in coverages(ngrid,ncov,2) for NotMod coverage group
-    integer :: boi                                                  ! index in coverages(ngrid,ncov,2) for old bareground coverage group
-    integer :: bni                                                  ! index in coverages(ngrid,ncov,2) for new bareground coverage group
-    integer :: dfi                                                  ! index in coverages(ngrid,ncov,2) for dead flotant marsh coverage group
-    integer :: bfi                                                  ! index in coverages(ngrid,ncov,2) for bare mat flotant marsh coverage group
+    integer :: wti                                                  ! index in coverages(ngrid,ncov) for water coverage group
+    integer :: nmi                                                  ! index in coverages(ngrid,ncov) for NotMod coverage group
+    integer :: boi                                                  ! index in coverages(ngrid,ncov) for old bareground coverage group
+    integer :: bni                                                  ! index in coverages(ngrid,ncov) for new bareground coverage group
+    integer :: dfi                                                  ! index in coverages(ngrid,ncov) for dead flotant marsh coverage group
+    integer :: bfi                                                  ! index in coverages(ngrid,ncov) for bare mat flotant marsh coverage group
     integer :: flt_thn_cnt                                          ! count of species included in the thin mat flotant marsh coverage group, excluding dead flotant
-    integer,dimension(:),allocatable ::  flt_thn_indices            ! 1D array that stores the coverage group indices of thin mat flotant marsh coverage types in coverages(ngrid,ncov,2), excluding dead flotant
+    integer,dimension(:),allocatable ::  flt_thn_indices            ! 1D array that stores the coverage group indices of thin mat flotant marsh coverage types in coverages(ngrid,ncov), excluding dead flotant
     integer :: flt_thk_cnt                                          ! count of species included in the thick mat flotant marsh coverage group, excluding dead flotant
-    integer,dimension(:),allocatable ::  flt_thk_indices            ! 1D array that stores the coverage group indices of thin mat flotant marsh coverage types in coverages(ngrid,ncov,2), excluding dead flotant
+    integer,dimension(:),allocatable ::  flt_thk_indices            ! 1D array that stores the coverage group indices of thin mat flotant marsh coverage types in coverages(ngrid,ncov), excluding dead flotant
 
 
     ! species coverage grid in: PREPROCESSING
     ! define variables used to define the vegetation species coverage at each grid cell that are read in from file
     ! these variables are 3D arrays [i,j,k] where the ith dimension represents the grid cell ID and the jth dimension represents the coverage type column, and the kth dimension represents the coverage value of type j for the previous coverage state [k=1] and for the current coverage state [j=2]
     character*3000 :: veg_coverage_file_header                      ! text string that saves the first row of the veg input file to use as a header in the output file
-    real(sp),dimension(:,:,:),allocatable :: coverages              ! percent of ICM_LAVegMod grid cell that is each coverage type (k=1 will be the previous state ICM-LAVegMod % value, where as k=2 will store state % value as used by ICM-LAVegMod; not to be confused with 'water_from_morph' variable)
+    real(sp),dimension(:,:),allocatable :: coverages              ! percent of ICM_LAVegMod grid cell that is each coverage type (k=1 will be the previous state ICM-LAVegMod % value, where as k=2 will store state % value as used by ICM-LAVegMod; not to be confused with 'water_from_morph' variable)
 
     
     ! define ICM-Hydro variables read in from compartment_out summary file in subroutine: PREPROCESSING

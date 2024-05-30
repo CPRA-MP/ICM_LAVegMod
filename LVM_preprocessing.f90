@@ -34,29 +34,29 @@ subroutine preprocessing
     
     ! process coverage groups and save indices for specifc coverage groups
     flt_thn_cnt = 0                                                                                 ! initialize counter for finding thin mat flotant coverages
-    flt_thn_indices = 0                                                                             ! initialize array to store coverage group index of FLOTANT coverage types in coverages(ngrid,ncov,2)
+    flt_thn_indices = 0                                                                             ! initialize array to store coverage group index of FLOTANT coverage types in coverages(ngrid,ncov)
     flt_thk_cnt = 0                                                                                 ! initialize counter for finding thin mat flotant coverages
-    flt_thk_indices = 0                                                                             ! initialize array to store coverage group index of FLOTANT coverage types in coverages(ngrid,ncov,2)
+    flt_thk_indices = 0                                                                             ! initialize array to store coverage group index of FLOTANT coverage types in coverages(ngrid,ncov)
     
     do ic = 1,ncov
         if (cov_grp(ic) == 0) then
-            wti = ic                                                                                ! coverage group index of WAT in coverages(ngrid,ncov,2)
+            wti = ic                                                                                ! coverage group index of WAT in coverages(ngrid,ncov)
         else if (cov_grp(ic) == 1) then
-            nmi = ic                                                                                ! coverage group index of NOTMOD in coverages(ngrid,ncov,2)
+            nmi = ic                                                                                ! coverage group index of NOTMOD in coverages(ngrid,ncov)
         else if (cov_grp(ic) == 2) then
-            boi = ic                                                                                ! coverage group index of BAREGRND_OLD in coverages(ngrid,ncov,2)
+            boi = ic                                                                                ! coverage group index of BAREGRND_OLD in coverages(ngrid,ncov)
         else if (cov_grp(ic) == 3) then
-            bni = ic                                                                                ! coverage group index of BAREGRND_NEW in coverages(ngrid,ncov,2)
-        else if (cov_grp(ic) == 4) then                                                             ! coverage group dimension indices for flotants in coverages(ngrid,ncov,2)
+            bni = ic                                                                                ! coverage group index of BAREGRND_NEW in coverages(ngrid,ncov)
+        else if (cov_grp(ic) == 4) then                                                             ! coverage group dimension indices for flotants in coverages(ngrid,ncov)
             flt_thn_cnt = flt_thn_cnt + 1
             flt_thn_indices(flt_thn_cnt) = ic                                                       ! store coverage group indices for thin flotants in new array
-        else if (cov_grp(ic) == 5) then                                                             ! coverage group dimension indices for flotants in coverages(ngrid,ncov,2)
+        else if (cov_grp(ic) == 5) then                                                             ! coverage group dimension indices for flotants in coverages(ngrid,ncov)
             flt_thk_cnt = flt_thk_cnt + 1
             flt_thk_indices(flt_thk_cnt) = ic                                                       ! store coverage group indices for thick flotants in new array
         else if (cov_grp(ic) == 6) then
-            bfi = ic                                                                                ! coverage group index of BARE_Flt in coverages(ngrid,ncov,2)
+            bfi = ic                                                                                ! coverage group index of BARE_Flt in coverages(ngrid,ncov)
         else if (cov_grp(ic) == 7) then
-            dfi = ic                                                                                ! coverage group index of DEAD_Flt in coverages(ngrid,ncov,2)
+            dfi = ic                                                                                ! coverage group index of DEAD_Flt in coverages(ngrid,ncov)
         end if
     end do
     
@@ -86,7 +86,7 @@ subroutine preprocessing
     open(unit=102, file=trim(adjustL(veg_in_file)))
     read(102,1234) veg_coverage_file_header                                                         ! dump column header row ! format 1234 must match structure of veg_out_file column headers
     do i = 1,ngrid
-        read(102,*) g, coverages(g,:,1)
+        read(102,*) g, coverages(g,:)
     end do
     close(102)
     
