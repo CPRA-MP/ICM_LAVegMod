@@ -94,9 +94,9 @@ module params
 
     ! species coverage grid in: PREPROCESSING
     ! define variables used to define the vegetation species coverage at each grid cell that are read in from file
-    ! these variables are 3D arrays [i,j,k] where the ith dimension represents the grid cell ID and the jth dimension represents the coverage type column, and the kth dimension represents the coverage value of type j for the previous coverage state [k=1] and for the current coverage state [j=2]
+    ! these variables are 3D arrays [i,j] where the ith dimension represents the grid cell ID and the jth dimension represents the coverage type column 
     character*3000 :: veg_coverage_file_header                      ! text string that saves the first row of the veg input file to use as a header in the output file
-    real(sp),dimension(:,:),allocatable :: coverages              ! percent of ICM_LAVegMod grid cell that is each coverage type (0.0 1.0)
+    real(sp),dimension(:,:),allocatable :: coverages                ! percent of ICM_LAVegMod grid cell that is each coverage type (0.0 1.0)
     
     ! define ICM-Hydro variables read in from compartment_out summary file in subroutine: PREPROCESSING
     real(sp),dimension(:),allocatable :: stg_mx_yr                  ! Maximum water surface elevation (stage) during the year (m NAVD88)
@@ -125,7 +125,7 @@ module params
     real(sp),dimension(:,:),allocatable :: mort_Y_bins              ! array holding the values used to define the Y-axis of each species mortality tables - the first dimension is the location in the X-axis, the second dimension is the coverage index, ic
     real(sp),dimension(:,:,:),allocatable :: mortality_tables       ! 2-dimensional mortality probablity table for each species - first dimension is X value of table, second dimension is Y value, third dimension is the coverage index, ic
     
-    ! these variables are 2D arrays [i,j] where the ith dimension represents the grid cell ID and the jth dimension represents the species coverage for the previous year [j=1] and for the current model year [j=2]
+    ! these variables are 1D arrays [i] where the ith dimension represents the grid cell ID 
     real(sp),dimension(:,:),allocatable :: FFIBS_score              ! weighted FFIBS score of ICM-LAVegMod grid cell - used for accretion
     real(sp),dimension(:,:),allocatable :: pct_vglnd_BLHF           ! percent of vegetated land that is bottomland hardwood forest
     real(sp),dimension(:,:),allocatable :: pct_vglnd_SWF            ! percent of vegetated land that is swamp forest

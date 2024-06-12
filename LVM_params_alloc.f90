@@ -66,14 +66,14 @@ subroutine params_alloc
     allocate(mort_Y_bins(n_Y_bins,ncov))
     allocate(mortality_tables(n_X_bins,n_Y_bins,ncov))
     
-    ! these variables are 2D arrays [i,j] where the ith dimension represents the grid cell ID and the jth dimension represents the species coverage for the previous year [j=1] and for the current model year [j=2]
-    allocate(FFIBS_score(ngrid,2))
-    allocate(pct_vglnd_BLHF(ngrid,2))
-    allocate(pct_vglnd_SWF(ngrid,2))
-    allocate(pct_vglnd_FM(ngrid,2))
-    allocate(pct_vglnd_IM(ngrid,2))
-    allocate(pct_vglnd_BM(ngrid,2))
-    allocate(pct_vglnd_SM(ngrid,2))
+    ! these variables are 1D arrays [i] where the ith dimension represents the grid cell ID 
+    allocate(FFIBS_score(ngrid))
+    allocate(pct_vglnd_BLHF(ngrid))
+    allocate(pct_vglnd_SWF(ngrid))
+    allocate(pct_vglnd_FM(ngrid))
+    allocate(pct_vglnd_IM(ngrid))
+    allocate(pct_vglnd_BM(ngrid))
+    allocate(pct_vglnd_SM(ngrid))
 
     ! allocate memory for variables read and set in subroutine: NEIGHBORS
     allocate(nearest_neighbors(ngrid,max_neighbors))
