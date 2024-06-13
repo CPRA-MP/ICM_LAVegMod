@@ -143,12 +143,12 @@ module params
     real(sp),dimension(:,:),allocatable :: mortality_p              ! the mortality probability for every cell and species in this model year based on the species-specific variables (0.0 - 1.0)
 
     ! define variables calculated in subroutine: UPDATE_COVERAGES
-    real(sp),dimension(:,:),allocatable :: disp_cov                 ! dispersal coverage for every coverage in every cell (0.0 - 1.0)
-    real(sp),dimension(:,:),allocatable :: exp_lkd                  ! expansion likelihood for each grid cell for each species coverage  (0.0 - 1.0)
-    real(sp),dimension(:),allocatable :: exp_lkd_total              ! total expansion likelihood for each grid cell  (0.0 - 1.0)
+    real(sp),dimension(:,:),allocatable :: disp_cov                 ! dispersal coverage for every coverage in every cell (0.0 - 2.0 or 3.0 depending on dispersal class)
+    real(sp),dimension(:,:),allocatable :: exp_lkd                  ! expansion likelihood for each grid cell for each species coverage  (0.0 - 2.0 or 3.0 depending on dispersal class)
+    real(sp),dimension(:),allocatable :: exp_lkd_total              ! total expansion likelihood for each grid cell  (0.0 - 3.0)
     
     ! define variables calculated in subroutine: UPDATE_FLOTANT
-    real(sp),dimension(:),allocatable :: exp_lkd_total_flt          ! total expansion likelihood for flotant each grid cell  (0.0 - 1.0)
+    real(sp),dimension(:),allocatable :: exp_lkd_total_flt          ! total expansion likelihood for flotant each grid cell  (0.0 - 2.0)
     real(sp),dimension(:),allocatable :: total_flt                  ! total area of flotant for each grid cell (0.0 - 1.0)
     
     ! define variables calculated in subroutine: SUM_UNOCCUPIED_LAND

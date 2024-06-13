@@ -22,14 +22,13 @@ subroutine sum_unoccupied_lnd
 
     ! local variables
     integer :: ic                                                                           ! iterator over veg grid coverages (columns)
-    integer :: cover_group                                                                  ! cover group value;  e.g., cover_group = 13 is saline emergent wetland vegetation
-
+ 
     total_unoccupied_lnd = 0.0                                                              ! initialize array to zero before first used
     newly_unoccupied_lnd = 0.0                                                              ! initialize array to zero before first used
     
-    do ic=1,ncov
-        cover_group = cov_grp(ic)                                                           ! Excludes flotant and non-veg coverages (cover groups 1-7)
-        if (cover_group > 7) then
+    ! Apply the mortality probability 
+    do ic=1,ncov                                  
+        if (cov_grp(ic)  > 7) then                                                          ! Excludes flotant and non-veg coverages (cover groups 1-7)
             newly_unoccupied_lnd = newly_unoccupied_lnd + (coverages(:,ic)*mortality_p(:,ic))
         end if
     end do

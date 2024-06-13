@@ -14,7 +14,8 @@ subroutine calc_dispersal_coverage
     
 
     ! This subroutine calculates the dispersal coverage for every coverage in every cell 
-   
+    ! D_i = total coverage of that vegetation in those cells / the area of those cells (remember those cells may not be the same size)
+    
     use params
     implicit none
 

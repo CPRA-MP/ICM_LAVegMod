@@ -7,8 +7,7 @@ subroutine land_change
     ! The change is based on the % of the cell that is water, as determined by Morph. 
     ! Possible outcomes are: 1) no change; 2) land gain; 3) land loss 
     ! If there is land gain, then the % water in the cell is decreased and the % new bareground is increased 
-    ! If there is land loss, then the % water in the cell is increased and the % land is decreased in the following order: 
-    ! old bareground is reduced first.
+    ! If there is land loss, then the % water in the cell is increased and the % land is decreased. Old bareground is reduced first, followed by vegetated land. 
 
     use params
     implicit none
@@ -18,7 +17,7 @@ subroutine land_change
     integer :: ic                                                                                   ! iterator over coverage types
     integer :: fi                                                                                   ! iterator of flotant coverage indices
     integer :: fli                                                                                  ! local varaible to store index of flotants in coverages(ngrid,ncov)
-    real :: delta_water                                                                             ! difference between Morph water and Veg water
+    real(sp) :: delta_water                                                                             ! difference between Morph water and Veg water
     real :: total_flotant                                                                           ! sum of all flotant coverage types
     real :: veg_land                                                                                ! total land (decimal %) in the Veg cell
     real :: morph_land                                                                              ! total land (decimal %) in the Morph cell
@@ -40,7 +39,6 @@ subroutine land_change
         
         else if (delta_water < -1.0*no_change_threshold) then                                       ! 3) LAND LOSS;  delta_water is negative and less than change_threshold
             delta_water = -1.0*delta_water                                                          ! redefining delta water so we're adding a positive rather than having to subtract a negative    
-            ! total_flotant = ELBA2_Flt(ig) + PAHE2_Flt(ig) + bare_Flt(ig) + dead_Flt(ig)
             total_flotant = coverages(ig,dfi)                                                     ! add DEAD_Flt to count of total flotant coverage
             total_flotant = total_flotant + coverages(ig,bfi)                                     ! add BARE_Flt to count of total flotant coverage
             do fi = 1,flt_thn_cnt                                                                   ! loop over living thin mat flotant coverages and add to total flotant coverage
