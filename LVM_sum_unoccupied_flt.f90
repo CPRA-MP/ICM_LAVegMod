@@ -31,10 +31,15 @@ subroutine sum_unoccupied_flt
     
     do il=1,flt_thn_cnt
         newly_unoccupied_thn_flt = newly_unoccupied_thn_flt + (coverages(:,flt_thn_indices(il))*mortality_p(:,flt_thn_indices(il)))
+        coverages(:,flt_thn_indices(il)) = coverages(:,flt_thn_indices(il)) * (1 - mortality_p(:,flt_thn_indices(il)))
     end do
     do il=1,flt_thk_cnt
         newly_unoccupied_thk_flt = newly_unoccupied_thk_flt + (coverages(:,flt_thk_indices(il))*mortality_p(:,flt_thk_indices(il)))
+        coverages(:,flt_thk_indices(il)) = coverages(:,flt_thk_indices(il)) * (1 - mortality_p(:,flt_thk_indices(il)))
     end do
-    total_unoccupied_flt = newly_unoccupied_thn_flt + newly_unoccupied_thk_flt + coverages(:,bfi)
+    
+    coverages(:,bfi) = coverages(:,bfi) + newly_unoccupied_thn_flt + newly_unoccupied_thk_flt   ! Add the newly unoccupied thin and thick mat flotant to the bareground flotant coverage (then it can be seen in the intermediate output)
+    total_unoccupied_flt = coverages(:,bfi)                                                     ! total unoccupied flotant is the same now as barground flotant
+
 
 end 

@@ -37,7 +37,7 @@ subroutine update_flotant
     end do
     
     ! Sum the flotant in the cell; helpful to have in the next step so we can skip over cells with no flotant
-    total_flt = total_unoccupied_flt 
+    total_flt = total_unoccupied_flt                                                    ! At this point, total_unoccupied_flt is the same as barground flotant coverage
     do il=1,flt_thn_cnt
         total_flt = total_flt + coverages(:,flt_thn_indices(il))
     end do
@@ -45,12 +45,14 @@ subroutine update_flotant
         total_flt = total_flt + coverages(:,flt_thn_indices(il))
     end do
 
+    coverages(:,bfi) = coverages(:,bfi) - (newly_unoccupied_thn_flt + newly_unoccupied_thk_flt)     ! Removing the newly unoccupied thin and thick mat from the bare floating so they can be correctly assigned in the next step
+
     do ig=1,ngrid
         if (total_flt(ig) > 0.0) then                                                   ! There is flotant in the cell 
             if (exp_lkd_total_flt(ig) == 0.0) then                                      ! Flotant cannot establish in current conditions
-                coverages(ig,dfi) = coverages(ig,dfi) + coverages(ig,bfi)               ! Dead thin mat is added to dead flotant
-                coverages(ig,bfi) = 0.0                                                 ! Reset bareground flotant
                 coverages(ig,dfi) = coverages(ig,dfi) + newly_unoccupied_thn_flt(ig)    ! Dead thin mat is added to dead flotant
+                coverages(ig,dfi) = coverages(ig,dfi) + coverages(ig,bfi)               ! Bareground flotant is added to dead flotant
+                coverages(ig,bfi) = 0.0                                                 ! Reset bareground flotant
                 coverages(ig,bfi) = newly_unoccupied_thk_flt(ig)                        ! Dead thick mat becomes bareground flotant
             else                                                                        ! Flotant can establish in current conditions 
                 do il=1,flt_thn_cnt

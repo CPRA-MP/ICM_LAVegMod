@@ -21,8 +21,6 @@ subroutine update_coverages
     ! local variables 
     integer :: ig                                                                   ! iterator over Veg grid cells
     integer :: ic                                                                   ! iterator over coverage types (columns)
-    integer :: dispersal_class
-    real(sp) :: total_est_P
 
  
     ! Sum expansion likelihood across all non-flotant species
@@ -35,28 +33,9 @@ subroutine update_coverages
     end do
     
     ! If exp_lkd_total is 0, then allow dispersal class 3 (weedy) species to establish; otherwise, allow all non-flotant veg to establish
+    ! If exp_lkd_total is non-zero, then allow all available non-flotant veg to establish 
     do ig=1,ngrid
-        if (exp_lkd_total(ig) == 0.0) then
-            total_est_P = 0.0
-            do ic=1,ncov
-                dispersal_class = cov_disp_class(ic)
-                if (dispersal_class == 3) then
-                    total_est_P = total_est_P + establish_P(ig,ic)          ! sum the estalishment Ps of the weedy species 
-                end if
-            end do
-            if (total_est_P>0) then
-                do ic=1,ncov
-                    dispersal_class = cov_disp_class(ic)
-                    if (dispersal_class == 3) then
-                        coverages(ig,ic) = coverages(ig,ic) +  ((establish_P(ig,ic)/total_est_P)*total_unoccupied_lnd(ig))         ! sum the estalishment Ps of the weedy species 
-                    end if
-                end do          
-                coverages(ig,bni) = 0.0                                   ! reset the new bareground 
-                coverages(ig,boi) = 0.0                                   ! reset the old bareground                 
-            else
-                ! leave bareground intact 
-            end if
-        else
+        if (exp_lkd_total(ig) > 0.0) then
             coverages(ig,bni) = 0.0                                       ! reset the new bareground 
             coverages(ig,boi) = 0.0                                       ! reset the old bareground 
             do ic=1,ncov

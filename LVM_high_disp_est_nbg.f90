@@ -1,4 +1,4 @@
-subroutine weedy_establishment
+subroutine high_disp_est_nbg
     ! global arrays updated by subroutine:
     !   coverages
     
@@ -10,7 +10,7 @@ subroutine weedy_establishment
     !   cov_disp_class
     !   establish_P
 
-    ! This subroutine allows Class 3 (weedy) dispersal vegetation to estbalish on new bareground at the start of the model year
+    ! This subroutine allows high dispersal (Class 3, weedy) vegetation to estbalish on new bareground at the start of the model year
    
     use params
     implicit none

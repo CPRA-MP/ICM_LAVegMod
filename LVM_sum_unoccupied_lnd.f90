@@ -23,15 +23,17 @@ subroutine sum_unoccupied_lnd
     ! local variables
     integer :: ic                                                                           ! iterator over veg grid coverages (columns)
  
-    total_unoccupied_lnd = 0.0                                                              ! initialize array to zero before first used
-    newly_unoccupied_lnd = 0.0                                                              ! initialize array to zero before first used
+    total_unoccupied_lnd = 0.0                                                              ! initialize 1D array to zero before first used
+    newly_unoccupied_lnd = 0.0                                                              ! initialize 1D array to zero before first used
     
     ! Apply the mortality probability 
     do ic=1,ncov                                  
         if (cov_grp(ic)  > 7) then                                                          ! Excludes flotant and non-veg coverages (cover groups 1-7)
             newly_unoccupied_lnd = newly_unoccupied_lnd + (coverages(:,ic)*mortality_p(:,ic))
+            coverages(:,ic) = coverages(:,ic)*(1 - mortality_p(:,ic))
         end if
     end do
-    total_unoccupied_lnd = newly_unoccupied_lnd + coverages(:,bni) + coverages(:,boi)   ! add the new barground and old bareground to the newly unoccupied land to give the total 
+    coverages(:,bni) = coverages(:,bni) + newly_unoccupied_lnd                          ! add the newly unoccupied land to the new bareground category (then it can be seen in the intermediate output)
+    total_unoccupied_lnd = coverages(:,bni) + coverages(:,boi)                          ! add the new barground and old bareground for the total unuccupied land in each cell 
 
 end 

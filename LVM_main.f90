@@ -87,6 +87,12 @@ program main
     write(  *,*) 'Land Change subroutine ended at: ',dtstr
     write(000,*) 'Land Change subroutine ended at: ',dtstr
 
+    ! write intermediate coverage file for post updates from ICM-Morph - also write summary output file
+    call write_output('imo_morphu',1)   !currently this is a 10*character string being passed in to write_output - currently needs to be padded with spaces
+    call date_and_time(VALUES=dtvalues)
+    write(dtstr,8889) dtvalues(1),'-',dtvalues(2),'-',dtvalues(3),' ',dtvalues(5),':',dtvalues(6),':',dtvalues(7)
+    write(  *,*) 'Write Intermediate Output subroutine ended at: ',dtstr
+    write(000,*) 'Write Intermediate Output subroutine ended at: ',dtstr 
 
     ! Calculate the establishment and mortality probabilities for every species and grid cell for this model year's environmental conditions
     !call mort_est_prob
@@ -95,29 +101,40 @@ program main
     write(  *,*) 'Mortality Establishment Probability subroutine ended at: ',dtstr
     write(000,*) 'Mortality Establishment Probability subroutine ended at: ',dtstr
 
-    ! Allow class three dispersal species ("weedy") to establish on any new bareground
-    !call weedy_establishment
+    ! Allow high dispersal species (class three "weedy" species) to establish on any new bareground
+    !call hhigh_disp_est_nbg
     call date_and_time(VALUES=dtvalues)
     write(dtstr,8889) dtvalues(1),'-',dtvalues(2),'-',dtvalues(3),' ',dtvalues(5),':',dtvalues(6),':',dtvalues(7)
-    write(  *,*) 'Weedy Establishment subroutine ended at: ',dtstr
-    write(000,*) 'Weedy Establishment subroutine ended at: ',dtstr
+    write(  *,*) 'High Dispersal Establishment on New Bareground subroutine ended at: ',dtstr
+    write(000,*) 'High Dispersal Establishment on New Bareground subroutine ended at: ',dtstr
 
-    ! Appy mortality to non-flotant species (without changing coverages) and sum the total unoccupied land in each grid cell 
+    ! write intermediate coverage file for post high dispersal establishment on new bareground (1 = first time high dispersal is called)- also write summary output file
+    call write_output('imo_hdest1',1)   !currently this is a 10*character string being passed in to write_output - currently needs to be padded with spaces
+    call date_and_time(VALUES=dtvalues)
+    write(dtstr,8889) dtvalues(1),'-',dtvalues(2),'-',dtvalues(3),' ',dtvalues(5),':',dtvalues(6),':',dtvalues(7)
+    write(  *,*) 'Write Intermediate Output subroutine ended at: ',dtstr
+    write(000,*) 'Write Intermediate Output subroutine ended at: ',dtstr 
+
+    ! Apply mortality to non-flotant species and sum the total unoccupied land in each grid cell 
     !call sum_unoccupied_lnd
     call date_and_time(VALUES=dtvalues)
     write(dtstr,8889) dtvalues(1),'-',dtvalues(2),'-',dtvalues(3),' ',dtvalues(5),':',dtvalues(6),':',dtvalues(7)
     write(  *,*) 'Sum Unoccupied Land subroutine ended at: ',dtstr
     write(000,*) 'Sum Unoccupied Land ended at: ',dtstr
 
-    ! Apply mortality to flotant species (without changing coverages)  and sum the unoccupied flotant, keeping track of the different types (dead thin, dead thick, and bareground flotant)
+    ! Apply mortality to flotant species and sum the unoccupied flotant, keeping track of the different types (dead thin, dead thick, and bareground flotant)
     !call sum_unoccupied_flt
     call date_and_time(VALUES=dtvalues)
     write(dtstr,8889) dtvalues(1),'-',dtvalues(2),'-',dtvalues(3),' ',dtvalues(5),':',dtvalues(6),':',dtvalues(7)
     write(  *,*) 'Sum Unoccupied Flotant subroutine ended at: ',dtstr
     write(000,*) 'Sum Unoccupied Flotant ended at: ',dtstr
 
-    ! Apply the mortality probabilty to the coverages
-    coverages(:,:) = coverages(:,:) * (1 - mortality_p) 
+    ! write intermediate coverage file for post mortality - also write summary output file
+    call write_output('imo_mort  ',1)   !currently this is a 10*character string being passed in to write_output - currently needs to be padded with spaces
+    call date_and_time(VALUES=dtvalues)
+    write(dtstr,8889) dtvalues(1),'-',dtvalues(2),'-',dtvalues(3),' ',dtvalues(5),':',dtvalues(6),':',dtvalues(7)
+    write(  *,*) 'Write Intermediate Output subroutine ended at: ',dtstr
+    write(000,*) 'Write Intermediate Output subroutine ended at: ',dtstr 
 
     ! Calculate the dispersal coverage for each species 
     !call calc_dispersal_coverage
@@ -144,6 +161,28 @@ program main
     write(dtstr,8889) dtvalues(1),'-',dtvalues(2),'-',dtvalues(3),' ',dtvalues(5),':',dtvalues(6),':',dtvalues(7)
     write(  *,*) 'Update Flotant subroutine ended at: ',dtstr
     write(000,*) 'Update Flotant subroutine ended at: ',dtstr
+
+    ! write intermediate coverage file for post standard establishment - also write summary output file
+    call write_output('imo_stest ',1)   !currently this is a 10*character string being passed in to write_output - currently needs to be padded with spaces
+    call date_and_time(VALUES=dtvalues)
+    write(dtstr,8889) dtvalues(1),'-',dtvalues(2),'-',dtvalues(3),' ',dtvalues(5),':',dtvalues(6),':',dtvalues(7)
+    write(  *,*) 'Write Intermediate Output subroutine ended at: ',dtstr
+    write(000,*) 'Write Intermediate Output subroutine ended at: ',dtstr 
+
+    ! Allow high dispersal species (class three "weedy" species) to establish on any remaining bareground
+    !call high_disp_stest
+    call date_and_time(VALUES=dtvalues)
+    write(dtstr,8889) dtvalues(1),'-',dtvalues(2),'-',dtvalues(3),' ',dtvalues(5),':',dtvalues(6),':',dtvalues(7)
+    write(  *,*) 'High Dispersal Establishment on Remaining Bareground subroutine ended at: ',dtstr
+    write(000,*) 'High Dispersal Establishment on Remaining Bareground subroutine ended at: ',dtstr
+
+    ! write intermediate coverage file for post standard establishment - also write summary output file
+    call write_output('imo_hdest2',1)   !currently this is a 10*character string being passed in to write_output - currently needs to be padded with spaces
+    call date_and_time(VALUES=dtvalues)
+    write(dtstr,8889) dtvalues(1),'-',dtvalues(2),'-',dtvalues(3),' ',dtvalues(5),':',dtvalues(6),':',dtvalues(7)
+    write(  *,*) 'Write Intermediate Output subroutine ended at: ',dtstr
+    write(000,*) 'Write Intermediate Output subroutine ended at: ',dtstr 
+
 
     ! Apply coverage changes caused by acute salinity
     !call acute_salinity_lnd
