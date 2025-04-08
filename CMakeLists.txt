@@ -71,28 +71,31 @@ ENDIF()
 # ICM_Morph
 ###########################################################################
 SET( LVM LAVegMod_v${ICMLVM_VERSION_STRING} )
-ADD_EXECUTABLE( ${LVM}   LVM_acute_salinity_lnd.f90
-                         LVM_acute_salinity_flt.f90
-                         LVM_calc_dispersal_coverage.f90
-                         LVM_check_sum.f90                         
-                         LVM_land_change.f90
-                         LVM_main.f90
-                         LVM_mort_est_prob.f90
-                         LVM_neighbors.f90
-                         LVM_oneway_interp.f90
-                         LVM_params.f90
-                         LVM_params_alloc.f90
-                         LVM_preprocessing.f90
-                         LVM_reset_coverages.f90
-                         LVM_round_coverages.f90
-                         LVM_set_io.f90
-                         LVM_sum_unoccupied_flt.f90
-                         LVM_sum_unoccupied_land.f90
-                         LVM_twoway_interp.f90
-                         LVM_update_coverages.f90
-                         LVM_update_flotant.f90
-                         LVM_weedy_establishment.f90
-                         LVM_write_output.f90 )
+ADD_EXECUTABLE( ${LVM}  LVM_acute_salinity_flt.f90
+                        LVM_acute_salinity_lnd.f90
+                        LVM_calc_dispersal_coverage.f90
+                        LVM_check_sum.f90
+                        LVM_coverage_calcs.f90
+                        LVM_high_disp_est_nbg.f90 
+                        LVM_high_disp_stest.f90
+                        LVM_land_change.f90
+                        LVM_main.f90
+                        LVM_mort_est_prob.f90
+                        LVM_neighbors.f90
+                        LVM_oneway_interp.f90
+                        LVM_params.f90
+                        LVM_params_alloc.f90
+                        LVM_preprocessing.f90
+                        LVM_reset_coverages.f90
+                        LVM_round_coverages.f90
+                        LVM_set_io.f90
+                        LVM_sum_unoccupied_flt.f90
+                        LVM_sum_unoccupied_lnd.f90
+                        LVM_twoway_interp.f90
+                        LVM_update_coverages.f90
+                        LVM_update_flotant.f90
+                        LVM_write_output.f90 )
+                         
 SET_TARGET_PROPERTIES( ${LVM} PROPERTIES Fortran_MODULE_DIRECTORY ${CMAKE_BINARY_DIR}/CMakeFiles/mod)
 SET_TARGET_PROPERTIES( ${LVM} PROPERTIES COMPILE_FLAGS "${Fortran_LINELENGTH_FLAG} ${Fortran_COMPILER_SPECIFIC_FLAG}" )
 
