@@ -12,8 +12,8 @@
 1358, near_neighbors_dist - distance in which a neighboring grid cell is considered a near neighbor (meters) *must be larger magnitude than "nearest_neighbor_dist"*
 16, max_neighbors - maximum number of grid cells that will be allowed in the near and nearest neighbor lists - this will be the number of columns in the neighbor files
 'veg/LAVegMod_coverage_attributes.csv',coverage_attribute_file - file name - with relative path - to csv with model attributes for each coverage type - this file row-order must match the column-order of veg_in_file below
-32, n_X_bins - number of bins definiing the X-axis of the establishment and mortability input tables
-32, n_Y_bins - number of bins definiing the Y-axis of the establishment and mortability input tables
+24, n_X_bins - number of bins definiing the X-axis of the establishment and mortability input tables
+39, n_Y_bins - number of bins definiing the Y-axis of the establishment and mortability input tables
 'veg/MP2023_S00_G000_C000_U00_V00_SLA_I_00_00_V_vegty.csv', veg_in_file - file name with relative path to *vegty.asc+ file saved by ICM-LAVegMod
 'hydro/TempFiles/compartment_out_2021.csv', hydro_comp_out_file - file name - with relative path - to compartment_out.csv from current model year's ICM-Hydro simulation
 'hydro/TempFiles/grid_data_500m_2020.csv', morph_grid_out_file - file name - with relative path - to grid_data.csv file from previous model year's ICM-Morph simulation
