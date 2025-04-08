@@ -71,7 +71,7 @@ ENDIF()
 # ICM_Morph
 ###########################################################################
 SET( LVM LAVegMod_v${ICMLVM_VERSION_STRING} )
-ADD_EXECUTABLE( ${LVM}   LVM_acute_salinity.f90
+ADD_EXECUTABLE( ${LVM}   LVM_acute_salinity_lnd.f90
                          LVM_acute_salinity_flt.f90
                          LVM_calc_dispersal_coverage.f90
                          LVM_check_sum.f90                         
