@@ -22,7 +22,6 @@
 program main
     
     use params
-    use sort
     
     implicit none
     
