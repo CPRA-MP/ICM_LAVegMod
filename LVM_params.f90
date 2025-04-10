@@ -126,13 +126,13 @@ module params
     real(sp),dimension(:,:,:),allocatable :: mortality_tables       ! 2-dimensional mortality probablity table for each species - first dimension is X value of table, second dimension is Y value, third dimension is the coverage index, ic
     
     ! these variables are 1D arrays [i] where the ith dimension represents the grid cell ID 
-    real(sp),dimension(:,:),allocatable :: FFIBS_score              ! weighted FFIBS score of ICM-LAVegMod grid cell - used for accretion
-    real(sp),dimension(:,:),allocatable :: pct_vglnd_BLHF           ! percent of vegetated land that is bottomland hardwood forest
-    real(sp),dimension(:,:),allocatable :: pct_vglnd_SWF            ! percent of vegetated land that is swamp forest
-    real(sp),dimension(:,:),allocatable :: pct_vglnd_FM             ! percent of vegetated land that is fresh (attached) marsh
-    real(sp),dimension(:,:),allocatable :: pct_vglnd_IM             ! percent of vegetated land that is intermediate marsh
-    real(sp),dimension(:,:),allocatable :: pct_vglnd_BM             ! percent of vegetated land that is brackish marsh
-    real(sp),dimension(:,:),allocatable :: pct_vglnd_SM             ! percent of vegetated land that is saline marsh
+    real(sp),dimension(:),allocatable :: FFIBS_score              ! weighted FFIBS score of ICM-LAVegMod grid cell - used for accretion
+    real(sp),dimension(:),allocatable :: pct_vglnd_BLHF           ! percent of vegetated land that is bottomland hardwood forest
+    real(sp),dimension(:),allocatable :: pct_vglnd_SWF            ! percent of vegetated land that is swamp forest
+    real(sp),dimension(:),allocatable :: pct_vglnd_FM             ! percent of vegetated land that is fresh (attached) marsh
+    real(sp),dimension(:),allocatable :: pct_vglnd_IM             ! percent of vegetated land that is intermediate marsh
+    real(sp),dimension(:),allocatable :: pct_vglnd_BM             ! percent of vegetated land that is brackish marsh
+    real(sp),dimension(:),allocatable :: pct_vglnd_SM             ! percent of vegetated land that is saline marsh
 
     ! define variables read in or calculated from files in subroutine: NEIGHBORS
     integer,dimension(:,:),allocatable ::  nearest_neighbors        ! list of grid cell IDs that are the nearest neighbors to each grid cell
