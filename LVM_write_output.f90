@@ -24,14 +24,14 @@ subroutine write_output(filetag,write_summary)
         open(unit=902, file=trim(adjustL(veg_summary_file)))
         write(902,'(A)') 'GridCellID,WeigtedFFIBS,pct_vglnd_BLHF,pct_vglnd_SWF,pct_vglnd_FM,pct_vglnd_IM,pct_vglnd_BM,pct_vglnd_SM'
         do g = 1,ngrid
-            write(902,3457) g,                           &      ! grid cell ID
-       &        FFIBS_score(g,2),                        &      ! FFIBS
-       &        pct_vglnd_BLHF(g,2),                     &      ! pL_BF
-       &        pct_vglnd_SWF(g,2),                      &      ! pL_SF
-       &        pct_vglnd_FM(g,2),                       &      ! pL_FM
-       &        pct_vglnd_IM(g,2),                       &      ! pL_IM
-       &        pct_vglnd_BM(g,2),                       &      ! pL_BM
-       &        pct_vglnd_SM(g,2)                               ! pL_SM
+            write(902,3457) g,                         &      ! grid cell ID
+       &        FFIBS_score(g),                        &      ! FFIBS
+       &        pct_vglnd_BLHF(g),                     &      ! pL_BF
+       &        pct_vglnd_SWF(g),                      &      ! pL_SF
+       &        pct_vglnd_FM(g),                       &      ! pL_FM
+       &        pct_vglnd_IM(g),                       &      ! pL_IM
+       &        pct_vglnd_BM(g),                       &      ! pL_BM
+       &        pct_vglnd_SM(g)                               ! pL_SM
         end do
     end if
     
