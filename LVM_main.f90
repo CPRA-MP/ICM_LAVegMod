@@ -228,7 +228,7 @@ program main
 
     
     ! write final coverage file for End of Year landscape - also write summary output file
-    call write_output('O','          ',1)   !currently this is a 10*character string being passed in to write_output - currently needs to be padded with spaces
+    call write_output('O','           ',1)   !currently this is a 11*character string being passed in to write_output - currently needs to be padded with spaces
     call date_and_time(VALUES=dtvalues)
     write(dtstr,8889) dtvalues(1),'-',dtvalues(2),'-',dtvalues(3),' ',dtvalues(5),':',dtvalues(6),':',dtvalues(7)
     write(  *,*) 'Write Output subroutine ended at: ',dtstr
