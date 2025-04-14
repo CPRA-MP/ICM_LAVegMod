@@ -11,8 +11,8 @@ subroutine write_output(fileflag,filetag,write_summary)
     character*11 :: filetag             ! text string to append to veg_out_file to indicate what point in the landscape update logcial structure the output file was written
 
     ! write ICM-LAVegMod grid output file to file
-    write(  *,*) ' - writing out LAVegMod grid-level outputs for end of current model year'
-    write(000,*) ' - writing out LAVegMod grid-level outputs for end of current model year'
+    write(  *,*) ' - writing out LAVegMod grid-level outputs'
+    write(000,*) ' - writing out LAVegMod grid-level outputs'
 
     write(year,'(I0)') start_year + elapsed_year - 1
 

@@ -99,8 +99,8 @@ subroutine neighbors
         end do
         
         ! write lists of NEAREST and NEAR NEIGHBOR grid cells to file
-        write(  *,*) ' - writing nearest neighbor file: ', nearest_neighbors_file
-        write(000,*) ' - writing nearest neighbor file: ', nearest_neighbors_file
+        write(  *,'(A,A)') ' - writing nearest neighbor file: ', nearest_neighbors_file
+        write(000,'(A,A)') ' - writing nearest neighbor file: ', nearest_neighbors_file
         
         open(unit=202, file=trim(adjustL(nearest_neighbors_file)))
         write(202,'(A,I0,A)') 'gridID,nearest neighbors within ',nearest_neighbors_dist,' m:'
@@ -109,8 +109,8 @@ subroutine neighbors
         end do
         close(202)
         
-        write(  *,*) ' - writing near neighbor file: ', near_neighbors_file
-        write(000,*) ' - writing near neighbor file: ', near_neighbors_file
+        write(  *,'(A,A)') ' - writing near neighbor file: ', near_neighbors_file
+        write(000,'(A,A)') ' - writing near neighbor file: ', near_neighbors_file
     
         open(unit=203, file=trim(adjustL(near_neighbors_file)))
         write(202,'(A,I0,A)') 'gridID,near neighbors within ',near_neighbors_dist,' m:'
@@ -121,8 +121,8 @@ subroutine neighbors
     
     else
         ! read lists of NEAREST and NEAR NEIGHBOR grid cells to file
-        write(  *,*) ' - reading list of nearest neighboring cells from file: ', nearest_neighbors_file
-        write(000,*) ' - reading list of nearest neighboring cells from file: ', nearest_neighbors_file
+        write(  *,'(A,A)') ' - reading list of nearest neighboring cells from file: ', nearest_neighbors_file
+        write(000,'(A,A)') ' - reading list of nearest neighboring cells from file: ', nearest_neighbors_file
         
         open(unit=202, file=trim(adjustL(nearest_neighbors_file)))
         read(202,*) dump_txt
