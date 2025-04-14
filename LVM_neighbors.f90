@@ -52,13 +52,13 @@ subroutine neighbors
                 closest_index = MINLOC( d,DIM=1,MASK=(d<=nearest_neighbors_dist) )
                 current_dist = d(closest_index)
                 if (current_dist <= nearest_neighbors_dist) then
-                    if (closest_index /= g0) then                   ! do not include g0 in the list of neighbors (count=0 when current_dist = 0 = d(closest_index)
+                    if (closest_index /= g0) then                  ! do not include g0 in the list of neighbors (count=0 when current_dist = 0 = d(closest_index)
                         nearest_neighbors(g0,count) = closest_index
-                        d(closest_index) = arbitrary_max            ! replace current minimum distance with max so it is no longer a candidate for MINLOC
                     end if
                     count = count + 1
+                    d(closest_index) = arbitrary_max    ! replace current minimum distance with max so it is no longer a candidate for MINLOC
                 else    
-                    exit                                            ! this ELSE will be triggered when the minimum distance returned from MINLOC is greater than nearest_neighbors_dist
+                    exit                                ! this ELSE will be triggered when the minimum distance returned from MINLOC is greater than nearest_neighbors_dist
                 end if
             end do
             
@@ -68,14 +68,13 @@ subroutine neighbors
                 closest_index = MINLOC( d,DIM=1,MASK=(d<=near_neighbors_dist) )
                 current_dist = d(closest_index)
                 if (current_dist <= near_neighbors_dist) then
-                    if (closest_index /= g0) then                   ! do not include g0 in the list of neighbors (count=0 when current_dist = 0 = d(closest_index)
+                    if (closest_index /= g0) then                  ! do not include g0 in the list of neighbors (count=0 when current_dist = 0 = d(closest_index)
                         near_neighbors(g0,count) = closest_index
-                        d(closest_index) = arbitrary_max            ! replace current minimum distance with max so it is no longer a candidate for MINLOC
                     end if
                     count = count + 1
-                    
+                    d(closest_index) = arbitrary_max    ! replace current minimum distance with max so it is no longer a candidate for MINLOC
                 else    
-                    exit                                            ! this ELSE will be triggered when the minimum distance returned from MINLOC is greater than near_neighbors_dist
+                    exit                                ! this ELSE will be triggered when the minimum distance returned from MINLOC is greater than near_neighbors_dist
                 end if
             end do
         end do
