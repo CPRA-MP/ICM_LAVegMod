@@ -88,7 +88,7 @@ program main
 
     ! write intermediate coverage file for post updates from ICM-Morph - also write summary output file
     if (write_intermediate_files == 1) then
-        call write_output('N','0.morph   ',1)   !currently this is a 10*character string being passed in to write_output - currently needs to be padded with spaces
+        call write_output('N','.0.morph   ',1)   !currently this is a 11*character string being passed in to write_output - currently needs to be padded with spaces
         call date_and_time(VALUES=dtvalues)
         write(dtstr,8889) dtvalues(1),'-',dtvalues(2),'-',dtvalues(3),' ',dtvalues(5),':',dtvalues(6),':',dtvalues(7)
         write(  *,*) 'Write Intermediate Output subroutine ended at: ',dtstr
@@ -111,7 +111,7 @@ program main
 
     ! write intermediate coverage file for post high dispersal establishment on new bareground (1 = first time high dispersal is called)- also write summary output file
     if (write_intermediate_files == 1) then
-        call write_output('N','1.est.newb',1)   !currently this is a 10*character string being passed in to write_output - currently needs to be padded with spaces
+        call write_output('N','.1.est.newb',1)   !currently this is a 11*character string being passed in to write_output - currently needs to be padded with spaces
         call date_and_time(VALUES=dtvalues)
         write(dtstr,8889) dtvalues(1),'-',dtvalues(2),'-',dtvalues(3),' ',dtvalues(5),':',dtvalues(6),':',dtvalues(7)
         write(  *,*) 'Write Intermediate Output subroutine ended at: ',dtstr
@@ -134,7 +134,7 @@ program main
 
     ! write intermediate coverage file for post mortality - also write summary output file
     if (write_intermediate_files == 1) then
-        call write_output('N','2.mort    ',1)   !currently this is a 10*character string being passed in to write_output - currently needs to be padded with spaces
+        call write_output('N','.2.mort    ',1)   !currently this is a 11*character string being passed in to write_output - currently needs to be padded with spaces
         call date_and_time(VALUES=dtvalues)
         write(dtstr,8889) dtvalues(1),'-',dtvalues(2),'-',dtvalues(3),' ',dtvalues(5),':',dtvalues(6),':',dtvalues(7)
         write(  *,*) 'Write Intermediate Output subroutine ended at: ',dtstr
@@ -169,7 +169,7 @@ program main
 
     ! write intermediate coverage file for post standard establishment routine - also write summary output file
     if (write_intermediate_files == 1) then
-        call write_output('N','3.est.stnd',1)   !currently this is a 10*character string being passed in to write_output - currently needs to be padded with spaces
+        call write_output('N','.3.est.stnd',1)   !currently this is a 11*character string being passed in to write_output - currently needs to be padded with spaces
         call date_and_time(VALUES=dtvalues)
         write(dtstr,8889) dtvalues(1),'-',dtvalues(2),'-',dtvalues(3),' ',dtvalues(5),':',dtvalues(6),':',dtvalues(7)
         write(  *,*) 'Write Intermediate Output subroutine ended at: ',dtstr
@@ -185,7 +185,7 @@ program main
     
     ! write intermediate coverage file for post high establishment on remaining bareground - also write summary output file
     if (write_intermediate_files == 1) then
-        call write_output('N','4.est.remb',1)   !currently this is a 10*character string being passed in to write_output - currently needs to be padded with spaces
+        call write_output('N','.4.est.remb',1)   !currently this is a 11*character string being passed in to write_output - currently needs to be padded with spaces
         call date_and_time(VALUES=dtvalues)
         write(dtstr,8889) dtvalues(1),'-',dtvalues(2),'-',dtvalues(3),' ',dtvalues(5),':',dtvalues(6),':',dtvalues(7)
         write(  *,*) 'Write Intermediate Output subroutine ended at: ',dtstr
