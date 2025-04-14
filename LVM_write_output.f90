@@ -6,7 +6,7 @@ subroutine write_output(fileflag,filetag,write_summary)
     ! local variables
     integer :: g                        ! iterator
     integer :: write_summary            ! flag to write summary output file that includes FFIBS score and percent habitat type coverages; 1=write summary file; 0=do not write
-    integer :: year                     ! calendar year of model run
+    character*4 :: year                     ! calendar year of model run
     character*1 :: fileflag             ! flag to indicate whether file is an output file (fileflag = "O") or an intermediate file (fileflag = "N")
     character*10 :: filetag             ! text string to append to veg_out_file to indicate what point in the landscape update logcial structure the output file was written
 
