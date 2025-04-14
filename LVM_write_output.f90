@@ -14,7 +14,7 @@ subroutine write_output(fileflag,filetag,write_summary)
     write(  *,*) ' - writing out LAVegMod grid-level outputs for end of current model year'
     write(000,*) ' - writing out LAVegMod grid-level outputs for end of current model year'
 
-    year = start_year + elapsed_year - 1
+    write(year,'I0') start_year + elapsed_year - 1
 
 
     open(unit=901, file=trim(adjustL(fnc_tag))//trim(adjustL(fileflag))//'_'//year//'_V_vegty'//trim(adjustL(filetag))//'.csv' )
