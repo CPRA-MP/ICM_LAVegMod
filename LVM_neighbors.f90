@@ -50,21 +50,20 @@ subroutine neighbors
             ! determine list of all NEAREST NEIGHBOR grid cells to current grid cell of interest (g0)
             count = 1
             maxcount = 0
-            do gi = 1,ngrid
+            do gi = 1,max_neighbors !ngrid
             
-                ! check to see if maximum number of neighboring cells has already been found - if so, report out error message but continue on
-                if (maxcount == max_neighbors) then
-                    write(  *,'(A)') ' - found the maximum number of neighbors (set in input_params). Stopping neighbor analysis.'
-                    write(000,'(A)') ' - found the maximum number of neighbors (set in input_params). Stopping neighbor analysis.'
-                    
-                    open(unit=201, file=trim(adjustL('veg/__NEIGHBORING_GRID_CELL_ERRORS__.txt')))
-                    write(201,'(A)') 'Found the maximum number of neighbors (set in input_params). Stopping neighbor analysis. Run continued.'
-                    write(201,*) 'Maximum number of neighbors was set to: ', max_neighbors
-                    close(201)
-                    
-                    exit
-                end if
-
+                !! check to see if maximum number of neighboring cells has already been found - if so, report out error message but continue on
+                !if (maxcount == max_neighbors) then
+                !    write(  *,'(A)') ' - found the maximum number of neighbors (set in input_params). Stopping neighbor analysis.'
+                !    write(000,'(A)') ' - found the maximum number of neighbors (set in input_params). Stopping neighbor analysis.'
+                !    
+                !    open(unit=201, file=trim(adjustL('veg/__NEIGHBORING_GRID_CELL_ERRORS__.txt')))
+                !    write(201,'(A)') 'Found the maximum number of neighbors (set in input_params). Stopping neighbor analysis. Run continued.'
+                !    write(201,*) 'Maximum number of neighbors was set to: ', max_neighbors
+                !    close(201)
+                !    
+                !    exit
+                !end if
 
                 closest_index = MINLOC( d,DIM=1,MASK=(d<=nearest_neighbors_dist) )
                 current_dist = d(closest_index)
@@ -83,22 +82,20 @@ subroutine neighbors
             ! determine list of all NEAR NEIGHBOR grid cells to current grid cell of interest (g0)
             count = 1
             maxcount = 0
-            do gi = 1,ngrid
+            do gi = 1,max_neighbors!ngrid
                 
-                ! check to see if maximum number of neighboring cells has already been found - if so, report out error message but continue on
-                if (maxcount == max_neighbors) then
-                    write(  *,'(A)') ' - found the maximum number of neighbors (set in input_params). Stopping neighbor analysis.'
-                    write(000,'(A)') ' - found the maximum number of neighbors (set in input_params). Stopping neighbor analysis.'
-                    
-                    open(unit=201, file=trim(adjustL('veg/__NEIGHBORING_GRID_CELL_ERRORS__.txt')))
-                    write(201,'(A)') 'Found the maximum number of neighbors (set in input_params). Stopping neighbor analysis. Run continued.'
-                    write(201,*) 'Maximum number of neighbors was set to: ', max_neighbors
-                    close(201)
-                    
-                    exit
-                end if
-
-                
+                !! check to see if maximum number of neighboring cells has already been found - if so, report out error message but continue on
+                !if (maxcount == max_neighbors) then
+                !    write(  *,'(A)') ' - found the maximum number of neighbors (set in input_params). Stopping neighbor analysis.'
+                !    write(000,'(A)') ' - found the maximum number of neighbors (set in input_params). Stopping neighbor analysis.'
+                !    
+                !    open(unit=201, file=trim(adjustL('veg/__NEIGHBORING_GRID_CELL_ERRORS__.txt')))
+                !    write(201,'(A)') 'Found the maximum number of neighbors (set in input_params). Stopping neighbor analysis. Run continued.'
+                !    write(201,*) 'Maximum number of neighbors was set to: ', max_neighbors
+                !    close(201)
+                !    
+                !    exit
+                !end if
                 
                 closest_index = MINLOC( d,DIM=1,MASK=(d<=near_neighbors_dist) )
                 current_dist = d(closest_index)
