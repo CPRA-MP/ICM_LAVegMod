@@ -17,6 +17,5 @@
 'veg/MP2023_S00_G000_C000_U00_V00_SLA_I_00_00_V_vegty.csv', veg_in_file - file name with relative path to *vegty.asc+ file saved by ICM-LAVegMod
 'hydro/TempFiles/compartment_out_2021.csv', hydro_comp_out_file - file name - with relative path - to compartment_out.csv from current model year's ICM-Hydro simulation
 'hydro/TempFiles/grid_data_500m_2020.csv', morph_grid_out_file - file name - with relative path - to grid_data.csv file from previous model year's ICM-Morph simulation
-'veg/MP2023_S07_G514_C000_U00_V00_SLA_O_01_01_V_vegty.csv', veg_out_file - file name with relative path to *vegty.asc+ file saved by ICM-LAVegMod
-'veg/MP2023_S07_G514_C000_U00_V00_SLA_O_01_01_V_vegsm.csv', veg_summary_out_file - file name with relative path to *veg_summary.csv file for current year written to disk for final landscape of the current model year
 MP2023_S07_G514_C000_U00_V00_SLA, file naming convention prefix
+1, write_intermediate_files - set to 1 if intermediate output files should be written - set to 0 to only write end-of-year files

@@ -87,12 +87,14 @@ program main
     write(000,*) 'Land Change subroutine ended at: ',dtstr
 
     ! write intermediate coverage file for post updates from ICM-Morph - also write summary output file
-    call write_output('imo_morphu',1)   !currently this is a 10*character string being passed in to write_output - currently needs to be padded with spaces
-    call date_and_time(VALUES=dtvalues)
-    write(dtstr,8889) dtvalues(1),'-',dtvalues(2),'-',dtvalues(3),' ',dtvalues(5),':',dtvalues(6),':',dtvalues(7)
-    write(  *,*) 'Write Intermediate Output subroutine ended at: ',dtstr
-    write(000,*) 'Write Intermediate Output subroutine ended at: ',dtstr 
-
+    if (write_intermediate_files == 1) then
+        call write_output('N','0.morph   ',1)   !currently this is a 10*character string being passed in to write_output - currently needs to be padded with spaces
+        call date_and_time(VALUES=dtvalues)
+        write(dtstr,8889) dtvalues(1),'-',dtvalues(2),'-',dtvalues(3),' ',dtvalues(5),':',dtvalues(6),':',dtvalues(7)
+        write(  *,*) 'Write Intermediate Output subroutine ended at: ',dtstr
+        write(000,*) 'Write Intermediate Output subroutine ended at: ',dtstr 
+    end if
+    
     ! Calculate the establishment and mortality probabilities for every species and grid cell for this model year's environmental conditions
     !call mort_est_prob
     call date_and_time(VALUES=dtvalues)
@@ -108,11 +110,13 @@ program main
     write(000,*) 'High Dispersal Establishment on New Bareground subroutine ended at: ',dtstr
 
     ! write intermediate coverage file for post high dispersal establishment on new bareground (1 = first time high dispersal is called)- also write summary output file
-    call write_output('imo_hdest1',1)   !currently this is a 10*character string being passed in to write_output - currently needs to be padded with spaces
-    call date_and_time(VALUES=dtvalues)
-    write(dtstr,8889) dtvalues(1),'-',dtvalues(2),'-',dtvalues(3),' ',dtvalues(5),':',dtvalues(6),':',dtvalues(7)
-    write(  *,*) 'Write Intermediate Output subroutine ended at: ',dtstr
-    write(000,*) 'Write Intermediate Output subroutine ended at: ',dtstr 
+    if (write_intermediate_files == 1) then
+        call write_output('N','1.est.newb',1)   !currently this is a 10*character string being passed in to write_output - currently needs to be padded with spaces
+        call date_and_time(VALUES=dtvalues)
+        write(dtstr,8889) dtvalues(1),'-',dtvalues(2),'-',dtvalues(3),' ',dtvalues(5),':',dtvalues(6),':',dtvalues(7)
+        write(  *,*) 'Write Intermediate Output subroutine ended at: ',dtstr
+        write(000,*) 'Write Intermediate Output subroutine ended at: ',dtstr 
+    end if
 
     ! Apply mortality to non-flotant species and sum the total unoccupied land in each grid cell 
     !call sum_unoccupied_lnd
@@ -129,12 +133,14 @@ program main
     write(000,*) 'Sum Unoccupied Flotant ended at: ',dtstr
 
     ! write intermediate coverage file for post mortality - also write summary output file
-    call write_output('imo_mort  ',1)   !currently this is a 10*character string being passed in to write_output - currently needs to be padded with spaces
-    call date_and_time(VALUES=dtvalues)
-    write(dtstr,8889) dtvalues(1),'-',dtvalues(2),'-',dtvalues(3),' ',dtvalues(5),':',dtvalues(6),':',dtvalues(7)
-    write(  *,*) 'Write Intermediate Output subroutine ended at: ',dtstr
-    write(000,*) 'Write Intermediate Output subroutine ended at: ',dtstr 
-
+    if (write_intermediate_files == 1) then
+        call write_output('N','2.mort    ',1)   !currently this is a 10*character string being passed in to write_output - currently needs to be padded with spaces
+        call date_and_time(VALUES=dtvalues)
+        write(dtstr,8889) dtvalues(1),'-',dtvalues(2),'-',dtvalues(3),' ',dtvalues(5),':',dtvalues(6),':',dtvalues(7)
+        write(  *,*) 'Write Intermediate Output subroutine ended at: ',dtstr
+        write(000,*) 'Write Intermediate Output subroutine ended at: ',dtstr 
+    end if
+    
     ! Calculate the dispersal coverage for each species 
     !call calc_dispersal_coverage
     call date_and_time(VALUES=dtvalues)
@@ -161,26 +167,30 @@ program main
     write(  *,*) 'Update Flotant subroutine ended at: ',dtstr
     write(000,*) 'Update Flotant subroutine ended at: ',dtstr
 
-    ! write intermediate coverage file for post standard establishment - also write summary output file
-    call write_output('imo_stest ',1)   !currently this is a 10*character string being passed in to write_output - currently needs to be padded with spaces
-    call date_and_time(VALUES=dtvalues)
-    write(dtstr,8889) dtvalues(1),'-',dtvalues(2),'-',dtvalues(3),' ',dtvalues(5),':',dtvalues(6),':',dtvalues(7)
-    write(  *,*) 'Write Intermediate Output subroutine ended at: ',dtstr
-    write(000,*) 'Write Intermediate Output subroutine ended at: ',dtstr 
-
+    ! write intermediate coverage file for post standard establishment routine - also write summary output file
+    if (write_intermediate_files == 1) then
+        call write_output('N','3.est.stnd',1)   !currently this is a 10*character string being passed in to write_output - currently needs to be padded with spaces
+        call date_and_time(VALUES=dtvalues)
+        write(dtstr,8889) dtvalues(1),'-',dtvalues(2),'-',dtvalues(3),' ',dtvalues(5),':',dtvalues(6),':',dtvalues(7)
+        write(  *,*) 'Write Intermediate Output subroutine ended at: ',dtstr
+        write(000,*) 'Write Intermediate Output subroutine ended at: ',dtstr 
+    end if
+    
     ! Allow high dispersal species (class three "weedy" species) to establish on any remaining bareground
     !call high_disp_stest
     call date_and_time(VALUES=dtvalues)
     write(dtstr,8889) dtvalues(1),'-',dtvalues(2),'-',dtvalues(3),' ',dtvalues(5),':',dtvalues(6),':',dtvalues(7)
     write(  *,*) 'High Dispersal Establishment on Remaining Bareground subroutine ended at: ',dtstr
     write(000,*) 'High Dispersal Establishment on Remaining Bareground subroutine ended at: ',dtstr
-
-    ! write intermediate coverage file for post standard establishment - also write summary output file
-    call write_output('imo_hdest2',1)   !currently this is a 10*character string being passed in to write_output - currently needs to be padded with spaces
-    call date_and_time(VALUES=dtvalues)
-    write(dtstr,8889) dtvalues(1),'-',dtvalues(2),'-',dtvalues(3),' ',dtvalues(5),':',dtvalues(6),':',dtvalues(7)
-    write(  *,*) 'Write Intermediate Output subroutine ended at: ',dtstr
-    write(000,*) 'Write Intermediate Output subroutine ended at: ',dtstr 
+    
+    ! write intermediate coverage file for post high establishment on remaining bareground - also write summary output file
+    if (write_intermediate_files == 1) then
+        call write_output('N','4.est.remb',1)   !currently this is a 10*character string being passed in to write_output - currently needs to be padded with spaces
+        call date_and_time(VALUES=dtvalues)
+        write(dtstr,8889) dtvalues(1),'-',dtvalues(2),'-',dtvalues(3),' ',dtvalues(5),':',dtvalues(6),':',dtvalues(7)
+        write(  *,*) 'Write Intermediate Output subroutine ended at: ',dtstr
+        write(000,*) 'Write Intermediate Output subroutine ended at: ',dtstr    
+    end if
 
 
     ! Apply coverage changes caused by acute salinity
@@ -218,7 +228,7 @@ program main
 
     
     ! write final coverage file for End of Year landscape - also write summary output file
-    call write_output('eoy       ',1)   !currently this is a 10*character string being passed in to write_output - currently needs to be padded with spaces
+    call write_output('O','          ',1)   !currently this is a 10*character string being passed in to write_output - currently needs to be padded with spaces
     call date_and_time(VALUES=dtvalues)
     write(dtstr,8889) dtvalues(1),'-',dtvalues(2),'-',dtvalues(3),' ',dtvalues(5),':',dtvalues(6),':',dtvalues(7)
     write(  *,*) 'Write Output subroutine ended at: ',dtstr
