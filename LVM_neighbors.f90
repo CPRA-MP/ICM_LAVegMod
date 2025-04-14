@@ -43,38 +43,40 @@ subroutine neighbors
             
             ! calculate distance from current grid cell of interest (g0) to all other grid cells (gi)
             do gi = 1,ngrid
-                d(gi) = ( ( grid_x(g0) - grid_x(gi) )**2 + ( ( grid_y(g0) - grid_y(gi) )**2 ) )**0.5
+                if (gi /= g0) then                                  ! do not include g0 in the list of distance calculations - d(g0)=0 
+                    d(gi) = ( ( grid_x(g0) - grid_x(gi) )**2 + ( ( grid_y(g0) - grid_y(gi) )**2 ) )**0.5
+                end if
             end do
             
             ! determine list of all NEAREST NEIGHBOR grid cells to current grid cell of interest (g0)
-            count = 0
+            count = 1
             do gi = 1,max_neighbors
                 closest_index = MINLOC( d,DIM=1,MASK=(d<=nearest_neighbors_dist) )
                 current_dist = d(closest_index)
                 if (current_dist <= nearest_neighbors_dist) then
-                    if (closest_index /= g0) then                  ! do not include g0 in the list of neighbors (count=0 when current_dist = 0 = d(closest_index)
+                    if (closest_index /= g0) then                   ! do not include g0 in the list of neighbors
                         nearest_neighbors(g0,count) = closest_index
                     end if
                     count = count + 1
-                    d(closest_index) = arbitrary_max    ! replace current minimum distance with max so it is no longer a candidate for MINLOC
+                    d(closest_index) = arbitrary_max                ! replace current minimum distance with max so it is no longer a candidate for MINLOC
                 else    
-                    exit                                ! this ELSE will be triggered when the minimum distance returned from MINLOC is greater than nearest_neighbors_dist
+                    exit                                            ! this ELSE will be triggered when the minimum distance returned from MINLOC is greater than nearest_neighbors_dist
                 end if
             end do
             
             ! determine list of all NEAR NEIGHBOR grid cells to current grid cell of interest (g0)
-            count = 0
+            count = 1
             do gi = 1,max_neighbors
                 closest_index = MINLOC( d,DIM=1,MASK=(d<=near_neighbors_dist) )
                 current_dist = d(closest_index)
                 if (current_dist <= near_neighbors_dist) then
-                    if (closest_index /= g0) then                  ! do not include g0 in the list of neighbors (count=0 when current_dist = 0 = d(closest_index)
+                    if (closest_index /= g0) then                   ! do not include g0 in the list of neighbors
                         near_neighbors(g0,count) = closest_index
                     end if
                     count = count + 1
-                    d(closest_index) = arbitrary_max    ! replace current minimum distance with max so it is no longer a candidate for MINLOC
+                    d(closest_index) = arbitrary_max                ! replace current minimum distance with max so it is no longer a candidate for MINLOC
                 else    
-                    exit                                ! this ELSE will be triggered when the minimum distance returned from MINLOC is greater than near_neighbors_dist
+                    exit                                            ! this ELSE will be triggered when the minimum distance returned from MINLOC is greater than near_neighbors_dist
                 end if
             end do
         end do
