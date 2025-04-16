@@ -110,7 +110,6 @@ subroutine neighbors
         open(unit=202, file=trim(adjustL(nearest_neighbors_file)))
         read(202,*) dump_txt
         do g = 1,ngrid
-            read(202,*)
             read(202,*) g0, nearest_neighbors(g0,1:max_neighbors)   ! read in grid cell of interest from file and assign list of nearest neighbors to array
         end do
         close(202)
