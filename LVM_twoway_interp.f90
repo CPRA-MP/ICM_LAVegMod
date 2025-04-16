@@ -79,7 +79,7 @@ subroutine twoway_interp(variable1, variable2, table, variable1bins, var1bin_n, 
         right = variable1bins(closest_index-1)
     end if 
 
-    ! Find the variable1 bin value closest to variable2   
+    ! Find the variable2 bin value closest to variable2   
     min_dif = 3000                                              ! arbitary value, just must be larger than any expected differences
     dif = 0 
     closest_index = -9999                                         
@@ -103,26 +103,46 @@ subroutine twoway_interp(variable1, variable2, table, variable1bins, var1bin_n, 
         below = variable2bins(closest_index-1)
     end if 
     
-    ! Interpolate 
-    y1 = table(below,left)
-    x1 = variable1bins(below)
-    y2 = table(above,left)
-    x2 = variable1bins(above)
-    xint = variable2
-    yint_varY1 = y1-(((y1-y2)/(x1-x2))*(x1-xint))
-    
-    y1 = table(below,right)
-    x1 = variable1bins(below)
-    y2 = table(above,right)
-    x2 = variable1bins(above)
-    xint = variable2
-    yint_varY2 = y1-(((y1-y2)/(x1-x2))*(x1-xint))
-    
-    y1 = yint_varY1
-    x1 = variable2bins(left)
-    y2 = yint_varY2
-    x2 = variable2bins(right)
-    xint = variable1
-    yint = y1-(((y1-y2)/(x1-x2))*(x1-xint))
+    ! Interpolate
+    if  above == below .and. left == right then
+        yint = table(below, left)
+    elseif above == below .and. left /= right then
+        yint_varY1 = table(below,left)
+        yint_varY2 = table(below,right)
+        y1 = yint_varY1
+        x1 = variable2bins(left)
+        y2 = yint_varY2
+        x2 = variable2bins(right)
+        xint = variable2       
+        yint = y1-(((y1-y2)/(x1-x2))*(x1-xint))
+    elseif above /= below .and. left == right then
+        y1 = table(below,left)
+        x1 = variable1bins(below)
+        y2 = table(above,left)
+        x2 = variable1bins(above)
+        xint = variable1
+        yint = y1-(((y1-y2)/(x1-x2))*(x1-xint))
+    else: 
+        y1 = table(below,left)
+        x1 = variable1bins(below)
+        y2 = table(above,left)
+        x2 = variable1bins(above)
+        xint = variable2
+        yint_varY1 = y1-(((y1-y2)/(x1-x2))*(x1-xint))
+        
+        y1 = table(below,right)
+        x1 = variable1bins(below)
+        y2 = table(above,right)
+        x2 = variable1bins(above)
+        xint = variable2
+        yint_varY2 = y1-(((y1-y2)/(x1-x2))*(x1-xint))
+        
+        y1 = yint_varY1
+        x1 = variable2bins(left)
+        y2 = yint_varY2
+        x2 = variable2bins(right)
+        xint = variable1
+        yint = y1-(((y1-y2)/(x1-x2))*(x1-xint))
+    end if
 
 end
