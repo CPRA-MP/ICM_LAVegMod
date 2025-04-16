@@ -12,10 +12,10 @@ ULAM,,BottomlandHardwoodForestModel,Fresh,veg_col_blh,8,1,0
 NYAQ2,Tupelo,SwampForestModel,Fresh,veg_col_swp,9,1,0
 SANI,BlackWillow,SwampForestModel,Fresh,veg_col_swp,9,3,0
 TADI2,Cypress,SwampForestModel,Fresh,veg_col_swp,9,1,0
-ELBA2_Flt,,FloatingMarshModel,Fresh,veg_col_thXX_flt,4,2,-9999
-PAHE2_Flt,,FloatingMarshModel,Fresh,veg_col_thXX_flt,5,1,-9999
-BAREGRND_Flt,,FloatingMarshModel,Fresh,veg_col_bare_flt,6,0,-9999
-DEAD_Flt,,NullModel,Fresh,veg_col_dead_flt,7,0,-9999
+ELBA2_FLT,,FloatingMarshModel,Fresh,veg_col_thXX_flt,4,2,-9999
+PAHE2_FLT,,FloatingMarshModel,Fresh,veg_col_thXX_flt,5,1,-9999
+BAREGRND_FLT,,FloatingMarshModel,Fresh,veg_col_bare_flt,6,0,-9999
+DEAD_FLT,,NullModel,Fresh,veg_col_dead_flt,7,0,-9999
 COES,Elephantsear,EmergentWetlandModel,Fresh,veg_col_ewf,10,3,0.25
 MOCE2,WaxMyrtle,EmergentWetlandModel,Fresh,veg_col_ewf,10,2,0.25
 PAHE2,Maidencane,EmergentWetlandModel,Fresh,veg_col_ewf,10,1,0.25

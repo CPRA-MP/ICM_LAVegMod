@@ -20,7 +20,7 @@ module params
     integer :: ngrid                                                ! number of ICM-LAVegMod grid cells
     integer :: ncomp                                                ! number of ICM-Hydro compartments
     integer :: dem_res                                              ! XY resolution of DEM (meters)
-    integer :: build_neighbors                                      ! flag - set to 1 if near and nearest neighbor lists need to be built from Grid XY data, set to 0 if neighbor files already exist
+    integer :: build_neighbors                                      ! flag - set to 1 if near and nearest neighbor lists need to be built from Grid XY data - set to 0 if neighbor files already exist
     integer :: nearest_neighbors_dist                               ! distance in which a neighboring grid cell is considered a nearest neighbor (meters) *must be smaller magnitude than "near_neighbor_dist"*
     integer :: near_neighbors_dist                                  ! distance in which a neighboring grid cell is considered a near neighbor (meters) *must be larger magnitude than "nearest_neighbor_dist"*
     integer :: max_neighbors                                        ! maximum number of grid cells that will be allowed in the near and nearest neighbor lists
@@ -35,11 +35,7 @@ module params
     character*fn_len :: veg_in_file                                 ! file name, with relative path, to *vegty.csv file from previous model year read in to set initial conditions for the current model year
     character*fn_len :: hydro_comp_out_file                         ! file name, with relative path, to *compartment_out.csv from current model year's ICM-Hydro simulation
     character*fn_len :: morph_grid_out_file                         ! file name, with relative path, to *grid_data.csv file from previous model year's ICM-Morph simulation
-    
-    ! output files in subroutine: SET_IO
-    character*fn_len :: veg_out_file                                ! file name, with relative path, to *vegty.csv file for current year written to disk for final landscape of the current model year
-    character*fn_len :: veg_summary_file                            ! file name, with relative path, to *vegsm.csv file for current year written to disk for final landscape of the current model year
-    
+
     ! QAQC save point information in subroutine: SET_IO
     character*fn_len :: fnc_tag                                     ! file naming convention tag
     character*6 :: mterm                                            ! file naming convention model name term
@@ -48,6 +44,8 @@ module params
     character*4 :: cterm                                            ! file naming convention CLARA scenario term
     character*3 :: uterm                                            ! file naming convention uncertainty term
     character*3 :: vterm                                            ! file naming convention variance term
+
+    integer ::  write_intermediate_files                            ! flag - set to 1 if intermediate output files should be written - set to 0 to only write end-of-year files
 
     ! define variables read in or calculated from files in subroutine: PREPROCESSING
     integer,dimension(:),allocatable ::  grid_comp                  ! ICM-Hydro compartment ID overlaying ICM-LAVegMod grid (-)
@@ -126,13 +124,13 @@ module params
     real(sp),dimension(:,:,:),allocatable :: mortality_tables       ! 2-dimensional mortality probablity table for each species - first dimension is X value of table, second dimension is Y value, third dimension is the coverage index, ic
     
     ! these variables are 1D arrays [i] where the ith dimension represents the grid cell ID 
-    real(sp),dimension(:,:),allocatable :: FFIBS_score              ! weighted FFIBS score of ICM-LAVegMod grid cell - used for accretion
-    real(sp),dimension(:,:),allocatable :: pct_vglnd_BLHF           ! percent of vegetated land that is bottomland hardwood forest
-    real(sp),dimension(:,:),allocatable :: pct_vglnd_SWF            ! percent of vegetated land that is swamp forest
-    real(sp),dimension(:,:),allocatable :: pct_vglnd_FM             ! percent of vegetated land that is fresh (attached) marsh
-    real(sp),dimension(:,:),allocatable :: pct_vglnd_IM             ! percent of vegetated land that is intermediate marsh
-    real(sp),dimension(:,:),allocatable :: pct_vglnd_BM             ! percent of vegetated land that is brackish marsh
-    real(sp),dimension(:,:),allocatable :: pct_vglnd_SM             ! percent of vegetated land that is saline marsh
+    real(sp),dimension(:),allocatable :: FFIBS_score              ! weighted FFIBS score of ICM-LAVegMod grid cell - used for accretion
+    real(sp),dimension(:),allocatable :: pct_vglnd_BLHF           ! percent of vegetated land that is bottomland hardwood forest
+    real(sp),dimension(:),allocatable :: pct_vglnd_SWF            ! percent of vegetated land that is swamp forest
+    real(sp),dimension(:),allocatable :: pct_vglnd_FM             ! percent of vegetated land that is fresh (attached) marsh
+    real(sp),dimension(:),allocatable :: pct_vglnd_IM             ! percent of vegetated land that is intermediate marsh
+    real(sp),dimension(:),allocatable :: pct_vglnd_BM             ! percent of vegetated land that is brackish marsh
+    real(sp),dimension(:),allocatable :: pct_vglnd_SM             ! percent of vegetated land that is saline marsh
 
     ! define variables read in or calculated from files in subroutine: NEIGHBORS
     integer,dimension(:,:),allocatable ::  nearest_neighbors        ! list of grid cell IDs that are the nearest neighbors to each grid cell
