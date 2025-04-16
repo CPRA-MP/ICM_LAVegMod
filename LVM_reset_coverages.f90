@@ -18,7 +18,7 @@ subroutine reset_coverages
 
     ! Add all new bareground to old bareground and reset the new bareground
     coverages(:,boi) = coverages(:,boi) + coverages(:,bni)
-    coverages(:,boi) = 0
+    coverages(:,bni) = 0
     
     ! Remove the whole Morph pixel portion of the dead flotant
     coverages(:,dfi) = coverages(:,dfi) - dem_pixel_proportion(:)*floor(coverages(:,dfi)/dem_pixel_proportion(:))
