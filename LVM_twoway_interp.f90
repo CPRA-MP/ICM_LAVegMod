@@ -104,9 +104,9 @@ subroutine twoway_interp(variable1, variable2, table, variable1bins, var1bin_n, 
     end if 
     
     ! Interpolate
-    if  above == below .and. left == right then
+    if  (above == below .and. left == right) then
         yint = table(below, left)
-    elseif above == below .and. left /= right then
+    elseif (above == below .and. left /= right) then
         yint_varY1 = table(below,left)
         yint_varY2 = table(below,right)
         y1 = yint_varY1
@@ -115,14 +115,14 @@ subroutine twoway_interp(variable1, variable2, table, variable1bins, var1bin_n, 
         x2 = variable2bins(right)
         xint = variable2       
         yint = y1-(((y1-y2)/(x1-x2))*(x1-xint))
-    elseif above /= below .and. left == right then
+    elseif (above /= below .and. left == right) then
         y1 = table(below,left)
         x1 = variable1bins(below)
         y2 = table(above,left)
         x2 = variable1bins(above)
         xint = variable1
         yint = y1-(((y1-y2)/(x1-x2))*(x1-xint))
-    else: 
+    else 
         y1 = table(below,left)
         x1 = variable1bins(below)
         y2 = table(above,left)
