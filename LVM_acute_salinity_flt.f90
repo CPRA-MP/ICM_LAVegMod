@@ -25,15 +25,19 @@ subroutine acute_salinity_flt
 
     acute_sal_threshold = 5.5           ! ppt
     do ig=1,ngrid
-        if (sal_mx_14d_yr(grid_comp(ig)) >= acute_sal_threshold) then
-            do il=1,flt_thn_cnt
-                coverages(ig,dfi) = coverages(ig,dfi) + coverages(ig,flt_thn_indices(il))        ! Thin mat is added to dead flotant
-                coverages(ig,flt_thn_indices(il)) = 0.0                                              ! Zero-out thin mat
-            end do
-            do il=1,flt_thk_cnt
-                coverages(ig,bfi) = coverages(ig,bfi) + coverages(ig,flt_thk_indices(il))        ! Thick mat is added to bareground flotant
-                coverages(ig,flt_thk_indices(il)) = 0.0                                              ! Zero-out thick mat            
-            end do            
-        end if 
+        if (grid_comp(ig) > 0) then             ! check that grid cell has an allowable ICM-Hydro compartment ID
+            if (grid_comp(ig)<= ncomp) then     ! check that grid cell has an allowable ICM-Hydro compartment ID
+                if (sal_mx_14d_yr(grid_comp(ig)) >= acute_sal_threshold) then
+                    do il=1,flt_thn_cnt
+                        coverages(ig,dfi) = coverages(ig,dfi) + coverages(ig,flt_thn_indices(il))        ! Thin mat is added to dead flotant
+                        coverages(ig,flt_thn_indices(il)) = 0.0                                              ! Zero-out thin mat
+                    end do
+                    do il=1,flt_thk_cnt
+                        coverages(ig,bfi) = coverages(ig,bfi) + coverages(ig,flt_thk_indices(il))        ! Thick mat is added to bareground flotant
+                        coverages(ig,flt_thk_indices(il)) = 0.0                                              ! Zero-out thick mat            
+                    end do            
+                end if 
+            end if
+        end if
     end do
 end 

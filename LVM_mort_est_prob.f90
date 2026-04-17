@@ -37,19 +37,23 @@ subroutine mort_est_prob
     establish_P = 0                                     ! initialize with all 0s; for coverages that do not calculate an establishment probability, the value will remain 0 (nothing will establish)
     mortality_P = 0                                     ! initialize with all 0s; for coverages that do not calculate an mortality probability, the value will remain 0 (nothing will die)
 
-    do ig = 1,ngrid                                     ! Loop through every grid cell 
-        do ic = 1, ncov                                 ! Loop through every coverage (column)
-            cover_group = cov_grp(ic)                   ! Identify which coverage group this coverage (column) belongs to
-            if (cover_group == 8 .or. cover_group == 14) then                             ! For bottomland hardwood forest and barrier island species (coverage group 8 and 14), calculate establishment probability from elevation 
-                call oneway_interp(grid_elev(ig), establish_tables(:,:,ic), est_Y_bins(:,ic), n_Y_bins, establish_P(ig,ic))    ! oneway_interp(variable1,table,variable1bins, var1bin_n, yint)
-                call oneway_interp(grid_elev(ig), mortality_tables(:,:,ic), mort_Y_bins(:,ic), n_Y_bins, mortality_P(ig,ic))   ! oneway_interp(variable1,table,variable1bins, var1bin_n, yint)
-            elseif (cover_group == 4 .or. cover_group == 5 .or. cover_group >= 9) then    ! For swamp forest, thick and thin floating marsh, emergent wetland (fresh, intermediate, brackish, and saline) (coverage groups 4-5, 9-13), calculate establishment probability from wlv and annual salinity
-                call twoway_interp(sal_av_yr(grid_comp(ig)), wlv_smr(grid_comp(ig)), establish_tables(:,:,ic), est_Y_bins(:,ic), n_Y_bins, est_X_bins(:,ic), n_X_bins, establish_P(ig,ic))             ! twoway_interp(variable1, variable2, table, variable1bins, var1bin_n, variable2bins, var2bin_n, yint)
-                call twoway_interp(sal_av_yr(grid_comp(ig)), wlv_smr(grid_comp(ig)), mortality_tables(:,:,ic), mort_Y_bins(:,ic), n_Y_bins, mort_X_bins(:,ic), n_X_bins, mortality_P(ig,ic))            ! twoway_interp(variable1, variable2, table, variable1bins, var1bin_n, variable2bins, var2bin_n, yint)
-            else                                                                           ! For water, not mod, new bareground, old bareground, bareground flotant, dead flotant (coverage groups 0-3, 6-7), do nothing
-                return ! is that right? 
-            endif
-        end do 
+    do ig = 1,ngrid                                     ! Loop through every grid cell
+        if (grid_comp(ig) > 0) then                     ! check that grid cell has an allowable ICM-Hydro compartment ID
+            if (grid_comp(ig)<= ncomp) then             ! check that grid cell has an allowable ICM-Hydro compartment ID
+                do ic = 1, ncov                                 ! Loop through every coverage (column)
+                    cover_group = cov_grp(ic)                   ! Identify which coverage group this coverage (column) belongs to
+                    if (cover_group == 8 .or. cover_group == 14) then                             ! For bottomland hardwood forest and barrier island species (coverage group 8 and 14), calculate establishment probability from elevation 
+                        call oneway_interp(grid_elev(ig), establish_tables(:,:,ic), est_Y_bins(:,ic), n_Y_bins, establish_P(ig,ic))    ! oneway_interp(variable1,table,variable1bins, var1bin_n, yint)
+                        call oneway_interp(grid_elev(ig), mortality_tables(:,:,ic), mort_Y_bins(:,ic), n_Y_bins, mortality_P(ig,ic))   ! oneway_interp(variable1,table,variable1bins, var1bin_n, yint)
+                    elseif (cover_group == 4 .or. cover_group == 5 .or. cover_group >= 9) then    ! For swamp forest, thick and thin floating marsh, emergent wetland (fresh, intermediate, brackish, and saline) (coverage groups 4-5, 9-13), calculate establishment probability from wlv and annual salinity
+                        call twoway_interp(sal_av_yr(grid_comp(ig)), wlv_smr(grid_comp(ig)), establish_tables(:,:,ic), est_Y_bins(:,ic), n_Y_bins, est_X_bins(:,ic), n_X_bins, establish_P(ig,ic))             ! twoway_interp(variable1, variable2, table, variable1bins, var1bin_n, variable2bins, var2bin_n, yint)
+                        call twoway_interp(sal_av_yr(grid_comp(ig)), wlv_smr(grid_comp(ig)), mortality_tables(:,:,ic), mort_Y_bins(:,ic), n_Y_bins, mort_X_bins(:,ic), n_X_bins, mortality_P(ig,ic))            ! twoway_interp(variable1, variable2, table, variable1bins, var1bin_n, variable2bins, var2bin_n, yint)
+                    else                                                                           ! For water, not mod, new bareground, old bareground, bareground flotant, dead flotant (coverage groups 0-3, 6-7), do nothing
+                        return ! is that right? 
+                    endif
+                end do 
+            end if
+        end if
     end do
 
     ! Zero-out establish_P for barrier island species not in barrier island cells and keep it in barrier island cells

@@ -1,0 +1,10 @@
+<NotepadPlus>
+    <Session activeView="0">
+        <mainView activeIndex="2">
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="6510" startPos="0" endPos="0" selMode="0" lang="Fortran (free form)" encoding="-1" userReadOnly="no" filename="C:\Eric\git\ICM_LAVegMod\LVM_coverage_calcs.f90" backupFilePath="" originalFileLastModifTimestamp="1133725973" originalFileLastModifTimestampHigh="31173159" mapFirstVisibleDisplayLine="-1" mapFirstVisibleDocLine="-1" mapLastVisibleDocLine="-1" mapNbLine="-1" mapHigherPos="-1" mapWidth="-1" mapHeight="-1" mapKByteInDoc="3145780" mapWrapIndentMode="-1" mapIsWrap="no" />
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="6510" startPos="0" endPos="0" selMode="0" lang="Fortran (free form)" encoding="-1" userReadOnly="no" filename="C:\Eric\git\ICM_LAVegMod\LVM_params_alloc.f90" backupFilePath="" originalFileLastModifTimestamp="1133855706" originalFileLastModifTimestampHigh="31173159" mapFirstVisibleDisplayLine="-1" mapFirstVisibleDocLine="-1" mapLastVisibleDocLine="-1" mapNbLine="-1" mapHigherPos="-1" mapWidth="-1" mapHeight="-1" mapKByteInDoc="1430711504" mapWrapIndentMode="-1" mapIsWrap="no" />
+            <File firstVisibleLine="79" xOffset="0" scrollWidth="6510" startPos="0" endPos="0" selMode="0" lang="Fortran (free form)" encoding="-1" userReadOnly="no" filename="C:\Eric\git\ICM_LAVegMod\LVM_params.f90" backupFilePath="" originalFileLastModifTimestamp="1133835391" originalFileLastModifTimestampHigh="31173159" mapFirstVisibleDisplayLine="-1" mapFirstVisibleDocLine="-1" mapLastVisibleDocLine="-1" mapNbLine="-1" mapHigherPos="-1" mapWidth="-1" mapHeight="-1" mapKByteInDoc="1141866496" mapWrapIndentMode="-1" mapIsWrap="no" />
+        </mainView>
+        <subView activeIndex="0" />
+    </Session>
+</NotepadPlus>

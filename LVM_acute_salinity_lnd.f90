@@ -22,14 +22,18 @@ subroutine acute_salinity_lnd
 
     acute_sal_threshold = 5.5           ! ppt
     do ig=1,ngrid
-        if (sal_mx_14d_yr(grid_comp(ig)) >= acute_sal_threshold) then
-            do ic=1,ncov
-                if (cov_grp(ic) == 10) then                                      ! cov_grp = 10; fresh emergent wetland vegetation
-                    coverages(ig,bni) = coverages(ig,bni) + coverages(ig,ic)
-                    coverages(ig,ic) = 0.0
+        if (grid_comp(ig) > 0) then             ! check that grid cell has an allowable ICM-Hydro compartment ID
+            if (grid_comp(ig)<= ncomp) then     ! check that grid cell has an allowable ICM-Hydro compartment ID
+                if (sal_mx_14d_yr(grid_comp(ig)) >= acute_sal_threshold) then
+                    do ic=1,ncov
+                        if (cov_grp(ic) == 10) then                                      ! cov_grp = 10; fresh emergent wetland vegetation
+                            coverages(ig,bni) = coverages(ig,bni) + coverages(ig,ic)
+                            coverages(ig,ic) = 0.0
+                        end if
+                    end do
                 end if
-            end do
-        end if 
+            end if
+        end if
     end do
 
 

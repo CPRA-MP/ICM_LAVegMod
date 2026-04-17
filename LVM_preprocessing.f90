@@ -71,7 +71,7 @@ subroutine preprocessing
     open(unit=101, file=trim(adjustL(grid_file)))
     read(101,1234) dump_txt                                                                         ! dump column header row
     do i = 1,ngrid
-        read(101,*) g, grid_x(g), grid_y(g), grid_a(g), grid_comp(g)
+        read(101,*) g, grid_x(g), grid_y(g), grid_a(g), grid_comp(g)                                ! veg grid cell may  not have an allowable ICM Hydro compartment number (this is checked for whenever Hydro data is read)
         dem_pixel_proportion(g) = dem_res**2 / grid_a(g)
     end do
     close(101)
