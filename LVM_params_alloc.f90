@@ -49,7 +49,7 @@ subroutine params_alloc
     allocate(sal_mx_14d_yr(ncomp))
     allocate(tmp_av_yr(ncomp))
     allocate(tmp_av_smr(ncomp))
-    allocation(stage_daily(366,ncomp))  ! set first dimension equal to 366 so it is big enough for leap year data
+    allocate(stage_daily(366,ncomp))  ! set first dimension equal to 366 so it is big enough for leap year data
 
     ! allocate memory for variables read in from ICM-Morph output files in subroutine: PREPROCESSING
     allocate(grid_elev(ngrid))
