@@ -19,7 +19,7 @@ subroutine tree_establishment_conditions
     ! local variables:
     real(sp) :: leapcheck                                                           ! decimal year
     integer :: j                                                                    ! iterator over all 365/366 simulation days
-    integer :: k                                                                    ! iterator over number of veg grid cells
+    integer :: g                                                                    ! iterator over number of veg grid cells
     integer :: jj                                                                   ! iterator over days during tree establishment window
     integer :: jjj                                                                  ! day of establishment window converted from simulation day
     integer :: dd                                                                   ! number of days in moving window
@@ -56,9 +56,9 @@ subroutine tree_establishment_conditions
     
     ! Check if current year is a leap year
     if ( (start_year + elapsed_year)/4.0 > floor((start_year + elapsed_year)/4.0) )then
-        simdays == 365
+        simdays = 365
     else:
-        simdays == 366
+        simdays = 366
         do j = 3,12
             month_DOY(j) = month_DOY(j)+1                                           ! Update first day of month for March through December during a leap year
         enddo
@@ -77,12 +77,12 @@ subroutine tree_establishment_conditions
     allocate(tree_est_flag(thresholdlength))
 
 
-    do k=1,ngrid 
-        comp = grid_comp(k) 
+    do g=1,ngrid 
+        comp = grid_comp(g) 
         if (comp > 0) then                                                          ! check that grid cell has an allowable ICM-Hydro compartment ID
             if (comp > 0) then                                                      ! check that grid cell has an allowable ICM-Hydro compartment ID
                 do j = 1,simdays
-                    grid_dep_daily(k,j) = stage_daily(j,comp) - grid_elev(k)        ! map compartment stage values to grid cells for each day and convert to depth
+                    grid_dep_daily(g,j) = stage_daily(j,comp) - grid_elev(g)        ! map compartment stage values to grid cells for each day and convert to depth
                 enddo
             
             ! Loop through days at each grid cell and determine tree establishment criteria is met
@@ -93,13 +93,13 @@ subroutine tree_establishment_conditions
                 
                 ! Loop over past two weeks and determine if any past day is wet
                 do dd=0,13
-                    if (grid_dep_daily(k,jj-dd) <= -0.30) then
+                    if (grid_dep_daily(g,jj-dd) <= -0.30) then
                         drypast_flag(jjj) = drypast_flag(jjj)*1
                     else
                         drypast_flag(jjj) = drypast_flag(jjj)*0                     ! If any day of the past 2 weeks is wet, drypast_flag is set to 0
                     endif
                 
-                    if (grid_dep_daily(k,jj+dd) <= -0.20) then                      ! loop over next two weeks and determine if any future day is wet                  
+                    if (grid_dep_daily(g,jj+dd) <= -0.20) then                      ! loop over next two weeks and determine if any future day is wet                  
                         dryfuture_flag(jjj) = dryfuture_flag(jjj)*1
                     else
                         dryfuture_flag(jjj) = dryfuture_flag(jjj)*0                 ! if any day of the next 2 weeks is flooded by more than 10 cm, dryfuture_flag is set to 0
@@ -115,17 +115,36 @@ subroutine tree_establishment_conditions
             do jj = firstday,lastday                                            
                 jjj = jj-firstday+1
                 if (tree_est_flag(jjj) > 0) then
-                    tree_establishment(k) = 1
+                    tree_establishment(g) = 1
                 endif
             enddo
-
         endif
     enddo
+    
+    ! write csv of tree establishment conditions if intermediate files are being written
+    if (write_intermediate_files == 1) then
+        open(unit=903, file='veg/'//trim(adjustL(fnc_tag))//'_'//'N'//'_'//year//'_V_tree_est.csv')
+        write(903,'(A)') 'GridCellID,TreeEstablishmentCondition'
+        do g=1,ngrid
+            write(903,3458) g,tree_establishment(g)
+        enddo
+        close(903)
+    endif
+    
+    
+    write(903,'(A)') trim(adjustL(veg_coverage_file_header))
+    do g = 1,ngrid
+        write(903,'(I0,','I0)') g, coverages(g,:)
+    end do
+    close(903)
+    
     
     deallocate(grid_dep_daily)
     deallocate(drypast_flag)
     deallocate(dryfuture_flag)
     deallocate(tree_est_flag)
     
+3458    format(I0,',',I0)
+    
     return
-    end
+end
