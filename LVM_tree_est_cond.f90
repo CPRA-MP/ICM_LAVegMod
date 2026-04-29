@@ -33,7 +33,7 @@ subroutine tree_establishment_conditions
     integer, dimension(:), allocatable :: dryfuture_flag                            ! flag (1 or 0) to determine if future 14 days have less than 10 cm of ponding
     integer, dimension(:), allocatable :: tree_est_flag                             ! combined flags to see if both conditions are met (dry past AND dry future)
     integer, dimension(:), allocatable :: month_DOY                                 ! array holding the starting index for each month in a daily timeseries
-    
+    character*4 :: year                                                             ! calendar year of model run - used in output file name
     
     tree_establishment = 0                                                          ! initialize entire tree_establishment array to 0
     
@@ -119,6 +119,7 @@ subroutine tree_establishment_conditions
     
     ! write csv of tree establishment conditions if intermediate files are being written
     if (write_intermediate_files == 1) then
+        write(year,'(I0)') start_year + elapsed_year - 1
         open(unit=903, file='veg/'//trim(adjustL(fnc_tag))//'_'//'N'//'_'//year//'_V_tree_est.csv')
         write(903,'(A)') 'GridCellID,TreeEstablishmentCondition'
         do g=1,ngrid
