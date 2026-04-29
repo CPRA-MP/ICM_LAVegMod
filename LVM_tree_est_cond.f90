@@ -79,11 +79,10 @@ subroutine tree_establishment_conditions
 
     do g=1,ngrid 
         comp = grid_comp(g) 
-        if (comp > 0) then                                                          ! check that grid cell has an allowable ICM-Hydro compartment ID
-            if (comp > 0) then                                                      ! check that grid cell has an allowable ICM-Hydro compartment ID
-                do j = 1,simdays
-                    grid_dep_daily(g,j) = stage_daily(j,comp) - grid_elev(g)        ! map compartment stage values to grid cells for each day and convert to depth
-                enddo
+        if (comp > 0) then                                                      ! check that grid cell has an allowable ICM-Hydro compartment ID
+            do j = 1,simdays
+                grid_dep_daily(g,j) = stage_daily(j,comp) - grid_elev(g)        ! map compartment stage values to grid cells for each day and convert to depth
+            enddo
             
             ! Loop through days at each grid cell and determine tree establishment criteria is met
             do jj = firstday,lastday          
@@ -104,11 +103,8 @@ subroutine tree_establishment_conditions
                     else
                         dryfuture_flag(jjj) = dryfuture_flag(jjj)*0                 ! if any day of the next 2 weeks is flooded by more than 10 cm, dryfuture_flag is set to 0
                     endif
-                    
                 enddo
-                
                 tree_est_flag(jjj) = dryfuture_flag(jjj)*drypast_flag(jjj)
-            
             enddo
             
             ! Loop over cell's timeseries of flags and set equal to 1 if any daily flags equal 1
@@ -131,13 +127,7 @@ subroutine tree_establishment_conditions
         close(903)
     endif
     
-    
-    write(903,'(A)') trim(adjustL(veg_coverage_file_header))
-    do g = 1,ngrid
-        write(903,'(I0,','I0)') g, coverages(g,:)
-    end do
-    close(903)
-    
+   
     
     deallocate(grid_dep_daily)
     deallocate(drypast_flag)
