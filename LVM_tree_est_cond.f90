@@ -57,7 +57,7 @@ subroutine tree_establishment_conditions
     ! Check if current year is a leap year
     if ( (start_year + elapsed_year)/4.0 > floor((start_year + elapsed_year)/4.0) )then
         simdays = 365
-    else:
+    else
         simdays = 366
         do j = 3,12
             month_DOY(j) = month_DOY(j)+1                                           ! Update first day of month for March through December during a leap year
