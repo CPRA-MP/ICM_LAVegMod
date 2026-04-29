@@ -8,8 +8,9 @@ subroutine preprocessing
     integer :: g                                                                                    ! local ICM-LAVegMod grid ID variable
     integer :: ic                                                                                   ! iterator over coverage types
     integer :: y                                                                                    ! iterator over establishment/mortality table columns
-
-    
+    integer :: nd                                                                                   ! iterator over daily timeseries of ICM-Hydro output data
+    integer :: nyr                                                                                  ! iterator over elapsed years that are included in the daily timeseries of ICM-Hydro output data
+    integer :: yeardays                                                                             ! iterator over 
     ! initialize grid data arrays to zero before reading in
     FFIBS_score = 0.0
     pct_vglnd_BLHF = 0.0
@@ -65,13 +66,14 @@ subroutine preprocessing
     grid_y = 0.0                                                                                    ! initialize data array to zero before reading in
     grid_a = 0.0                                                                                    ! initialize data array to zero before reading in
     grid_comp = 0                                                                                   ! initialize data array to zero before reading in
+    barrier_island = 0                                                                              ! initialize data array to zero before reading in
     
     write(  *,*) ' - reading in grid cell attributes'
     write(000,*) ' - reading in grid cell attributes'
     open(unit=101, file=trim(adjustL(grid_file)))
     read(101,1234) dump_txt                                                                         ! dump column header row
     do i = 1,ngrid
-        read(101,*) g, grid_x(g), grid_y(g), grid_a(g), grid_comp(g)                                ! veg grid cell may  not have an allowable ICM Hydro compartment number (this is checked for whenever Hydro data is read)
+        read(101,*) g, grid_x(g), grid_y(g), grid_a(g), grid_comp(g),barrier_island(g)              ! veg grid cell may  not have an allowable ICM Hydro compartment number (this is checked for whenever Hydro data is read)
         dem_pixel_proportion(g) = dem_res**2 / grid_a(g)
     end do
     close(101)
@@ -162,29 +164,28 @@ subroutine preprocessing
     
     water_from_morph = water_from_morph/100.0                                                       ! convert from 0-100% to 0.0-1.0 proportion
 
-    ! read barrier island domain
-    barrier_island = 0                                                                              ! initialize data array to zero before reading in
-    
-    write(  *,*) ' - reading in barrier island domain map'
-    write(000,*) ' - reading in barrier island domain map'
-    open(unit=105, file=trim(adjustL(morph_grid_out_file)))
-    read(105,*) dump_txt                                                                            ! dump header
-    do i = 1,ngrid
-        read(105,*) g,                          &                                                   ! grid cell ID
-   &            barrier_island(g)                                                                   ! barrier island flag (1 if grid cell is in barrier island domain; 0, if not)
-    end do
-    close(105)
-    
-    ! read tree establishment criteria
-    tree_establishment = 0                                                                           ! initialize data array to zero before reading in
-    
-    write(  *,*) ' - reading in tree establishment criteria'
-    write(000,*) ' - reading in tree establishment criteria'
-    open(unit=106, file=trim(adjustL(morph_grid_out_file)))
-    read(106,*) dump_txt                                                                            ! dump header
-    do i = 1,ngrid
-        read(106,*) g,                          &                                                   ! grid cell ID
-   &            tree_establishment(g)                                                               ! tree establishment criteria (1 if conditions are met; 0, if not)
+
+    ! read in daily water level timeseries from ICM-Hydro (used for tree establishment criteria)
+    stage_daily = 0                                                                                   ! initialize data array to zero before reading in
+
+    write(  *,*) ' - reading in daily water level timeseries for use in tree establishment criteria'
+    write(000,*) ' - reading in daily water level timeseries for use in tree establishment criteria'
+    open(unit=106, file=trim(adjustL(hydro_daily_stage_file)))
+    !!there is no header row!! read(106,*) dump_txt                                                                            ! dump header
+  
+    do nyr = 0,elapsedyear-1                                                                          ! loop through all elapsed years that are included in the daily timeseries ICM-Hydro output file
+        if ( (start_year + nyr)/4.0 > floor((start_year + nyr)/4.0) )then                           ! check if year is leapyear
+            simdays = 365
+        else
+            simdays = 366
+        endif
+        do nd = 1,simdays                                                                          ! loop through days of each year up to and including the current model year, which will equal 'elapsedyear'
+            if (nyr == elapsedyear-1) then                                                            ! if loop's current year is elapsedyear, then read daily timeseries into array
+                read(106,*) stage_daily(nd,:)                                                      ! stage_daily(simday,ncomp)
+            else                                                                                    ! else current loop is not on elapseyear, so skip over line in daily timeseries file
+                read(106,*) dump_txt
+            endif
+        end do
     end do
     close(106)
     
@@ -224,6 +225,6 @@ subroutine preprocessing
     
     
 1234    format(A,<ncov>(',',A))
-
+2345    format(
     return
 end

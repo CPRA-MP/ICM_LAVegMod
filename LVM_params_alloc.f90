@@ -39,7 +39,7 @@ subroutine params_alloc
     ! these variables are 2D arrays [i,j] where the ith dimension represents the grid cell ID and the jth dimension represents the coverage type column
     allocate(coverages(ngrid,ncov))
     
-    ! allocate memory for variables read in from compartment_out ICM-Hydro summary file in subroutine: PREPROCESSING
+    ! allocate memory for variables read in from daily timeseries and compartment_out ICM-Hydro summary file in subroutine: PREPROCESSING
     allocate(stg_mx_yr(ncomp))
     allocate(stg_av_yr(ncomp))
     allocate(stg_av_smr(ncomp))
@@ -49,15 +49,15 @@ subroutine params_alloc
     allocate(sal_mx_14d_yr(ncomp))
     allocate(tmp_av_yr(ncomp))
     allocate(tmp_av_smr(ncomp))
+    allocation(stage_daily(366,ncomp))  ! set first dimension equal to 366 so it is big enough for leap year data
 
     ! allocate memory for variables read in from ICM-Morph output files in subroutine: PREPROCESSING
     allocate(grid_elev(ngrid))
     allocate(water_from_morph(ngrid))
     
     ! allocate memory for variables read in in subroutine: PREPROCESSING
-    allocate(barrier_island(ngrid)) 
-    allocate(tree_establishment(ngrid))
-    
+    allocate(barrier_island(ngrid))
+
     ! allocate memory for variables read in for establishment and mortability tables in subroutine: PREPROCESSING
     allocate(est_X_bins(n_X_bins,ncov))
     allocate(est_Y_bins(n_Y_bins,ncov))
@@ -78,6 +78,9 @@ subroutine params_alloc
     ! allocate memory for variables read and set in subroutine: NEIGHBORS
     allocate(nearest_neighbors(ngrid,max_neighbors))
     allocate(near_neighbors(ngrid,max_neighbors))
+    
+    ! allocate memory for variables set in subroutine: TREE_ESTABLISHMENT_CONDITIONS
+    allocate(tree_establishment(ngrid))
     
     ! allocate memory for variables calculated in subroutine: MORT_EST_PROB
     allocate(establish_P(ngrid,ncov))

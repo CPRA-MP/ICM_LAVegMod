@@ -72,6 +72,14 @@ program main
     write(  *,*) 'Nearest neighbors subroutine ended at: ',dtstr
     write(000,*) 'Nearest neighbors subroutine ended at: ',dtstr
 
+    call tree_establishment_conditions
+    call date_and_time(VALUES=dtvalues)
+    write(dtstr,8889) dtvalues(1),'-',dtvalues(2),'-',dtvalues(3),'_',dtvalues(5),':',dtvalues(6),':',dtvalues(7)
+    write(  *,*) 'Tree establishment conditions subroutine ended at: ',dtstr
+    write(000,*) 'Tree establishment conditions ended at: ',dtstr
+
+
+
     ! Reset new bareground and adjust dead flotant 
     call reset_coverages
     call date_and_time(VALUES=dtvalues)
