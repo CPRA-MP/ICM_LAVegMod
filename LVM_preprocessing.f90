@@ -10,7 +10,8 @@ subroutine preprocessing
     integer :: y                                                                                    ! iterator over establishment/mortality table columns
     integer :: nd                                                                                   ! iterator over daily timeseries of ICM-Hydro output data
     integer :: nyr                                                                                  ! iterator over elapsed years that are included in the daily timeseries of ICM-Hydro output data
-    integer :: yeardays                                                                             ! iterator over 
+    integer :: yeardays                                                                             ! iterator over
+    
     ! initialize grid data arrays to zero before reading in
     FFIBS_score = 0.0
     pct_vglnd_BLHF = 0.0
@@ -166,22 +167,22 @@ subroutine preprocessing
 
 
     ! read in daily water level timeseries from ICM-Hydro (used for tree establishment criteria)
-    stage_daily = 0                                                                                   ! initialize data array to zero before reading in
+    stage_daily = 0                                                                                 ! initialize data array to zero before reading in
 
     write(  *,*) ' - reading in daily water level timeseries for use in tree establishment criteria'
     write(000,*) ' - reading in daily water level timeseries for use in tree establishment criteria'
     open(unit=106, file=trim(adjustL(hydro_daily_stage_file)))
     !!there is no header row!! read(106,*) dump_txt                                                                            ! dump header
   
-    do nyr = 0,elapsedyear-1                                                                          ! loop through all elapsed years that are included in the daily timeseries ICM-Hydro output file
+    do nyr = 0,elapsed_year-1                                                                       ! loop through all elapsed years that are included in the daily timeseries ICM-Hydro output file
         if ( (start_year + nyr)/4.0 > floor((start_year + nyr)/4.0) )then                           ! check if year is leapyear
-            simdays = 365
+            yeardays = 365
         else
-            simdays = 366
+            yeardays = 366
         endif
-        do nd = 1,simdays                                                                          ! loop through days of each year up to and including the current model year, which will equal 'elapsedyear'
-            if (nyr == elapsedyear-1) then                                                            ! if loop's current year is elapsedyear, then read daily timeseries into array
-                read(106,*) stage_daily(nd,:)                                                      ! stage_daily(simday,ncomp)
+        do nd = 1,yeardays                                                                          ! loop through days of each year up to and including the current model year, which will equal 'elapsedyear'
+            if (nyr == elapsed_year-1) then                                                         ! if loop's current year is elapsedyear, then read daily timeseries into array
+                read(106,*) stage_daily(nd,:)                                                       ! stage_daily(simday,ncomp)
             else                                                                                    ! else current loop is not on elapseyear, so skip over line in daily timeseries file
                 read(106,*) dump_txt
             endif

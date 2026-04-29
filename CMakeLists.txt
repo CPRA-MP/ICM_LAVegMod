@@ -91,6 +91,7 @@ ADD_EXECUTABLE( ${LVM}  LVM_acute_salinity_flt.f90
                         LVM_set_io.f90
                         LVM_sum_unoccupied_flt.f90
                         LVM_sum_unoccupied_lnd.f90
+                        LVM_tree_est_cond.f90
                         LVM_twoway_interp.f90
                         LVM_update_coverages.f90
                         LVM_update_flotant.f90
