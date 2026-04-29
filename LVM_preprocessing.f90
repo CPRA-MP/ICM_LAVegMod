@@ -225,6 +225,6 @@ subroutine preprocessing
     
     
 1234    format(A,<ncov>(',',A))
-2345    format(
+
     return
 end
