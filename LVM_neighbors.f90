@@ -96,7 +96,7 @@ subroutine neighbors
         write(000,'(A,A)') ' - writing near neighbor file: ', trim(adjustL(near_neighbors_file))
     
         open(unit=203, file=trim(adjustL(near_neighbors_file)))
-        write(202,'(A,I0,A)') 'gridID,near neighbors within ',near_neighbors_dist,' m:'
+        write(203,'(A,I0,A)') 'gridID,near neighbors within ',near_neighbors_dist,' m:'
         do g0 = 1,ngrid
             write(203,2345) g0, near_neighbors(g0,:)
         end do
