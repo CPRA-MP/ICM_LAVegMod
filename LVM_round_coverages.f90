@@ -27,9 +27,9 @@ subroutine round_coverages
 
                 dif = coverage_area_m2 - coverage_area_flr
                 if (dif > 0.5) then   
-                    coverages(ig,ic,2) = coverage_area_flr + 1      ! round up
+                    coverages(ig,ic) = coverage_area_flr + 1      ! round up
                 else                                                
-                    coverages(ig,ic,2) = coverage_area_flr          ! round down
+                    coverages(ig,ic) = coverage_area_flr          ! round down
                 end if 
             elseif (coverages(ig,ic) < 0.0) then
                 write(*,*) '*****************WARNING************************************'
