@@ -32,7 +32,7 @@ subroutine set_io
     read(001,*) veg_in_file,dump_txt        ! we can have this set automatically via the elapsed_year variable internal to the code instead of having it written to an input file
     read(001,*) hydro_comp_out_file 
     read(001,*) morph_grid_out_file
-    hydro_daily_stage_file = '../hydro/STG.out'
+    read(001,*) hydro_daily_stage_file
     
     ! filenaming convention
     read(001,*) fnc_tag
