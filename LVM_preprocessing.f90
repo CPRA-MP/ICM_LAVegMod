@@ -22,7 +22,7 @@ subroutine preprocessing
     pct_vglnd_SM = 0.0
     
     ! read ICM-LAVegMod model attributes for each coverage type
-    write(  *,*) ' - reading in model attributes for coverage types'
+    write(*,'(A)') ' - reading in model attributes for coverage types'
     write(000,*) ' - reading in model attributes for coverage types'
     cov_grp = 0
     cov_disp_class = 0
@@ -69,7 +69,7 @@ subroutine preprocessing
     grid_comp = 0                                                                                   ! initialize data array to zero before reading in
     barrier_island = 0                                                                              ! initialize data array to zero before reading in
     
-    write(  *,*) ' - reading in grid cell attributes'
+    write(*,'(A)') ' - reading in grid cell attributes'
     write(000,*) ' - reading in grid cell attributes'
     open(unit=101, file=trim(adjustL(grid_file)))
     read(101,1234) dump_txt                                                                         ! dump column header row
@@ -84,7 +84,7 @@ subroutine preprocessing
     ! read ICM-LAVegMod grid output file into arrays - read in last year output veg coverages into initial values
     coverages = 0.0                                                                                 ! initialize grid data arrays to zero before reading in
 
-    write(  *,*) ' - reading in LAVegMod grid-level output from previous year'
+    write(*,'(A)') ' - reading in LAVegMod grid-level output from previous year'
     write(000,*) ' - reading in LAVegMod grid-level output from previous year'
     open(unit=102, file=trim(adjustL(veg_in_file)))
     read(102,1234) veg_coverage_file_header                                                         ! dump column header row ! format 1234 must match structure of veg_out_file column headers
@@ -117,7 +117,7 @@ subroutine preprocessing
     tmp_av_yr = 0.0                                                                                 ! initialize data array to zero before reading in   
     tmp_av_smr = 0.0                                                                                ! initialize data array to zero before reading in  
 
-    write(  *,*) ' - reading in annual ICM-Hydro compartment-level output'
+    write(*,'(A)') ' - reading in annual ICM-Hydro compartment-level output'
     write(000,*) ' - reading in annual ICM-Hydro compartment-level output'
     open(unit=103, file=trim(adjustL(hydro_comp_out_file)))
     read(103,*) dump_txt                                                                            ! dump header
@@ -149,7 +149,7 @@ subroutine preprocessing
     grid_elev = 0.0                                                                                 ! initialize data array to zero before reading in
     water_from_morph = 0.0                                                                          ! initialize data array to zero before reading in
     
-    write(  *,*) ' - reading in annual ICM-Morph landscape data output'
+    write(*,'(A)') ' - reading in annual ICM-Morph landscape data output'
     write(000,*) ' - reading in annual ICM-Morph landscape data output'
     open(unit=104, file=trim(adjustL(morph_grid_out_file)))
     read(104,*) dump_txt        ! dump header
@@ -169,7 +169,7 @@ subroutine preprocessing
     ! read in daily water level timeseries from ICM-Hydro (used for tree establishment criteria)
     stage_daily = 0                                                                                 ! initialize data array to zero before reading in
 
-    write(  *,*) ' - reading in daily water level timeseries for use in tree establishment criteria'
+    write(*,'(A)') ' - reading in daily water level timeseries for use in tree establishment criteria'
     write(000,*) ' - reading in daily water level timeseries for use in tree establishment criteria'
     open(unit=106, file=trim(adjustL(hydro_daily_stage_file)))
     !!there is no header row!! read(106,*) dump_txt                                                                            ! dump header
@@ -195,7 +195,7 @@ subroutine preprocessing
     est_Y_bins = 0.0                                                                                ! initialize data array to zero before reading in
     establish_tables = 0.0                                                                          ! initialize data array to zero before reading in
     
-    write(  *,*) ' - reading in probability of establishment tables'
+    write(*,'(A)') ' - reading in probability of establishment tables'
     write(000,*) ' - reading in probability of establishment tables'
     do ic = 1,ncov
         open(unit=107, file=trim(adjustL('veg/tables/establishment_'//trim(adjustL(cov_symbol(ic)))))//'.csv' )
@@ -212,7 +212,7 @@ subroutine preprocessing
     mort_Y_bins = 0.0                                                                                ! initialize data array to zero before reading in
     mortality_tables = 0.0                                                                          ! initialize data array to zero before reading in
     
-    write(  *,*) ' - reading in probability of mortality tables'
+    write(*,'(A)') ' - reading in probability of mortality tables'
     write(000,*) ' - reading in probability of mortality tables'
     do ic = 1,ncov
         open(unit=108, file=trim(adjustL('veg/tables/mortality_'//trim(adjustL(cov_symbol(ic)))))//'.csv' )
