@@ -231,8 +231,8 @@ program main
 
     ! Note, check sum needs to be called before adding the whole pixel portion of dead flotant to water so it is not double counted in dead flotant and water
 
-    ! Add the whole Morph pixel portion of the dead flotant to water
-    coverages(:,wti) = coverages(:,wti) + (dem_pixel_proportion*floor(coverages(:,dfi)/dem_pixel_proportion))
+    ! Add the whole Morph pixel portion of the dead flotant to water -  ! DON'T NEED THIS SINCE MORPH WILL REMOVE DEAD FLT AND CONVERT TO WATER
+    !coverages(:,wti) = coverages(:,wti) + (dem_pixel_proportion*floor(coverages(:,dfi)/dem_pixel_proportion))
 
     
     ! write final coverage file for End of Year landscape - also write summary output file
