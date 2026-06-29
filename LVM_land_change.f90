@@ -19,16 +19,23 @@ subroutine land_change
     integer :: fli                                                                                  ! local varaible to store index of flotants in coverages(ngrid,ncov)
     real(sp) :: delta_water                                                                         ! difference between Morph water and Veg water
     real :: total_flotant                                                                           ! sum of all flotant coverage types
-    real :: veg_land                                                                                ! total land (decimal %) in the Veg cell
+    real :: veg_land, sum_scale_land                                                                ! total land (decimal %) in the Veg cell
     real :: morph_land                                                                              ! total land (decimal %) in the Morph cell
     real :: scale_land                                                                              ! ratio of Morph land to Veg land (0.0 <= scale_land <= 1.0)
     real :: no_change_threshold                                                                     ! ratio of DEM pixel to Veg grid cell indicating no change at DEM-pixel level was detected
 
     
     
-    !water_from_morph = water_from_morph * (1 - coverages(:,nmi))                                    ! Adjust the Morph water to be comparable to the Veg water (Morph treats NOTMOD as NoData, so the %water does not account for NOTMOD. Morph Water + Morph Land + Veg NOTMOD = 100%)
+    !water_from_morph = water_from_morph * (1 - coverages(:,nmi))                                  ! Adjust the Morph water to be comparable to the Veg water (Morph treats NOTMOD as NoData, so the %water does not account for NOTMOD. Morph Water + Morph Land + Veg NOTMOD = 100%)
    
     do ig = 1, ngrid                                                                                ! Loop through every grid cell comparing the amount of water and making the needed changes
+        sum_scale_land = 0.0                                                                        ! using this value to scale land changes 
+        do ic=1,ncov
+           if (cov_grp(ic) > 7) then                                                                ! skip coverage groups for water, bareground, not modeled, and flotant
+               sum_scale_land = sum_scale_land + coverages(ig,ic)
+           end if
+        end do
+
         no_change_threshold = dem_pixel_proportion(ig)                                              ! portion of LAVegMod grid cell that is one DEM pixel - can't have land change less than one pixel
         delta_water = coverages(ig,wti) - water_from_morph(ig)                                      ! Compare Morph water to Veg water and proceed accordingly
                                                                                                     ! Check if change in water area is greater *in magnitude* than the no_change_threshold; the first IF is met when land gain occurs, the ELSE IF is land loss
@@ -51,7 +58,14 @@ subroutine land_change
             end do
            
             morph_land = 1.0 - (water_from_morph(ig) + coverages(ig,nmi) + total_flotant)           ! calculate land area from last ICM-Morph outputs (ignoring NotMod)
-            veg_land = 1.0 - (coverages(ig,wti)+ coverages(ig,bni) + total_flotant)                 ! calculate land area from last ICM-LAVegMod outputs
+            !morph_land = 1.0 - (water_from_morph(ig) + total_flotant)                              ! calculate land area from last ICM-Morph outputs (ignoring NotMod)
+            if(morph_land < 0) then
+                coverages(ig,nmi) = 1.0 - (water_from_morph(ig) + total_flotant)
+                morph_land = 0.0
+            end if
+            !veg_land = 1.0 - (coverages(ig,wti)+ coverages(ig,bni) + total_flotant)                ! calculate land area from last ICM-LAVegMod outputs
+            veg_land = 1.0 - (coverages(ig,wti)  + coverages(ig,nmi) + total_flotant)               ! calculate land area from last ICM-LAVegMod outputs
+            scale_land = 0.0   ! initial scale_land
             
             if (morph_land < 0.0) then
                 write(*,*) '*****************WARNING************************'                       ! print a warning message -- why is morph land less than 0?
@@ -85,6 +99,7 @@ subroutine land_change
                     if (veg_land > 0) then                                                          !   there is still vegetated land to be lost (reduced)
                         coverages(ig,wti) = coverages(ig,wti) + delta_water                         !       add residual amount of new water area to water
                         scale_land = morph_land/veg_land                                            !       calculate the factor by which to reduce all veg coverages (decimal less than 1.0)
+                        !if (sum_scale_land > 0) scale_land = 1 - delta_water/sum_scale_land        ! revised scale_land calculation ZW 6/26/2026      !   calculate the factor by which to reduce all veg coverages (decimal less than 1.0)
                     else                                                                            !   there is not enough vegetated land available to be lost (meaning veg_land is 0)
                         write(*,*) '*****************WARNING************************'
                         write(*,*) 'Grid Cell ID ',ig,' does not have enough land area available to meet calculated land loss area.'
@@ -93,6 +108,7 @@ subroutine land_change
                 else                                                                                ! there's no old bareground to reduce first 
                     coverages(ig,wti) = coverages(ig,wti) + delta_water                             !   add to new water area to water
                     scale_land = morph_land/veg_land                                                !   calculate the factor by which to reduce all veg coverages (decimal less than 1.0)
+                    !if (sum_scale_land > 0) scale_land = 1 - delta_water/sum_scale_land            ! revised scale_land calculation ZW 6/26/2026      !   calculate the factor by which to reduce all veg coverages (decimal less than 1.0)
                 end if  
                 
                 do ic=1,ncov
@@ -103,7 +119,7 @@ subroutine land_change
             else 
                 
                 write(*,*) '*****************WARNING************************'                       ! print error message --  veg land is 0, meaning there's nothing to be reduced
-                write(*,*) 'Grid Cell ID ',ig,' has no land area available and therefore does not have enough land area available to meet calculated land loss area.'
+                write(*,*) 'Grid Cell ID ',ig,' has no land area availalb and therefore does not have enough land area available to meet calculated land loss area.'
                 write(*,*) '************************************************'
             end if  
         end if
