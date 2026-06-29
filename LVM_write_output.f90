@@ -16,14 +16,14 @@ subroutine write_output(fileflag,filetag,write_summary)
 
     write(year,'(I0)') start_year + elapsed_year - 1
 
-
     open(unit=901, file='veg/'//trim(adjustL(fnc_tag))//'_'//trim(adjustL(fileflag))//'_'//year//'_V_vegty'//trim(adjustL(filetag))//'.csv' )
     write(901,'(A)') trim(adjustL(veg_coverage_file_header))
     do g = 1,ngrid
         write(901,3456) g, coverages(g,:)
     end do
     close(901)
-    
+
+    ! if summary flag = 1, then *also* write the habitat coverage and weighted FFIBS summary file
     if (write_summary == 1) then
         open(unit=902, file='veg/'//trim(adjustL(fnc_tag))//'_'//trim(adjustL(fileflag))//'_'//year//'_V_vegsm'//trim(adjustL(filetag))//'.csv')
         write(902,'(A)') 'GridCellID,WeigtedFFIBS,pct_vglnd_BLHF,pct_vglnd_SWF,pct_vglnd_FM,pct_vglnd_IM,pct_vglnd_BM,pct_vglnd_SM'

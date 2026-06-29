@@ -57,28 +57,32 @@ program main
     write(000,*) 'Started ICM-LAVegMod simulation at: ',dtstr
     write(000,*)
 
+    ! Read in input/output files and various configuration seetings
     call set_io                                     ! input/output settings - must be run BEFORE parameter allocation   
+    
+    ! Allocate memory arrays for all global variables
     call params_alloc
    
+    ! Start preprocessing where all necessary input data is read in from file
     call preprocessing
     call date_and_time(VALUES=dtvalues)
     write(dtstr,8889) dtvalues(1),'-',dtvalues(2),'-',dtvalues(3),'_',dtvalues(5),':',dtvalues(6),':',dtvalues(7)
     write(  *,*) 'Preprocessing subroutine ended at: ',dtstr
     write(000,*) 'Preprocessing subroutine ended at: ',dtstr
 
+    ! Calculate distances to neighboring cells for dispersal functions (this will either calculate the distances or read them from file based on *build_neighbors* flag in *set_io*
     call neighbors
     call date_and_time(VALUES=dtvalues)
     write(dtstr,8889) dtvalues(1),'-',dtvalues(2),'-',dtvalues(3),'_',dtvalues(5),':',dtvalues(6),':',dtvalues(7)
     write(  *,*) 'Nearest neighbors subroutine ended at: ',dtstr
     write(000,*) 'Nearest neighbors subroutine ended at: ',dtstr
 
+    ! Determine if the proper wet/dry cycle existed for tree establishment. This subroutine was ported over from an older ICM-Hydro subroutine
     call tree_establishment_conditions
     call date_and_time(VALUES=dtvalues)
     write(dtstr,8889) dtvalues(1),'-',dtvalues(2),'-',dtvalues(3),'_',dtvalues(5),':',dtvalues(6),':',dtvalues(7)
     write(  *,*) 'Tree establishment conditions subroutine ended at: ',dtstr
     write(000,*) 'Tree establishment conditions ended at: ',dtstr
-
-
 
     ! Reset new bareground and adjust dead flotant 
     call reset_coverages
@@ -94,9 +98,9 @@ program main
     write(  *,*) 'Land Change subroutine ended at: ',dtstr
     write(000,*) 'Land Change subroutine ended at: ',dtstr
 
-    ! write intermediate coverage file for post updates from ICM-Morph - also write summary output file
+    ! Write intermediate coverage file for post updates from ICM-Morph (0.morph)
     if (write_intermediate_files == 1) then
-        call write_output('N','.0.morph   ',1)   !currently this is a 11*character string being passed in to write_output - currently needs to be padded with spaces
+        call write_output('N','.0.morph   ',0)   !currently this is a 11*character string being passed in to write_output - currently needs to be padded with spaces
         call date_and_time(VALUES=dtvalues)
         write(dtstr,8889) dtvalues(1),'-',dtvalues(2),'-',dtvalues(3),' ',dtvalues(5),':',dtvalues(6),':',dtvalues(7)
         write(  *,*) 'Write Intermediate Output subroutine ended at: ',dtstr
@@ -117,9 +121,9 @@ program main
     write(  *,*) 'High Dispersal Establishment on New Bareground subroutine ended at: ',dtstr
     write(000,*) 'High Dispersal Establishment on New Bareground subroutine ended at: ',dtstr
 
-    ! write intermediate coverage file for post high dispersal establishment on new bareground (1 = first time high dispersal is called)- also write summary output file
+    ! Write intermediate coverage file for post high dispersal establishment on new bareground (1.est.newb)
     if (write_intermediate_files == 1) then
-        call write_output('N','.1.est.newb',1)   !currently this is a 11*character string being passed in to write_output - currently needs to be padded with spaces
+        call write_output('N','.1.est.newb',0)   !currently this is a 11*character string being passed in to write_output - currently needs to be padded with spaces
         call date_and_time(VALUES=dtvalues)
         write(dtstr,8889) dtvalues(1),'-',dtvalues(2),'-',dtvalues(3),' ',dtvalues(5),':',dtvalues(6),':',dtvalues(7)
         write(  *,*) 'Write Intermediate Output subroutine ended at: ',dtstr
@@ -140,9 +144,9 @@ program main
     write(  *,*) 'Sum Unoccupied Flotant subroutine ended at: ',dtstr
     write(000,*) 'Sum Unoccupied Flotant ended at: ',dtstr
 
-    ! write intermediate coverage file for post mortality - also write summary output file
+    ! Write intermediate coverage file for post mortality (2.mort)
     if (write_intermediate_files == 1) then
-        call write_output('N','.2.mort    ',1)   !currently this is a 11*character string being passed in to write_output - currently needs to be padded with spaces
+        call write_output('N','.2.mort    ',0)   !currently this is a 11*character string being passed in to write_output - currently needs to be padded with spaces
         call date_and_time(VALUES=dtvalues)
         write(dtstr,8889) dtvalues(1),'-',dtvalues(2),'-',dtvalues(3),' ',dtvalues(5),':',dtvalues(6),':',dtvalues(7)
         write(  *,*) 'Write Intermediate Output subroutine ended at: ',dtstr
@@ -175,9 +179,9 @@ program main
     write(  *,*) 'Update Flotant subroutine ended at: ',dtstr
     write(000,*) 'Update Flotant subroutine ended at: ',dtstr
 
-    ! write intermediate coverage file for post standard establishment routine - also write summary output file
+    ! Write intermediate coverage file for post standard establishment routine (3.est.stnd)
     if (write_intermediate_files == 1) then
-        call write_output('N','.3.est.stnd',1)   !currently this is a 11*character string being passed in to write_output - currently needs to be padded with spaces
+        call write_output('N','.3.est.stnd',0)   !currently this is a 11*character string being passed in to write_output - currently needs to be padded with spaces
         call date_and_time(VALUES=dtvalues)
         write(dtstr,8889) dtvalues(1),'-',dtvalues(2),'-',dtvalues(3),' ',dtvalues(5),':',dtvalues(6),':',dtvalues(7)
         write(  *,*) 'Write Intermediate Output subroutine ended at: ',dtstr
@@ -191,15 +195,14 @@ program main
     write(  *,*) 'High Dispersal Establishment on Remaining Bareground subroutine ended at: ',dtstr
     write(000,*) 'High Dispersal Establishment on Remaining Bareground subroutine ended at: ',dtstr
     
-    ! write intermediate coverage file for post high establishment on remaining bareground - also write summary output file
+    ! Write intermediate coverage file for post high establishment on remaining bareground (4.est.remb)
     if (write_intermediate_files == 1) then
-        call write_output('N','.4.est.remb',1)   !currently this is a 11*character string being passed in to write_output - currently needs to be padded with spaces
+        call write_output('N','.4.est.remb',0)   !currently this is a 11*character string being passed in to write_output - currently needs to be padded with spaces
         call date_and_time(VALUES=dtvalues)
         write(dtstr,8889) dtvalues(1),'-',dtvalues(2),'-',dtvalues(3),' ',dtvalues(5),':',dtvalues(6),':',dtvalues(7)
         write(  *,*) 'Write Intermediate Output subroutine ended at: ',dtstr
         write(000,*) 'Write Intermediate Output subroutine ended at: ',dtstr    
     end if
-
 
     ! Apply coverage changes caused by acute salinity
     call acute_salinity_lnd
@@ -234,8 +237,14 @@ program main
     ! Add the whole Morph pixel portion of the dead flotant to water -  ! DON'T NEED THIS SINCE MORPH WILL REMOVE DEAD FLT AND CONVERT TO WATER
     !coverages(:,wti) = coverages(:,wti) + (dem_pixel_proportion*floor(coverages(:,dfi)/dem_pixel_proportion))
 
+    ! Calculate percent habitat coverages and weighted FFIBS scores
+    call coverage_calcs
+    call date_and_time(VALUES=dtvalues)
+    write(dtstr,8889) dtvalues(1),'-',dtvalues(2),'-',dtvalues(3),' ',dtvalues(5),':',dtvalues(6),':',dtvalues(7)
+    write(  *,*) 'Calculation of summary habitat coverages subroutine ended at: ',dtstr
+    write(000,*) 'Calculation of summary habitat coverages subroutine ended at: ',dtstr    
     
-    ! write final coverage file for End of Year landscape - also write summary output file
+    ! Write final coverage file for End of Year landscape - also write summary output file
     call write_output('O','           ',1)   !currently this is a 11*character string being passed in to write_output - currently needs to be padded with spaces
     call date_and_time(VALUES=dtvalues)
     write(dtstr,8889) dtvalues(1),'-',dtvalues(2),'-',dtvalues(3),' ',dtvalues(5),':',dtvalues(6),':',dtvalues(7)
