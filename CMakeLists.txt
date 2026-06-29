@@ -42,7 +42,7 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/CMakeFiles)
 #...Set the version string (used for libraries)
 SET(ICMLVM_VERSION_MAJOR 26)
 SET(ICMLVM_VERSION_MINOR  1)
-SET(ICMLVM_VERSION_PATCH  0)
+SET(ICMLVM_VERSION_PATCH  0.debug)
 SET(ICMLVM_VERSION_STRING ${ICMLVM_VERSION_MAJOR}.${ICMLVM_VERSION_MINOR}.${ICMLVM_VERSION_PATCH})
 ###########################################################################
 
