@@ -26,7 +26,7 @@ subroutine land_change
 
     
     
-    water_from_morph = water_from_morph * (1 - coverages(:,nmi))                                  ! Adjust the Morph water to be comparable to the Veg water (Morph treats NOTMOD as NoData, so the %water does not account for NOTMOD. Morph Water + Morph Land + Veg NOTMOD = 100%)
+    
    
     do ig = 1, ngrid                                                                                ! Loop through every grid cell comparing the amount of water and making the needed changes
         no_change_threshold = dem_pixel_proportion(ig)                                              ! portion of LAVegMod grid cell that is one DEM pixel - can't have land change less than one pixel
@@ -50,8 +50,14 @@ subroutine land_change
                 total_flotant = total_flotant + coverages(ig,fli)
             end do
            
-            morph_land = 1.0 - (water_from_morph(ig) + coverages(ig,nmi) + total_flotant)         ! calculate land area from last ICM-Morph outputs (ignoring NotMod)
-            veg_land = 1.0 - (coverages(ig,wti)+ coverages(ig,bni) + total_flotant)             ! calculate land area from last ICM-LAVegMod outputs
+            morph_land = 1.0 - (water_from_morph(ig) + coverages(ig,nmi) + total_flotant)           ! calculate land area that would equal ICM-Morph output non-water area
+            if(morph_land < 0) then                                                                 ! check if there is a NotMod (veg) vs Upland (morph) disagreement
+                coverages(ig,nmi) = 1.0 - (water_from_morph(ig) + total_flotant)                    ! add correction to NotMod if there was a disagreement between Veg and Morph (unlikely - but failsafe backup)
+                morph_land = 0.0
+            end if
+
+            veg_land = 1.0 - (coverages(ig,wti)+ coverages(ig,bni) + total_flotant)                 ! calculate all modeled (e.g., non NotMod) land area from last ICM-LAVegMod outputs
+            scale_land = 0.0                                                                        ! initial scale_land
             
             if (morph_land < 0.0) then
                 write(*,*) '*****************WARNING************************'                       ! print a warning message -- why is morph land less than 0?

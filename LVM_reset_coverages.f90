@@ -29,6 +29,8 @@ subroutine reset_coverages
     ! The residual dead_flotant will remain as the starting amount of dead_flotant for the current model year.
     ! Filter to ensure non-negative values.
     
+    coverages(:,wti) = coverages(:,wti) + dem_pixel_proportion(:)*floor(coverages(:,dfi)/dem_pixel_proportion(:))           !ZW added 6/29/2026
+
     coverages(:,dfi) = max( 0.0, coverages(:,dfi) - dem_pixel_proportion(:)*floor(coverages(:,dfi)/dem_pixel_proportion(:)) )
 
 end
