@@ -56,7 +56,7 @@ subroutine land_change
                 morph_land = 0.0
             end if
 
-            veg_land = 1.0 - (coverages(ig,wti)+ coverages(ig,bni) + total_flotant)                 ! calculate all modeled (e.g., non NotMod) land area from last ICM-LAVegMod outputs
+            veg_land = 1.0 - (coverages(ig,wti)+ coverages(ig,nmi) + total_flotant)                 ! calculate all modeled (e.g., non NotMod) land area from last ICM-LAVegMod outputs
             scale_land = 0.0                                                                        ! initial scale_land
             
             if (morph_land < 0.0) then
