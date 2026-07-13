@@ -51,7 +51,7 @@ subroutine land_change
             end do
            
             morph_land = 1.0 - (water_from_morph(ig) + coverages(ig,nmi) + total_flotant)         ! calculate land area from last ICM-Morph outputs (ignoring NotMod)
-            veg_land = 1.0 - (coverages(ig,wti)+ coverages(ig,bni) + total_flotant)             ! calculate land area from last ICM-LAVegMod outputs
+            veg_land = 1.0 - (coverages(ig,wti)+ coverages(ig,bni) + total_flotant)             ! calculate land area from last ICM-LAVegMod outputs; note, if there is land loss, there should be no new bareground, so bni should not be needed here
             
             if (morph_land < 0.0) then
                 write(*,*) '*****************WARNING************************'                       ! print a warning message -- why is morph land less than 0?

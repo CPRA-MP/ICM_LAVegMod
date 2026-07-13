@@ -52,24 +52,31 @@ subroutine oneway_interp(variable1,table,variable1bins,var1bin_n,yint)
 
     ! Figure out if the min_dif bin value is above or below the given value and assign above and below 
     if ( (variable1bins(closest_index)-variable1) < 0 ) then
-        below = variable1bins(closest_index)
-        above = variable1bins(closest_index+1)
-    elseif ( (variable1bins(closest_index)-variable1) == 0 ) then ! same value no interpolation needed 
-        below = variable1bins(closest_index)
-        above = variable1bins(closest_index)
-    else ! (variable1bins(closest_index)-variable1) > 0
-        above = variable1bins(closest_index)
-        below = variable1bins(closest_index-1)
+        below = closest_index
+        above = closest_index+1
+    elseif ((variable1bins(closest_index)-variable1) > 0) then
+        above = closest_index
+        below = closest_index-1
+    else ! ( (variable1bins(closest_index)-variable1) == 0 ) then ! same value no interpolation needed 
+        below = closest_index
+        above = closest_index
+
     end if 
 
     ! Interpolate 
-    y1 = table(below)
-    x1 = variable1bins(below)
-    y2 = table(above)
-    x2 = variable1bins(above)
-    xint = variable1
-    yint = y1-(((y1-y2)/(x1-x2))*(x1-xint))
-   
+    if (above == below) then ! no interpolation needed 
+        yint = table(below)
+    else
+        y1 = table(below)
+        x1 = variable1bins(below)
+        y2 = table(above)
+        x2 = variable1bins(above)
+        xint = variable1
+        yint = y1-(((y1-y2)/(x1-x2))*(x1-xint))
+
+    yint = max(0.0_sp, min(1.0_sp, yint))                           ! force yint to be between 0.0 and 1.0
+
+    
 end 
 
 
