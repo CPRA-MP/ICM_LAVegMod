@@ -35,7 +35,7 @@ subroutine mort_est_prob
     real(sp) :: tol                     ! level of tolerance allowed in the sum; values +/- this value are considered in range
 
     establish_P = 0                                     ! initialize with all 0s; for coverages that do not calculate an establishment probability, the value will remain 0 (nothing will establish)
-    mortality_P = 0                                     ! initialize with all 0s; for coverages that do not calculate an mortality probability, the value will remain 0 (nothing will die)
+    mortality_P = 0                                     ! initialize with all 0s; for coverages that do not calculate a mortality probability, the value will remain 0 (nothing will die)
 
     do ig = 1,ngrid                                     ! Loop through every grid cell
         if (grid_comp(ig) > 0) then                     ! check that grid cell has an allowable ICM-Hydro compartment ID
@@ -48,8 +48,8 @@ subroutine mort_est_prob
                     elseif (cover_group == 4 .or. cover_group == 5 .or. cover_group >= 9) then    ! For swamp forest, thick and thin floating marsh, emergent wetland (fresh, intermediate, brackish, and saline) (coverage groups 4-5, 9-13), calculate establishment probability from wlv and annual salinity
                         call twoway_interp(sal_av_yr(grid_comp(ig)), wlv_smr(grid_comp(ig)), establish_tables(:,:,ic), est_Y_bins(:,ic), n_Y_bins, est_X_bins(:,ic), n_X_bins, establish_P(ig,ic))             ! twoway_interp(variable1, variable2, table, variable1bins, var1bin_n, variable2bins, var2bin_n, yint)
                         call twoway_interp(sal_av_yr(grid_comp(ig)), wlv_smr(grid_comp(ig)), mortality_tables(:,:,ic), mort_Y_bins(:,ic), n_Y_bins, mort_X_bins(:,ic), n_X_bins, mortality_P(ig,ic))            ! twoway_interp(variable1, variable2, table, variable1bins, var1bin_n, variable2bins, var2bin_n, yint)
-                    else                                                                           ! For water, not mod, new bareground, old bareground, bareground flotant, dead flotant (coverage groups 0-3, 6-7), do nothing
-                        return ! is that right? 
+                    !else                                                                           ! For water, not mod, new bareground, old bareground, bareground flotant, dead flotant (coverage groups 0-3, 6-7), do nothing
+                         ! return ! is that right? 2026: No, return breaks the whole subroutine potenially at ic = 1; taking the else statement out all together
                     endif
                 end do 
             end if
@@ -72,7 +72,7 @@ subroutine mort_est_prob
                 if (cover_group == 14 .or. cover_group < 4) then
                     ! do nothing, leave as is
                 else
-                    establish_P(ig,ic) = 0.0
+                    establish_P(ig,ic) = 0.0                ! If the initial map has non-barrier island species on barrier island cells, then the current code only stops them from expanding and does not remove them
                 end if
             end do
         end if

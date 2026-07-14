@@ -201,7 +201,7 @@ program main
     write(000,*) 'Acute Salinity Land subroutine ended at: ',dtstr
 
     ! Apply coverage changes in flotant species caused by acute salinity 
-    call acute_salinity_flt
+    call acute_salinity_flt ! should be removed for MP2029
     call date_and_time(VALUES=dtvalues)
     write(dtstr,8889) dtvalues(1),'-',dtvalues(2),'-',dtvalues(3),' ',dtvalues(5),':',dtvalues(6),':',dtvalues(7)
     write(  *,*) 'Acute Salinity Flotant subroutine ended at: ',dtstr
