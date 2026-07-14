@@ -52,11 +52,11 @@ subroutine land_change
            
             morph_land = 1.0 - (water_from_morph(ig) + coverages(ig,nmi) + total_flotant)           ! calculate land area that would equal ICM-Morph output non-water area
             if(morph_land < 0) then                                                                 ! check if there is a NotMod (veg) vs Upland (morph) disagreement
-                coverages(ig,nmi) = max(0.0,1.0 - (water_from_morph(ig) + total_flotant))                    ! add correction to NotMod if there was a disagreement between Veg and Morph (unlikely - but failsafe backup)
+                coverages(ig,nmi) = max(0.0,1.0 - (water_from_morph(ig) + total_flotant))           ! add correction to NotMod if there was a disagreement between Veg and Morph (unlikely - but failsafe backup)
                 morph_land = 0.0
             end if
 
-            veg_land = 1.0 - (coverages(ig,wti)+ coverages(ig,nmi) + total_flotant)                 ! calculate all modeled (e.g., non NotMod) land area from last ICM-LAVegMod outputs
+            veg_land = 1.0 - (coverages(ig,wti) + coverages(ig,nmi) + total_flotant)                ! calculate all modeled (e.g., non NotMod) land area from last ICM-LAVegMod outputs; note if there is land loss, there should be no new bareground, so coverages(ig,bni) is not needed here
             scale_land = 0.0                                                                        ! initial scale_land
             
             if (morph_land < 0.0) then

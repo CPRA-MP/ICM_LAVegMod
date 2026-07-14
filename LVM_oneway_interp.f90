@@ -22,54 +22,60 @@ subroutine oneway_interp(variable1,table,variable1bins,var1bin_n,yint)
     ! dummy local variables populated with arrays passed into subroutine
     integer,intent(in) :: var1bin_n                             ! dummy variable to hold the number of 'bins' used to discretizethe the interpolation table in the variable1 dimension
     real(sp),intent(in) :: variable1                            ! dummy variable to hold value of variable used in interpolation. For the 2023 Master Plan, variable1 was elevation for barrier island species establishment/mortality tables.
-    real(sp),dimension(var1bin_n),intent(in) :: table            ! dummy variable to hold one-dimensional table interpolation is performed on.
+    real(sp),dimension(var1bin_n),intent(in) :: table           ! dummy variable to hold one-dimensional table interpolation is performed on.
     real(sp),dimension(var1bin_n),intent(in) :: variable1bins   ! dummy variable to hold the values (in same units of variable1) defining the lower bound of the discretization 'bins' of the interpolation table
     real(sp),intent(inout) :: yint                              ! dummy variable to hold the final interpolated value, returned to parent subroutine
     
     ! local variables 
-    integer   :: ib                               ! iterator over n_X_bins 
-    real(sp)  :: above                            ! value of establisment/mortality table above the input value (variable1)
-    real(sp)  :: below                            ! value of establisment/mortality table above the input value (variable1)
-    real(sp)  :: min_dif                          ! the smallest difference of the differences between variable1 and each variable1bins values
-    real(sp)  :: dif                              ! difference between variable1 and each variable1bins values
-    integer   :: closest_index                    ! index within variable1bins for either the above or below value
-    real(sp)  :: y1                               ! variable used in the linear interpolation formula 
-    real(sp)  :: x1                               ! variable used in the linear interpolation formula 
-    real(sp)  :: y2                               ! variable used in the linear interpolation formula 
-    real(sp)  :: x2                               ! variable used in the linear interpolation formula 
-    real(sp)  :: xint                             ! variable used in the linear interpolation formula 
+    integer   :: ib                                             ! iterator over n_X_bins 
+    real(sp)  :: above                                          ! value of establisment/mortality table above the input value (variable1)
+    real(sp)  :: below                                          ! value of establisment/mortality table above the input value (variable1)
+    real(sp)  :: min_dif                                        ! the smallest difference of the differences between variable1 and each variable1bins values
+    real(sp)  :: dif                                            ! difference between variable1 and each variable1bins values
+    integer   :: closest_index                                  ! index within variable1bins for either the above or below value
+    real(sp)  :: y1                                             ! variable used in the linear interpolation formula 
+    real(sp)  :: x1                                             ! variable used in the linear interpolation formula 
+    real(sp)  :: y2                                             ! variable used in the linear interpolation formula 
+    real(sp)  :: x2                                             ! variable used in the linear interpolation formula 
+    real(sp)  :: xint                                           ! variable used in the linear interpolation formula 
 
     ! Find the variable1 bin value closest to variable1 
-    min_dif = 3000                                          ! arbitary value, just must be larger than any expected differences
-    dif = 0                                                 ! initialize as 0 
-    do ib = 1, var1bin_n                                    ! loop through the bin values
-        dif = abs(variable1bins(ib) - variable1)            ! calculate the absolte value of the difference between each bin and the given value
-        if ( dif < min_dif ) then
-            closest_index = ib                              ! index for the value closest to the given value
-            min_dif = dif                                   ! absolute value of the smallest difference between the bin values and the given value
+    min_dif = 3000.0                                            ! arbitary value, just must be larger than any expected differences
+    dif = 0.0                                                   ! initialize as 0 
+    do ib = 1, var1bin_n                                        ! loop through the bin values
+        dif = abs(variable1bins(ib) - variable1)                ! calculate the absolte value of the difference between each bin and the given value
+        if ( dif < min_dif ) then   
+            closest_index = ib                                  ! index for the value closest to the given value
+            min_dif = dif                                       ! absolute value of the smallest difference between the bin values and the given value
         end if 
     end do
 
     ! Figure out if the min_dif bin value is above or below the given value and assign above and below 
     if ( (variable1bins(closest_index)-variable1) < 0 ) then
-        below = variable1bins(closest_index)
-        above = variable1bins(closest_index+1)
-    elseif ( (variable1bins(closest_index)-variable1) == 0 ) then ! same value no interpolation needed 
-        below = variable1bins(closest_index)
-        above = variable1bins(closest_index)
-    else ! (variable1bins(closest_index)-variable1) > 0
-        above = variable1bins(closest_index)
-        below = variable1bins(closest_index-1)
+        below = closest_index
+        above = closest_index+1
+    elseif ((variable1bins(closest_index)-variable1) > 0) then
+        above = closest_index
+        below = closest_index-1
+    else ! ( (variable1bins(closest_index)-variable1) == 0 ) then ! same value no interpolation needed 
+        below = closest_index
+        above = closest_index
+
     end if 
 
     ! Interpolate 
-    y1 = table(below)
-    x1 = variable1bins(below)
-    y2 = table(above)
-    x2 = variable1bins(above)
-    xint = variable1
-    yint = y1-(((y1-y2)/(x1-x2))*(x1-xint))
-   
-end 
+    if (above == below) then ! no interpolation needed 
+        yint = table(below)
+    else
+        y1 = table(below)
+        x1 = variable1bins(below)
+        y2 = table(above)
+        x2 = variable1bins(above)
+        xint = variable1
+        yint = y1-(((y1-y2)/(x1-x2))*(x1-xint))
 
+    yint = max(0.0, min(1.0, yint))                             ! force yint to be between 0.0 and 1.0
+
+    
+end 
 
