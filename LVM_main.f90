@@ -211,12 +211,13 @@ program main
     write(  *,*) 'Acute Salinity Land subroutine ended at: ',dtstr
     write(000,*) 'Acute Salinity Land subroutine ended at: ',dtstr
 
+    ! MP29 Recommendation was to remove acute salinity loss for flotant
     ! Apply coverage changes in flotant species caused by acute salinity 
-    call acute_salinity_flt
-    call date_and_time(VALUES=dtvalues)
-    write(dtstr,8889) dtvalues(1),'-',dtvalues(2),'-',dtvalues(3),' ',dtvalues(5),':',dtvalues(6),':',dtvalues(7)
-    write(  *,*) 'Acute Salinity Flotant subroutine ended at: ',dtstr
-    write(000,*) 'Acute Salinity Flotant subroutine ended at: ',dtstr
+    ! call acute_salinity_flt
+    ! call date_and_time(VALUES=dtvalues)
+    ! write(dtstr,8889) dtvalues(1),'-',dtvalues(2),'-',dtvalues(3),' ',dtvalues(5),':',dtvalues(6),':',dtvalues(7)
+    ! write(  *,*) 'Acute Salinity Flotant subroutine ended at: ',dtstr
+    ! write(000,*) 'Acute Salinity Flotant subroutine ended at: ',dtstr
 
     ! Round all coverages to the nearest 1 m^2 and check if anything is negative
     call round_coverages

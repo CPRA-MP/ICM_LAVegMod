@@ -102,7 +102,7 @@ subroutine land_change
                 end if  
                 
                 do ic=1,ncov
-                    if (cov_grp(ic) > 7) then                                                       ! skip coverage groups for water, bareground, not modeled, and flotant
+                    if (cov_grp(ic) > 9) then                                                       ! skip coverage groups for water, bareground, not modeled, flotant, swamp forest, and bottomland hardwood
                         coverages(ig,ic) = coverages(ig,ic) * scale_land
                     end if
                 end do
