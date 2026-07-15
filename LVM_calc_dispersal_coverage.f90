@@ -42,7 +42,7 @@ subroutine calc_dispersal_coverage
             do inb=1,max_neighbors
                 neighbor = nearest_neighbors(ig,inb)                            ! neighbor is a grid cell ID 
                 if (neighbor < 0) then                                          ! if neighbor index is -9999, then it has reached the end of nearest neighbors
-                    return
+                    exit                                                        ! exit the do-loop but not the whole subroutine 
                 else
                     numerator = numerator + (coverages(neighbor,ic) * grid_a(neighbor))
                     denominator = denominator + grid_a(neighbor)
@@ -57,7 +57,7 @@ subroutine calc_dispersal_coverage
                 do inb=1,max_neighbors
                     neighbor = near_neighbors(ig,inb)                           ! neighbor is a grid cell ID 
                     if (neighbor < 0) then                                      ! if neighbor index is -9999, then it has reached the end of near neighbors
-                        return
+                        exit                                                    ! exit the do-loop but not the whole subroutine 
                     else
                         numerator = numerator + (coverages(neighbor,ic) * grid_a(neighbor))
                         denominator = denominator + grid_a(neighbor)
