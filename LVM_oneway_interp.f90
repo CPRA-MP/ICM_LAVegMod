@@ -73,6 +73,7 @@ subroutine oneway_interp(variable1,table,variable1bins,var1bin_n,yint)
         x2 = variable1bins(above)
         xint = variable1
         yint = y1-(((y1-y2)/(x1-x2))*(x1-xint))
+    end if
 
     yint = max(0.0, min(1.0, yint))                             ! force yint to be between 0.0 and 1.0
 
