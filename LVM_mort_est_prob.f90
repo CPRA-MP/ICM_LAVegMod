@@ -74,7 +74,7 @@ subroutine mort_est_prob
                 if (cover_group == 14 .or. cover_group < 4) then
                     ! do nothing, leave as is
                 else
-                    establish_P(ig,ic) = 0.0                                                                                            ! If the initial map has non-barrier island species on barrier island cells, then the current code only stops them from expanding and does not remove them
+                    establish_P(ig,ic) = 0.0                                                                                            ! The initial map has been processed so all non-barrier island species are removed from the BI areas. However if the initial map has non-barrier island species on barrier island cells, then the current code only stops them from expanding and does not remove them
                 end if
             end do
         end if
