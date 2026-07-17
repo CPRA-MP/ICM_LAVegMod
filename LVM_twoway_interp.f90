@@ -47,11 +47,13 @@ subroutine twoway_interp(variable1, variable2, table, variable1bins, var1bin_n, 
     real(sp)  :: min_dif                                        ! the smallest difference of the differences between variable1 or variable2 and each bin values
     real(sp)  :: dif                                            ! difference between variable1 or variable2 and each bin value
     integer   :: closest_index                                  ! index corresponding to closest bin value  above/below or left/right
-    real(sp)  :: y1                                             ! variable used in the linear interpolation formula 
-    real(sp)  :: x1                                             ! variable used in the linear interpolation formula 
-    real(sp)  :: y2                                             ! variable used in the linear interpolation formula 
-    real(sp)  :: x2                                             ! variable used in the linear interpolation formula 
-    real(sp)  :: xint                                           ! variable used in the linear interpolation formula 
+    real(sp)  :: y1                                             ! upper Y value bounding the zone being interpolated between
+    real(sp)  :: y2                                             ! lower Y value bounding the zone being interpolated between
+    real(sp)  :: dy                                             ! distance between the upper and lower Y values being interpolated between
+    real(sp)  :: x1                                             ! upper X value bounding the zone being interpolated between
+    real(sp)  :: x2                                             ! lower X value bounding the zone being interpolated between 
+    real(sp)  :: dx                                             ! distance between the upper and lower X values being interpolated between
+    real(sp)  :: xint                                           ! interpolated X value 
     real(sp)  :: yint_varY1                                     ! variable used in the linear interpolation formula 
     real(sp)  :: yint_varY2                                     ! variable used in the linear interpolation formula 
 
@@ -99,16 +101,21 @@ subroutine twoway_interp(variable1, variable2, table, variable1bins, var1bin_n, 
     elseif ((variable2bins(closest_index)-variable2) > 0) then 
         right = closest_index
         left  = closest_index-1
-    else ! if ( (variable2bins(closest_index)-variable2) == 0 ) then    ! same value no interpolation needed 
+    else                                                        ! same value no interpolation needed 
         left  = closest_index
         right = closest_index
 
     end if 
     
-    ! Interpolate
+    ! Perform multi-directional interpolations
+    ! There are 4 interpolation options
+    !
+    ! #1 -  no interpolation needed in either dimension because both X and Y input variables are bin values in the input table - now a 2D lookup equation
     if  (above == below .and. left == right) then
         yint = table(below, left)
-    elseif (above == below .and. left /= right) then
+    
+    ! #2 - no interpolation in Y dimension is needed because Y input variable is a bin value in the input table - now a 1D interpolation in the X dimension
+    elseif (above == below .and. left /= right) then        
         yint_varY1 = table(below,left)
         yint_varY2 = table(below,right)
         y1 = yint_varY1
@@ -116,37 +123,71 @@ subroutine twoway_interp(variable1, variable2, table, variable1bins, var1bin_n, 
         y2 = yint_varY2
         x2 = variable2bins(right)
         xint = variable2       
-        yint = y1-(((y1-y2)/(x1-x2))*(x1-xint))
-    elseif (above /= below .and. left == right) then
+        dx = x1 - x2
+        dy = y1 - y2
+        if (dx == 0) then                                   ! if returned values of X being interpolated are the same  dx=0 will return div/0 error - but this means no interpolation is necessary since returned values are identical
+            yint = y1
+        else:    
+            yint = y1- ((dy/dx)*(x1-xint)))                 ! if dx nonzero and dy=zero, then yint=y1; if both are nonzero then interpolation will occur
+        
+    ! #3 - no interpolation in X dimension is needed because X input variable is a bin value in the input table - now a 1D interpolation in the Y dimension
+    elseif (above /= below .and. left == right) then        
         y1 = table(below,left)
         x1 = variable1bins(below)
         y2 = table(above,left)
         x2 = variable1bins(above)
         xint = variable1
-        yint = y1-(((y1-y2)/(x1-x2))*(x1-xint))
-    else 
+        dx = x1 - x2
+        dy = y1 - y2
+        if (dx == 0) then                                   ! if returned values of X being interpolated are the same  dx=0 will return div/0 error - but this means no interpolation is necessary since returned values are identical
+            yint = y1
+        else:    
+            yint = y1- ((dy/dx)*(x1-xint)))                 ! if dx<>0 and dy=0, then yint=y1; if both are nonzero then interpolation will occur
+    
+    ! #4 - interpolate in both X and Y dimensions since neither X nor Y are bin values in the input table - now a 2D interpolation in the X & Y dimensions    
+    else
+        ! #4a - first step in 2D interpolation is to interpolate for Y dimension on the left/lower end of X dimension - this is the Y value on the left side of the X bin, yint_varY1
         y1 = table(below,left)
         x1 = variable1bins(below)
         y2 = table(above,left)
         x2 = variable1bins(above)
         xint = variable2
-        yint_varY1 = y1-(((y1-y2)/(x1-x2))*(x1-xint))
+        dx = x1 - x2
+        dy = y1 - y2
+        if (dx == 0) then
+            yint = y1
+        else:    
+            yint_varY1 = y1- ((dy/dx)*(x1-xint)))
         
+        ! 4b - second step in 2D interplation is to interpolate for Y dimension on the right/upper end of X dimension - this is the Y value on the right side of the X bin, yint_varY2
         y1 = table(below,right)
         x1 = variable1bins(below)
         y2 = table(above,right)
         x2 = variable1bins(above)
         xint = variable2
-        yint_varY2 = y1-(((y1-y2)/(x1-x2))*(x1-xint))
+        dx = x1 - x2
+        dy = y1 - y2
+        if (dx == 0) then
+            yint = y1
+        else:    
+            yint_varY2 = y1- ((dy/dx)*(x1-xint)))
         
+        ! #4c - hird step in 2D interplation is to interpolate in the X dimension between the lower/left Y value, yint_varY1, and the upper/right Y value, yint_varY2
         y1 = yint_varY1
         x1 = variable2bins(left)
         y2 = yint_varY2
         x2 = variable2bins(right)
         xint = variable1
-        yint = y1-(((y1-y2)/(x1-x2))*(x1-xint))
+        dx = x1 - x2
+        dy = y1 - y2
+        if (dx == 0) then
+            yint = y1
+        else:    
+            yint = y1- ((dy/dx)*(x1-xint)))
+        
     end if
 
-    yint = max(0.0, min(1.0, yint))                           ! force yint to be between 0.0 and 1.0
+    
+    yint = max(0.0, min(1.0, yint))                         ! force yint to be between 0.0 and 1.0
 
 end
