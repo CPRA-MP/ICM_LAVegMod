@@ -33,7 +33,11 @@ subroutine mort_est_prob
     integer :: ic                                                                                                                       ! iterator over veg grid coverages (columns)
     integer :: cover_group                                                                                                              ! cover group value;  e.g., cover_group = 13 is saline emergent wetland vegetation
     real(sp) :: tol                                                                                                                     ! level of tolerance allowed in the sum; values +/- this value are considered in range
-                                                                                
+    real(sp) :: minY                                                                                                                    ! minimum value included in the establishment/mortality input tables
+    real(sp) :: maxY                                                                                                                    ! maximum value included in the establishment/mortality input tables
+    real(sp) :: var1                                                                                                                    ! filtered value of varialbe1 passed into oneway_interp to boound the variable by the extreme min/max values in the establishment/mortality input tables
+
+    
     establish_P = 0                                                                                                                     ! initialize with all 0s; for coverages that do not calculate an establishment probability, the value will remain 0 (nothing will establish)
     mortality_P = 0                                                                                                                     ! initialize with all 0s; for coverages that do not calculate a mortality probability, the value will remain 0 (nothing will die)
 
@@ -44,8 +48,15 @@ subroutine mort_est_prob
                     cover_group = cov_grp(ic)                                                                                           ! Identify which coverage group this coverage (column) belongs to
                     if (cover_group == 8 .or. cover_group == 14) then                                                                   ! For bottomland hardwood forest and barrier island species (coverage group 8 and 14), calculate establishment probability from elevation 
                                                                                                                                         !   - oneway_interp(variable1,table,variable1bins, var1bin_n, yint)
-                        call oneway_interp(grid_elev(ig), establish_tables(:,:,ic), est_Y_bins(:,ic), n_Y_bins, establish_P(ig,ic))
-                        call oneway_interp(grid_elev(ig), mortality_tables(:,:,ic), mort_Y_bins(:,ic), n_Y_bins, mortality_P(ig,ic))
+                        minY = min(est_Y_bins(:,ic))
+                        maxY = max(est_Y_bins(:,ic))
+                        var1 = max(min(grid_elev(ig),maxY),minY)                                                                        ! apply low/high pass filter to limit variable1 to be set to extreme values located in the input table
+                        call oneway_interp(var1, establish_tables(:,:,ic), est_Y_bins(:,ic), n_Y_bins, establish_P(ig,ic))
+
+                        minY = min(mort_Y_bins(:,ic))
+                        maxY = max(mort_Y_bins(:,ic))
+                        var1 = max(min(grid_elev(ig),maxY),minY)                                                                        ! apply low/high pass filter to limit variable1 to be set to extreme values located in the input table
+                        call oneway_interp(var1, mortality_tables(:,:,ic), mort_Y_bins(:,ic), n_Y_bins, mortality_P(ig,ic))
                         
                     elseif (cover_group == 4 .or. cover_group == 5 .or. cover_group >= 9) then                                          ! For swamp forest, thick and thin floating marsh, emergent wetland (fresh, intermediate, brackish, and saline) (coverage groups 4-5, 9-13), calculate establishment probability from wlv and annual salinity
                                                                                                                                         !   - twoway_interp(variable1, variable2, table, variable1bins, var1bin_n, variable2bins, var2bin_n, yint)

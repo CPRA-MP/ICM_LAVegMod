@@ -40,7 +40,7 @@ subroutine oneway_interp(variable1,table,variable1bins,var1bin_n,yint)
     real(sp)  :: xint                                           ! variable used in the linear interpolation formula 
 
     ! Find the variable1 bin value closest to variable1 
-    min_dif = 3000.0                                            ! arbitary value, just must be larger than any expected differences
+    min_dif = 999910.0                                            ! arbitary value, just must be larger than any expected differences
     dif = 0.0                                                   ! initialize as 0 
     do ib = 1, var1bin_n                                        ! loop through the bin values
         dif = abs(variable1bins(ib) - variable1)                ! calculate the absolte value of the difference between each bin and the given value
