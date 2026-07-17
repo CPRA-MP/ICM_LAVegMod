@@ -48,13 +48,13 @@ subroutine mort_est_prob
                     cover_group = cov_grp(ic)                                                                                           ! Identify which coverage group this coverage (column) belongs to
                     if (cover_group == 8 .or. cover_group == 14) then                                                                   ! For bottomland hardwood forest and barrier island species (coverage group 8 and 14), calculate establishment probability from elevation 
                                                                                                                                         !   - oneway_interp(variable1,table,variable1bins, var1bin_n, yint)
-                        minY = min(est_Y_bins(:,ic))
-                        maxY = max(est_Y_bins(:,ic))
+                        minY = minval(est_Y_bins(:,ic))
+                        maxY = maxval(est_Y_bins(:,ic))
                         var1 = max(min(grid_elev(ig),maxY),minY)                                                                        ! apply low/high pass filter to limit variable1 to be set to extreme values located in the input table
                         call oneway_interp(var1, establish_tables(:,:,ic), est_Y_bins(:,ic), n_Y_bins, establish_P(ig,ic))
 
-                        minY = min(mort_Y_bins(:,ic))
-                        maxY = max(mort_Y_bins(:,ic))
+                        minY = minval(mort_Y_bins(:,ic))
+                        maxY = maxval(mort_Y_bins(:,ic))
                         var1 = max(min(grid_elev(ig),maxY),minY)                                                                        ! apply low/high pass filter to limit variable1 to be set to extreme values located in the input table
                         call oneway_interp(var1, mortality_tables(:,:,ic), mort_Y_bins(:,ic), n_Y_bins, mortality_P(ig,ic))
                         
