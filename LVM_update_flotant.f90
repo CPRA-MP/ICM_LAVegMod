@@ -26,7 +26,8 @@ subroutine update_flotant
     integer :: ig                                                                                               ! iterator over the veg grid cell 
     real(sp) :: flt_thn_expansion                                                                               ! grid-level variable that will store the proportional increase in thin mat flotant
     real(sp) :: flt_thk_expansion                                                                               ! grid-level variable that will store the proportional increase in thick mat flotant
-
+    real(sp) :: old_bare_flt                                                                                    ! grid-level variable that will store the previous year's bare flotant value
+    
     exp_lkd_total_flt = 0.0                                                                                     ! initialize array before first use
     total_flt = 0.0                                                                                             ! initialize array before first use
     
@@ -53,9 +54,10 @@ subroutine update_flotant
         
         flt_thn_expansion = 0.0                                                                                 ! initialize variable for current grid
         flt_thk_expansion = 0.0                                                                                 ! initialize variable for current grid
+        old_bare_flt = 0.0                                                                                      ! initialize variable for current grid
         
         if (total_flt(ig) > 0.0) then                                                                           ! There is flotant in the cell 
-            old_bare_flt = coverages(:,bfi) - (newly_unoccupied_thn_flt + newly_unoccupied_thk_flt)             ! 1 - partition total bare float into portions that were:
+            old_bare_flt = coverages(ig,bfi) - (newly_unoccupied_thn_flt(ig) + newly_unoccupied_thk_flt(ig))    ! 1 - partition total bare float into portions that were:
                                                                                                                 !       - bare after previous year: candidate for establishment OR for conversion to dead float
                                                                                                                 !       - thin flotant that is newly bare this year: will be converted to dead float
                                                                                                                 !       - thick flotant that is newly bare this year: will be converted to bare float
