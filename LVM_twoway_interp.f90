@@ -58,10 +58,10 @@ subroutine twoway_interp(y, x, table, Yrows, nYrows, Xcols, nXcols, VALxy)
 
     real(sp),intent(in) :: x                                     !   value of input variable for the X-dimension of the 2d interpolation table (X-dimension is water level variability for MP29 establishment and mortality tables) 
     real(sp),intent(in) :: y                                     !   value of input variable for the Y-dimension of the 2d interpolation table (Y-dimension is salinity for MP29 establishment and mortality tables)  
-    real(sp),intent(out) :: VALxy			         !   final interpolated value for input variables X=(x) and Y=(y)
+    real(sp),intent(out) :: VALxy                                !   final interpolated value for input variables X=(x) and Y=(y)
 
-    integer,intent(in) :: nXcols			         !   number of columns for the X-dimension of the 2d interpolation table
-    integer,intent(in) :: nYrows			         !   number of rows for the Y-dimension of the 2d interpolation table
+    integer,intent(in) :: nXcols                                 !   number of columns for the X-dimension of the 2d interpolation table
+    integer,intent(in) :: nYrows                                 !   number of rows for the Y-dimension of the 2d interpolation table
     real(sp),dimension(nXcols),intent(in) :: Xcols               !   column header values for the X-dimension of the 2d interpolation table - ASCENDING ORDER FROM LEFT TO RIGHT
     real(sp),dimension(nYrows),intent(in) :: Yrows               !   row header values for the Y-dimension of the 2d interpolation table - ASCENDING ORDER FROM TOP TO BOTTOM
     real(sp),dimension(nXcols,nYrows),intent(in) :: table        !   2d table of values being interpolated across in the X and Y dimensions (establishment and mortality tables for each species in MP29)
