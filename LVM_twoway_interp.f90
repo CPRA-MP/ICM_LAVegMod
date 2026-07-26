@@ -1,198 +1,169 @@
-subroutine twoway_interp(variable1, variable2, table, variable1bins, var1bin_n, variable2bins, var2bin_n, yint)
-
-    ! inputs to the subroutine:
-    !   variable1 = the value of the input variable specific to the grid cell. For 2023 LAVegMod, variable1 is either mean annual salinity or water level variability. 
-    !   variable2 = the value of the input variable specific to the grid cell. For 2023 LAVegMod, variable1 is either mean annual salinity or water level variability. 
-    !   table = establishment or mortality table for one species (2D)
-    !   variable1bins = the slice of est_X_bins (or mort_X_bins, est_Y_bins, mort_Y_bins) for one species (1D)
-    !   var1bin_n = the number of 'bins' used to discretizethe the interpolation table in the variable1 dimension
-    !   var2bin_n = dummy variable to hold the number of 'bins' used to discretizethe the interpolation table in the variable2 dimension
-    !   variable2bins = the slice of est_Y_bins (or mort_X_bins, est_Y_bins, mort_Y_bins) for one species (1D)
+subroutine twoway_interp(y, x, table, Yrows, nYrows, Xcols, nXcols, VALxy)
     
+    ! inputs to the subroutine:
+    !   x      : the (x) value of the input variable specific to the grid cell. For MP29, X is water level variability. 
+    !   y      : the (y) value of the input variable specific to the grid cell. For MP29, Y is mean annual salinity. 
+    !   table  : establishment or mortality table for one species (2D) being interpolated over in the X- and Y-dimensions
+    !   Xcols  : the 1d array of column header values, in ascending order, for the X-dimension of (table). For MP29, Xcols is (est_X_bins), or (mort_X_bins), for one species (1D)
+    !   nXcols : the number of 'bins' used to discretizethe the interpolation table in the X-dimension
+    !   Yrows  : the 1d array of row header values, in ascending order, for the Y-dimension of (table). For MP29, Yrows is (est_Y_bins), or (mort_Y_bins), for one species (1D)
+    !   nYrows : the number of 'bins' used to discretizethe the interpolation table in the Y-dimension
+    !
     ! output of the subroutine:
-    !   yint = the interpolated value of establishment or mortality probability for the value of variable1 and variable2
-
-    ! global arrays updated by subroutine:
-    !   establish_P or mortality_P -- but not directly updated here, but rather the output updates one of those arrays (2026: not sure what this means)
-
+    !   VALxy  : the output interpolated value for the input x and y values
+    !
+    ! global arrays updated by subroutine for MP29:
+    !   establish_P : this subroutine returns the output (VALxy) and can return that into a variable, or in the case of LVM_mort_est_prob.f90 into a speficic location of a pre-existing array, specifically the (mortality_P) and (establishment_P) probablity arrays for a given grid cell(ig) and coverage type (ic)
+    !   mortality_P : this subroutine returns the output (VALxy) and can return that into a variable, or in the case of LVM_mort_est_prob.f90 into a speficic location of a pre-existing array, specifically the (mortality_P) and (establishment_P) probablity arrays for a given grid cell(ig) and coverage type (ic)
+    !
     ! global arrays used by subroutine:
-    !   n_X_bins
-    !   n_Y_bins
+    !   refer to the parent subroutines which call this subroutine, global arrays are passed into this subroutine and locally stored. Refer to the intent(in) and intent(out) variables defined below.
+    !   
+    !
+    ! This subroutine interpolates the establishment or mortality probability based on two inputs. For each grid cell, it is iteratively called across all species and interpolates one species' establishment/mortality table at a time. 
+    ! This subroutine is called for any LAVegMod cover group that uses two variables to define the probability of mortality and establishment.
+    ! For MP23 and MP29, the cover groups that use two variables are: swamp forest, thick and thin floating marsh, and emergent wetland (fresh, intermediate, brackish, and saline). 
+    ! For MP23 and MP29, the est and mort probabilities of those species are a function of mean annual salinity (sal_av_yr) and water level variabilty (wlv_smr). 
+    ! 
+    ! The logic/pseudocode for this 2-dimensional interpolation is based on the structure of the MP29 establishment and mortality tables that are ordered:
+    !    - in ascending order in the X-dimension from left to right, and
+    !    - in ascending order in the Y-dimension from top to bottom.
+    !
+    ! In the schematic below, to find the interpolated value at location (x,y) the boundaries surrounding the desired location at (x,y) are defined as:
+    !    - the upper left bound is to the (l)eft of (x), and (a)bove (y)
+    !    - the upper right bound is to the (r)ight of (x), and (a)bove (y)
+    !    - the lower left bound is to the (l)eft of (x), and (b)elow (y)
+    !    - the lower right bound is to the (r)ight of (x), and (b)elow (y)
+    !               
+    !               
+    !                              left       x         right
+    !                         (-) ----------------------------------------(+)
+    !                above     | VAL(l,a)   VAL(x,a)   VAL(r,a)     _ _           
+    !                          |                                     |   (y-above)
+    !                  y       | VAL(l,y)  *VAL(x,y)*  VAL(r,y)     _|_              
+    !                          |           
+    !                below     | VAL(l,b)   VAL(x,b)   VAL(r,b)           
+    !                          |
+    !                          |  |--(x-left)--|
+    !                          |
+    !                         (+)
+    !               
+    !               
+    !               
 
-    ! This subroutine interpolates the establishment or mortality probability based on two inputs. It acts on one species for one grid cell.
-    ! For 2023 LAVegMod, this subroutine applies to swamp forest, thick and thin floating marsh, and emergent wetland (fresh, intermediate, brackish, and saline). 
-    ! The est and mort probabilities of those species are a function of mean annual salinity (sal_av_yr) and water level variabilty (wlv_smr). 
-
-
+              
+               
     use params
     implicit none
 
-    ! dummy local variables populated with arrays passed into subroutine
-    integer,intent(in) :: var1bin_n                             ! dummy variable to hold the number of 'bins' used to discretizethe the interpolation table in the variable1 dimension
-    integer,intent(in) :: var2bin_n                             ! dummy variable to hold the number of 'bins' used to discretizethe the interpolation table in the variable2 dimension
-    real(sp),intent(in) :: variable1                            ! dummy variable to hold value of first variable used in 2d interpolation. For the 2023 Master Plan, variable1 was salinity on the establishment/mortality tables.
-    real(sp),intent(in) :: variable2                            ! dummy variable to hold value of second variable used in 2d interpolation. For the 2023 Master Plan, variable2 was water level variability on the establishment/mortality tables.
-    real(sp),dimension(var1bin_n,var2bin_n),intent(in) :: table ! dummy variable to hold two-dimensional table interpolation is performed on. variable1 is the X-axis of this table, variable2 is the Y-axis of this table.
-    real(sp),dimension(var1bin_n),intent(in) :: variable1bins   ! dummy variable to hold the values (in same units of variable1) defining the lower bound of the discretization 'bins' of the interpolation table in the variable1 dimension
-    real(sp),dimension(var2bin_n),intent(in) :: variable2bins   ! dummy variable to hold the values (in same units of variable2) defining the lower bound of the discretization 'bins' of the interpolation table in the variable2 dimension    
-    real(sp),intent(out) :: yint                                ! dummy variable to hold the final interpolated value, returned to parent subroutine
-    
-    ! local variables 
-    ! not used --> integer   :: ig                                             ! iterator over Veg grid cells
-    integer   :: ib                                             ! iterator over n_X_bins or n_Y_bins
-    integer   :: above                                          ! index of establisment/mort table bin value above the input value
-    integer   :: below                                          ! index of establisment/mort table bin value below the input value
-    integer   :: left                                           ! index of establisment/mort table bin value left of the input value
-    integer   :: right                                          ! index of establisment/mort table bin value right of the input value
-    real(sp)  :: min_dif                                        ! the smallest difference of the differences between variable1 or variable2 and each bin values
-    real(sp)  :: dif                                            ! difference between variable1 or variable2 and each bin value
-    integer   :: closest_index                                  ! index corresponding to closest bin value  above/below or left/right
-    real(sp)  :: y1                                             ! upper Y value bounding the zone being interpolated between
-    real(sp)  :: y2                                             ! lower Y value bounding the zone being interpolated between
-    real(sp)  :: dy                                             ! distance between the upper and lower Y values being interpolated between
-    real(sp)  :: x1                                             ! upper X value bounding the zone being interpolated between
-    real(sp)  :: x2                                             ! lower X value bounding the zone being interpolated between 
-    real(sp)  :: dx                                             ! distance between the upper and lower X values being interpolated between
-    real(sp)  :: xint                                           ! interpolated X value 
-    real(sp)  :: yint_varY1                                     ! variable used in the linear interpolation formula 
-    real(sp)  :: yint_varY2                                     ! variable used in the linear interpolation formula 
+    real(sp),intent(in) :: x                                     !   value of input variable for the X-dimension of the 2d interpolation table (X-dimension is water level variability for MP29 establishment and mortality tables) 
+    real(sp),intent(in) :: y                                     !   value of input variable for the Y-dimension of the 2d interpolation table (Y-dimension is salinity for MP29 establishment and mortality tables)  
+    real(sp),intent(out) :: VALxy			         !   final interpolated value for input variables X=(x) and Y=(y)
 
-    ! Find the variable1 bin value closest to variable1    
-    min_dif = 3000                                              ! arbitary value, just must be larger than any expected differences
-    dif = 0
-    closest_index = -9999
-    do ib = 1, var1bin_n                                        ! loop through the bin values
-        dif = abs(variable1bins(ib) - variable1)                ! calculate the absolute value of the difference between each bin and the given value
-        if (dif < min_dif) then
-            closest_index = ib                                  ! index for the value closest to the given value
-            min_dif = dif                                       ! absolute value of the smallest difference between the bin values and the given value
+    integer,intent(in) :: nXcols			         !   number of columns for the X-dimension of the 2d interpolation table
+    integer,intent(in) :: nYrows			         !   number of rows for the Y-dimension of the 2d interpolation table
+    real(sp),dimension(nXcols),intent(in) :: Xcols               !   column header values for the X-dimension of the 2d interpolation table - ASCENDING ORDER FROM LEFT TO RIGHT
+    real(sp),dimension(nYrows),intent(in) :: Yrows               !   row header values for the Y-dimension of the 2d interpolation table - ASCENDING ORDER FROM TOP TO BOTTOM
+    real(sp),dimension(nXcols,nYrows),intent(in) :: table        !   2d table of values being interpolated across in the X and Y dimensions (establishment and mortality tables for each species in MP29)
+    
+    integer :: ib                                                !   iterator over: (nXcols) or (nYrows)
+    integer :: closest_index                                     !   index corresponding to: the closest row to (x), or the closet column to (y)
+    real(sp) :: min_dif                                          !   the smallest difference between: (y) and the closest column header value, or (y) and the closest row header value
+    real(sp) :: dif                                              !   the difference between: (x) and any iterable column header value, or (y) and any iterable row header value
+    
+    integer :: left                                              !   index of column to the (left) of (x) in the 2d interpolation table     
+    integer :: right                                             !   index of column to the (right) of (x) in the 2d interpolation table 
+    integer :: above                                             !   index of row (above) (y) in the 2d interpolation table 
+    integer :: below                                             !   index of row (below) (y) in the 2d interpolation table 
+    real(sp) :: r                                                !   column header value to the (r)ight of (x) in the X-dimension
+    real(sp) :: l                                                !   column header value to the (l)eft of (x) in the X-dimension
+    real(sp) :: a                                                !   row header value (a)bove (y) in the Y-dimension
+    real(sp) :: b                                                !   row header value (b)elow (y) in the Y-dimension
+    real(sp) :: VALla                                            !   table lookup value for interpolation boundary to the (l)eft of (x)  & (a)bove (y)
+    real(sp) :: VALra                                            !   table lookup value for interpolation boundary to the (r)ight of (x) & (a)bove (y)
+    real(sp) :: VALlb                                            !   table lookup value for interpolation boundary to the (l)eft of (x)  & (b)elow (y)   
+    real(sp) :: VALrb                                            !   table lookup value for interpolation boundary to the (r)ight of (x) & (b)elow (y)   
+    real(sp) :: VALxa	                       	                 !   VAL(x,a) = interpolated value at (x), at the upper boundary (a)bove (y) 
+    real(sp) :: VALxb					         !   VAL(x,b) = interpolated value at (x), at the lower boundary (b)elow (y)
+    real(sp) :: x_int_wgt                                        !   interpolation weighting factor in the X-dimension
+    real(sp) :: y_int_wgt                                        !   interpolation weighting factor in the Y-dimension
+
+
+
+                                                                 ! Read Y-dimension of input 2d interpolation table and determine which rows are above and below the value of y and will be used as the bounds for interpolation in the Y-dimension
+    closest_index = -9999                                        ! arbitary large negative initial value
+    dif = 0                                                      ! set initial difference to zero
+    min_dif = 9999                                               ! arbitary large initial value
+
+    do ib = 1,nYrows                                             ! iterate over the rows in the Y-dimension of the input 2d interpolation table					    
+        dif = abs(Yrows(ib) - y)                                 ! calculate the distance between y and the header value of the current row
+        if (dif < min_dif) then                                  ! check if the value of the current row header is closer to y than previously closest row header
+            closest_index = ib                                   ! if closer, store the current index as the closest to y
+            min_dif = dif                                        ! calculate the magnitude of the distance between y and the row header value in the closest_index
         end if 
     end do
 
-    ! Figure out if the min_dif bin value is above or below the given value and assign above and below 
-    if ( (variable1bins(closest_index)-variable1) < 0) then
-        below = closest_index
-        above = closest_index+1
-    elseif ((variable1bins(closest_index)-variable1) > 0) then 
-        above = closest_index
-        below = closest_index-1
-    else !( (variable1bins(closest_index)-variable1) == 0) then  ! same value no interpolation needed 
-        below = closest_index
-        above = closest_index
-
+    if ( Yrows(closest_index) > y )  then                        ! if the min_dif row header value is greater than y:
+        below = closest_index                                    !    - then the closest_index is below y when ascending the row header values from top to bottom
+        above = below + 1                                        !    - set index for row above
+    elseif( Yrows(closest_index) < y ) then                      ! if the min_dif row header value is less than y
+        above = closest_index                                    !    - then the closest_index is above y when ascending the row header values from top to bottom
+        below = above - 1                                        !    - set index for row below
+    else                                                         ! if the min_dif row header value is equal to y
+        below = closest_index                                    !    - then the closest_index is at y and set to below
+        above = below                                            !    - above and below are equal
     end if 
 
-    ! Find the variable2 bin value closest to variable2   
-    min_dif = 3000.0                                            ! arbitary value, just must be larger than any expected differences
-    dif = 0.0 
-    closest_index = -9999                                         
-    do ib = 1, var2bin_n                                        ! loop through the bin values
-        dif = abs(variable2bins(ib) - variable2)                ! calculate the absolte value of the difference between each bin and the given value
-        if (dif < min_dif) then
-            closest_index = ib                                  ! index for the value closest to the given value
-            min_dif = dif                                       ! absolute value of the smallest difference between the bin values and the given value
+
+                                                                 ! Read X-dimension of input 2d interpolation table and determine which columns are to the right and to the left of the value of x and will be used as the bounds for interpolation in the X-dimension
+    closest_index = -9999                                        ! arbitary large negative initial value
+    dif = 0                                                      ! set initial difference to zero
+    min_dif = 9999                                               ! arbitary large initial value
+
+    do ib = 1,nXcols                                             ! iterate over the columns in the X-dimension of the input 2d interpolation table					    
+        dif = abs(Xcols(ib) - x)                                 ! calculate the distance between x and the header value of the current column
+        if (dif < min_dif) then                                  ! check if the value of the current column header is closer to x than previously closest column header
+            closest_index = ib                                   ! if closer, store the current index as the closest to x
+            min_dif = dif                                        ! calculate the magnitude of the distance between x and the column header value in the closest_index
         end if 
     end do
 
-    ! Figure out if the min_dif bin value is above or below the given value and assign above and below 
-    if ( (variable2bins(closest_index)-variable2) < 0 ) then
-        left  = closest_index
-        right = closest_index+1
-    elseif ((variable2bins(closest_index)-variable2) > 0) then 
-        right = closest_index
-        left  = closest_index-1
-    else                                                        ! same value no interpolation needed 
-        left  = closest_index
-        right = closest_index
-
+    if ( Xcols(closest_index) > x )  then                        ! if the min_dif column header value is greater than x:
+        right = closest_index                                    !    - then the closest_index is to the right of x when ascending the column header values from left to right
+        left = right - 1                                         !    - set index for column to the left
+    elseif( Xcols(closest_index) < x ) then                      ! if the min_dif column header value is less than x
+        left = closest_index                                     !    - then the closest_index is to the left of x when ascending the column header values from left to right
+        right = left + 1                                         !    - set index for column to the right
+    else                                                         ! if the min_dif column header value is equal to x
+        left = closest_index                                     !    - then the closest_index is at x and set to left
+        right = left                                             !    - right and left are equal
     end if 
-    
-    ! Perform multi-directional interpolations
-    ! There are 4 interpolation options
-    !
-    ! #1 -  no interpolation needed in either dimension because both X and Y input variables are bin values in the input table - now a 2D lookup equation
-    if  (above == below .and. left == right) then
-        yint = table(below, left)
-    
-    ! #2 - no interpolation in Y dimension is needed because Y input variable is a bin value in the input table - now a 1D interpolation in the X dimension
-    elseif (above == below .and. left /= right) then        
-        yint_varY1 = table(below,left)
-        yint_varY2 = table(below,right)
-        y1 = yint_varY1
-        x1 = variable2bins(left)
-        y2 = yint_varY2
-        x2 = variable2bins(right)
-        xint = variable2       
-        dx = x1 - x2
-        dy = y1 - y2
-        if (dx == 0) then                                   ! if returned values of X being interpolated are the same  dx=0 will return div/0 error - but this means no interpolation is necessary since returned values are identical
-            yint = y1
-        else    
-            yint = y1- ((dy/dx)*(x1-xint))                 ! if dx nonzero and dy=zero, then yint=y1; if both are nonzero then interpolation will occur
-        end if
-        
-    ! #3 - no interpolation in X dimension is needed because X input variable is a bin value in the input table - now a 1D interpolation in the Y dimension
-    elseif (above /= below .and. left == right) then        
-        y1 = table(below,left)
-        x1 = variable1bins(below)
-        y2 = table(above,left)
-        x2 = variable1bins(above)
-        xint = variable1
-        dx = x1 - x2
-        dy = y1 - y2
-        if (dx == 0) then                                   ! if returned values of X being interpolated are the same  dx=0 will return div/0 error - but this means no interpolation is necessary since returned values are identical
-            yint = y1
-        else    
-            yint = y1- ((dy/dx)*(x1-xint))                 ! if dx<>0 and dy=0, then yint=y1; if both are nonzero then interpolation will occur
-        end if
-        
-    ! #4 - interpolate in both X and Y dimensions since neither X nor Y are bin values in the input table - now a 2D interpolation in the X & Y dimensions    
-    else
-        ! #4a - first step in 2D interpolation is to interpolate for Y dimension on the left/lower end of X dimension - this is the Y value on the left side of the X bin, yint_varY1
-        y1 = table(below,left)
-        x1 = variable1bins(below)
-        y2 = table(above,left)
-        x2 = variable1bins(above)
-        xint = variable2
-        dx = x1 - x2
-        dy = y1 - y2
-        if (dx == 0) then
-            yint = y1
-        else    
-            yint_varY1 = y1- ((dy/dx)*(x1-xint))
-        end if
-        
-        ! 4b - second step in 2D interplation is to interpolate for Y dimension on the right/upper end of X dimension - this is the Y value on the right side of the X bin, yint_varY2
-        y1 = table(below,right)
-        x1 = variable1bins(below)
-        y2 = table(above,right)
-        x2 = variable1bins(above)
-        xint = variable2
-        dx = x1 - x2
-        dy = y1 - y2
-        if (dx == 0) then
-            yint = y1
-        else    
-            yint_varY2 = y1- ((dy/dx)*(x1-xint))
-        end if
-        
-        ! #4c - hird step in 2D interplation is to interpolate in the X dimension between the lower/left Y value, yint_varY1, and the upper/right Y value, yint_varY2
-        y1 = yint_varY1
-        x1 = variable2bins(left)
-        y2 = yint_varY2
-        x2 = variable2bins(right)
-        xint = variable1
-        dx = x1 - x2
-        dy = y1 - y2
-        if (dx == 0) then
-            yint = y1
-        else    
-            yint = y1- ((dy/dx)*(x1-xint))
-        end if
-        
-    end if
 
+
+    r = Xcols(right)                                             ! set column header value to the right of the interpolation bounds in X-dimension
+    l = Xcols(left)                                              ! set column header value to the leftt of the interpolation bounds in X-dimension
+    b = Yrows(below)                                             ! set column header value below the interpolation bounds in Y-dimension
+    a = Yrows(above)                                             ! set column header value above the interpolation bounds in Y-dimension
     
-    yint = max(0.0, min(1.0, yint))                         ! force yint to be between 0.0 and 1.0
+    VALla = table(left,above)                                    ! lookup value from table at the upper left interpolation bound to the left of and above x
+    VALra = table(right,above)                                   ! lookup value from table at the upper right interpolation bound to the right of and above x
+    VALlb = table(left,below)                                    ! lookup value from table at the lower left interpolation bound to the left of and below x
+    VALrb = table(right,below)                                   ! lookup value from table at the lower right interpolation bound to the right of and below x
+    
+    if (r==l) then                                               ! if the right and left bounding values for interpolation in the X-dimension are the same
+        x_int_wgt = 0.0				                 !    - set the X-dimensional interpolation weighting factor to zero
+    else                                                         ! if the right and left bounding values for interpolation in the X-dimension are not the same
+        x_int_wgt = (x-l)/(r-l)                                  !     - scale the magnitude from right to left by the distance between the left bound and x
+    endif
+
+    if (a==b) then                                               ! if the below and above bounding values for interpolation in the Y-dimension are the same
+        y_int_wgt = 0.0				                 !    - set the Y-dimensional interpolation weighting factor to zero
+    else                                                         ! if the below and above bounding values for interpolation in the Y-dimension are not the same
+        y_int_wgt = (y-a)/(b-a)                                  !     - scale the magnitude from below to above by the distance between the above bound and y
+    endif
+
+    VALxa = VALla + (VALra - VALla) * x_int_wgt                 ! interpolate in the X-dimension for the row above y: VAL(x,a)
+    VALxb = VALlb + (VALrb - VALlb) * x_int_wgt                 ! interpolate in the X-dimension for the row below y: VAL(x,b)
+    VALxy = VALxa + (VALxb - VALxa) * y_int_wgt                 ! interpolate in the Y-dimension between the above value at x [VAL(x,a)] and the below value [VAL(x,b)] at x
 
 end
