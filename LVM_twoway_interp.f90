@@ -153,13 +153,13 @@ subroutine twoway_interp(y, x, table, Yrows, nYrows, Xcols, nXcols, VALxy)
     if (r==l) then                                               ! if the right and left bounding values for interpolation in the X-dimension are the same
         x_int_wgt = 0.0				                 !    - set the X-dimensional interpolation weighting factor to zero
     else                                                         ! if the right and left bounding values for interpolation in the X-dimension are not the same
-        x_int_wgt = (x-l)/(r-l)                                  !     - scale the magnitude from right to left by the distance between the left bound and x
+        x_int_wgt = (x-l)/(r-l)                                  !     - scale the magnitude from left to right by the distance between the left bound and x
     endif
 
     if (a==b) then                                               ! if the below and above bounding values for interpolation in the Y-dimension are the same
         y_int_wgt = 0.0				                 !    - set the Y-dimensional interpolation weighting factor to zero
     else                                                         ! if the below and above bounding values for interpolation in the Y-dimension are not the same
-        y_int_wgt = (y-a)/(b-a)                                  !     - scale the magnitude from below to above by the distance between the above bound and y
+        y_int_wgt = (y-a)/(b-a)                                  !     - scale the magnitude from above to below by the distance between the above bound and y
     endif
 
     VALxa = VALla + (VALra - VALla) * x_int_wgt                 ! interpolate in the X-dimension for the row above y: VAL(x,a)
