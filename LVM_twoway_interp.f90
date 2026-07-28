@@ -68,7 +68,7 @@ subroutine twoway_interp(y, x, table, Yrows, nYrows, Xcols, nXcols, VALxy)
     
     integer :: ib                                                !   iterator over: (nXcols) or (nYrows)
     integer :: closest_index                                     !   index corresponding to: the closest row to (x), or the closet column to (y)
-    real(sp) :: min_dif                                          !   the smallest difference between: (y) and the closest column header value, or (y) and the closest row header value
+    real(sp) :: min_dif                                          !   the smallest difference between: (x) and the closest column header value, or (y) and the closest row header value
     real(sp) :: dif                                              !   the difference between: (x) and any iterable column header value, or (y) and any iterable row header value
     
     integer :: left                                              !   index of column to the (left) of (x) in the 2d interpolation table     
@@ -83,7 +83,7 @@ subroutine twoway_interp(y, x, table, Yrows, nYrows, Xcols, nXcols, VALxy)
     real(sp) :: VALra                                            !   table lookup value for interpolation boundary to the (r)ight of (x) & (a)bove (y)
     real(sp) :: VALlb                                            !   table lookup value for interpolation boundary to the (l)eft of (x)  & (b)elow (y)   
     real(sp) :: VALrb                                            !   table lookup value for interpolation boundary to the (r)ight of (x) & (b)elow (y)   
-    real(sp) :: VALxa	                       	                 !   VAL(x,a) = interpolated value at (x), at the upper boundary (a)bove (y) 
+    real(sp) :: VALxa                          	                 !   VAL(x,a) = interpolated value at (x), at the upper boundary (a)bove (y) 
     real(sp) :: VALxb                                            !   VAL(x,b) = interpolated value at (x), at the lower boundary (b)elow (y)
     real(sp) :: x_int_wgt                                        !   interpolation weighting factor in the X-dimension
     real(sp) :: y_int_wgt                                        !   interpolation weighting factor in the Y-dimension
@@ -151,7 +151,7 @@ subroutine twoway_interp(y, x, table, Yrows, nYrows, Xcols, nXcols, VALxy)
     VALrb = table(right,below)                                   ! lookup value from table at the lower right interpolation bound to the right of and below x
     
     if (r==l) then                                               ! if the right and left bounding values for interpolation in the X-dimension are the same
-        x_int_wgt = 0.0	                                         !    - set the X-dimensional interpolation weighting factor to zero
+        x_int_wgt = 0.0                                          !    - set the X-dimensional interpolation weighting factor to zero
     else                                                         ! if the right and left bounding values for interpolation in the X-dimension are not the same
         x_int_wgt = (x-l)/(r-l)                                  !     - scale the magnitude from left to right by the distance between the left bound and x
     endif
