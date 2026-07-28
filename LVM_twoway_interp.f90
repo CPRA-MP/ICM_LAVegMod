@@ -141,9 +141,9 @@ subroutine twoway_interp(y, x, table, Yrows, nYrows, Xcols, nXcols, VALxy)
 
 
     r = Xcols(right)                                             ! set column header value to the right of the interpolation bounds in X-dimension
-    l = Xcols(left)                                              ! set column header value to the leftt of the interpolation bounds in X-dimension
-    b = Yrows(below)                                             ! set column header value below the interpolation bounds in Y-dimension
-    a = Yrows(above)                                             ! set column header value above the interpolation bounds in Y-dimension
+    l = Xcols(left)                                              ! set column header value to the left of the interpolation bounds in X-dimension
+    b = Yrows(below)                                             ! set row header value below the interpolation bounds in Y-dimension
+    a = Yrows(above)                                             ! set row header value above the interpolation bounds in Y-dimension
     
     VALla = table(left,above)                                    ! lookup value from table at the upper left interpolation bound to the left of and above x
     VALra = table(right,above)                                   ! lookup value from table at the upper right interpolation bound to the right of and above x
