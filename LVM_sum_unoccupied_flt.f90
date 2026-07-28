@@ -22,12 +22,12 @@ subroutine sum_unoccupied_flt
     implicit none
 
     
-    integer :: il                               ! iterator over flotant species within the thin and thick mat categories
-    integer :: cover_group                      ! cover group value;  e.g., cover_group = 13 is saline emergent wetland vegetation
-
-    total_unoccupied_flt = 0.0                                                      ! initialize array to zero before first used
-    newly_unoccupied_thn_flt = 0.0                                                  ! initialize array to zero before first used
-    newly_unoccupied_thk_flt = 0.0                                                  ! initialize array to zero before first used
+    integer :: il                                                                               ! iterator over flotant species within the thin and thick mat categories
+    integer :: cover_group                                                                      ! cover group value;  e.g., cover_group = 13 is saline emergent wetland vegetation
+            
+    total_unoccupied_flt = 0.0                                                                  ! initialize array to zero before first used
+    newly_unoccupied_thn_flt = 0.0                                                              ! initialize array to zero before first used
+    newly_unoccupied_thk_flt = 0.0                                                              ! initialize array to zero before first used
     
     do il=1,flt_thn_cnt
         newly_unoccupied_thn_flt = newly_unoccupied_thn_flt + (coverages(:,flt_thn_indices(il))*mortality_p(:,flt_thn_indices(il)))
@@ -38,7 +38,8 @@ subroutine sum_unoccupied_flt
         coverages(:,flt_thk_indices(il)) = coverages(:,flt_thk_indices(il)) * (1 - mortality_p(:,flt_thk_indices(il)))
     end do
     
-    coverages(:,bfi) = coverages(:,bfi) + newly_unoccupied_thn_flt + newly_unoccupied_thk_flt   ! Add the newly unoccupied thin and thick mat flotant to the bareground flotant coverage (then it can be seen in the intermediate output)
+    coverages(:,bfi) = coverages(:,bfi) + newly_unoccupied_thn_flt + newly_unoccupied_thk_flt   ! Temporarily add the newly unoccupied thin and thick mat flotant to the bareground flotant coverage so that it can be seen in the intermediate output
+                                                                                                ! - these will need to be removed in LVM_update_flotant in order to properly determine what shifts from bare->dead and what is available for re-establishment
     total_unoccupied_flt = coverages(:,bfi)                                                     ! total unoccupied flotant is the same now as barground flotant
 
 
