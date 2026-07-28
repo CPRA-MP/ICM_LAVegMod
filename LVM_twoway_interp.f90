@@ -105,10 +105,10 @@ subroutine twoway_interp(y, x, table, Yrows, nYrows, Xcols, nXcols, VALxy)
 
     if ( Yrows(closest_index) > y )  then                        ! if the min_dif row header value is greater than y:
         below = closest_index                                    !    - then the closest_index is below y when ascending the row header values from top to bottom
-        above = below + 1                                        !    - set index for row above
+        above = below - 1                                        !    - set index for row above by moving back up the table (which is -1 in index values) (above index is always -1 value less than below index)
     elseif( Yrows(closest_index) < y ) then                      ! if the min_dif row header value is less than y
         above = closest_index                                    !    - then the closest_index is above y when ascending the row header values from top to bottom
-        below = above - 1                                        !    - set index for row below
+        below = above + 1                                        !    - set index for row below by  moving down the table (which is +1 in index values) (below index is always +1 value greater than above index)
     else                                                         ! if the min_dif row header value is equal to y
         below = closest_index                                    !    - then the closest_index is at y and set to below
         above = below                                            !    - above and below are equal
@@ -120,7 +120,7 @@ subroutine twoway_interp(y, x, table, Yrows, nYrows, Xcols, nXcols, VALxy)
     dif = 0                                                      ! set initial difference to zero
     min_dif = 9999                                               ! arbitary large initial value
 
-    do ib = 1,nXcols                                             ! iterate over the columns in the X-dimension of the input 2d interpolation table					    
+    do ib = 1,nXcols                                             ! iterate over the columns in the X-dimension of the input 2d interpolation table
         dif = abs(Xcols(ib) - x)                                 ! calculate the distance between x and the header value of the current column
         if (dif < min_dif) then                                  ! check if the value of the current column header is closer to x than previously closest column header
             closest_index = ib                                   ! if closer, store the current index as the closest to x
@@ -130,10 +130,10 @@ subroutine twoway_interp(y, x, table, Yrows, nYrows, Xcols, nXcols, VALxy)
 
     if ( Xcols(closest_index) > x )  then                        ! if the min_dif column header value is greater than x:
         right = closest_index                                    !    - then the closest_index is to the right of x when ascending the column header values from left to right
-        left = right - 1                                         !    - set index for column to the left
+        left = right - 1                                         !    - set index for column to the left by moving back one step (left index is always -1 value less than right index)
     elseif( Xcols(closest_index) < x ) then                      ! if the min_dif column header value is less than x
         left = closest_index                                     !    - then the closest_index is to the left of x when ascending the column header values from left to right
-        right = left + 1                                         !    - set index for column to the right
+        right = left + 1                                         !    - set index for column to the right by moving forward one index step (right index is always +1 value greater than left index)
     else                                                         ! if the min_dif column header value is equal to x
         left = closest_index                                     !    - then the closest_index is at x and set to left
         right = left                                             !    - right and left are equal
