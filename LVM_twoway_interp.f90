@@ -105,10 +105,10 @@ subroutine twoway_interp(y, x, table, Yrows, nYrows, Xcols, nXcols, VALxy)
 
     if ( Yrows(closest_index) > y )  then                        ! if the min_dif row header value is greater than y:
         igreaterY = closest_index                                !    - then the closest_index is greater than y when ascending the row header values from top to bottom
-        ilesserY = below - 1                                     !    - lesser index is always -1 value less than greater index
+        ilesserY = igreaterY - 1                                 !    - lesser index is always -1 value less than greater index
     elseif( Yrows(closest_index) < y ) then                      ! if the min_dif row header value is less than y
         ilesserY = closest_index                                 !    - then the closest_index is less than y when ascending the row header values from top to bottom
-        igreaterY = above + 1                                    !    -  greater index is always +1 value more than lesser index
+        igreaterY = ilesserY + 1                                 !    -  greater index is always +1 value more than lesser index
     else                                                         ! if the min_dif row header value is equal to y
         igreaterY = closest_index                                !    - then the closest_index is at y and set to lesser index
         ilesserY = igreaterY                                     !    - lesser and greater indices are equal
@@ -164,6 +164,6 @@ subroutine twoway_interp(y, x, table, Yrows, nYrows, Xcols, nXcols, VALxy)
 
     VALxl = VALll + (VALgl - VALll) * x_int_wgt                 ! interpolate in the X-dimension for the row index lesser than y: VAL(x,l)
     VALxg = VALlg + (VALgg - VALlg) * x_int_wgt                 ! interpolate in the X-dimension for the row index greater than y: VAL(x,g)
-    VALxy = VALxl + (VALxl - VALxl) * y_int_wgt                 ! interpolate in the Y-dimension between the bounding values calculated at x, [VAL(x,l)] and [VAL(x,g)]
+    VALxy = VALxl + (VALxg - VALxl) * y_int_wgt                 ! interpolate in the Y-dimension between the bounding values calculated at x, [VAL(x,l)] and [VAL(x,g)]
 
 end
