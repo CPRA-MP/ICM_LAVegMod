@@ -145,10 +145,10 @@ subroutine twoway_interp(y, x, table, Yrows, nYrows, Xcols, nXcols, VALxy)
     greaterY = Yrows(igreaterY)                                  ! set row header value that is the greater/upper of the interpolation bounds in Y-dimension
     lesserY = Yrows(ilesserY)                                    ! set row header value  that is the lesser/lower of the interpolation bounds in Y-dimension
     
-    VALll = table(lesserX,lesserY)                               ! lookup value from table at the upper left interpolation bound lesser than (x) and lesser than (y)
-    VALgl = table(greaterX,lesserY)                              ! lookup value from table at the upper right interpolation bound greater than (x) and lesser than (y)
-    VALlg = table(lesserX,greaterY)                              ! lookup value from table at the lower left interpolation bound lesser than (x) and greater than (y)
-    VALgg = table(greaterX,greaterY)                             ! lookup value from table at the lower right interpolation bound greater than (x) and greater than (y)
+    VALll = table(ilesserX,ilesserY)                               ! lookup value from table at the upper left interpolation bound lesser than (x) and lesser than (y)
+    VALgl = table(igreaterX,ilesserY)                              ! lookup value from table at the upper right interpolation bound greater than (x) and lesser than (y)
+    VALlg = table(ilesserX,igreaterY)                              ! lookup value from table at the lower left interpolation bound lesser than (x) and greater than (y)
+    VALgg = table(igreaterX,igreaterY)                             ! lookup value from table at the lower right interpolation bound greater than (x) and greater than (y)
     
     if (greaterX==lesserX) then                                  ! if the right and left bounding values for interpolation in the X-dimension are the same
         x_int_wgt = 0.0                                          !    - set the X-dimensional interpolation weighting factor to zero
