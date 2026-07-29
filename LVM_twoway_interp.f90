@@ -79,12 +79,12 @@ subroutine twoway_interp(y, x, table, Yrows, nYrows, Xcols, nXcols, VALxy)
     real(sp) :: greaterX                                         !   column  header value greater than (x) in the X-dimension
     real(sp) :: lesserY                                          !   row header value less than (y) in the Y-dimension
     real(sp) :: greaterY                                         !   row header value greater than (y) in the Y-dimension
-    real(sp) :: VALll                                            !   table lookup value for interpolation boundary lesser than (x)  & lesser than (y)
-    real(sp) :: VALgl                                            !   table lookup value for interpolation boundary greater than (x) & lesser than (y)
-    real(sp) :: VALlg                                            !   table lookup value for interpolation boundary lesser than (x)  & greater than (y)   
-    real(sp) :: VALgg                                            !   table lookup value for interpolation boundary greater than (x) & greater than (y)   
-    real(sp) :: VALxl                          	                 !   VAL(x,a) = interpolated value at (x), at the lesser Y-dimension boundary less than (y) 
-    real(sp) :: VALxg                                            !   VAL(x,b) = interpolated value at (x), at the greater Y-dimension boundary greater than (y)
+    real(sp) :: VALll                                            !   table lookup value for interpolation boundary (l)esser than (x)  & (l)esser than (y)
+    real(sp) :: VALgl                                            !   table lookup value for interpolation boundary (g)reater than (x) & (l)esser than (y)
+    real(sp) :: VALlg                                            !   table lookup value for interpolation boundary (l)esser than (x)  & (g)reater than (y)   
+    real(sp) :: VALgg                                            !   table lookup value for interpolation boundary (g)reater than (x) & (g)reater than (y)   
+    real(sp) :: VALxl                          	                 !   VAL(x,a) = interpolated value at (x), at the (l)esser Y-dimension boundary less than (y) 
+    real(sp) :: VALxg                                            !   VAL(x,b) = interpolated value at (x), at the (g)reater Y-dimension boundary greater than (y)
     real(sp) :: x_int_wgt                                        !   interpolation weighting factor in the X-dimension
     real(sp) :: y_int_wgt                                        !   interpolation weighting factor in the Y-dimension
 
