@@ -30,21 +30,21 @@ subroutine twoway_interp(y, x, table, Yrows, nYrows, Xcols, nXcols, VALxy)
     !    - in ascending order in the Y-dimension from top to bottom.
     !
     ! In the schematic below, to find the interpolated value at location (x,y) the boundaries surrounding the desired location at (x,y) are defined as:
-    !    - the upper left bound is to the (l)eft of (x), and (a)bove (y)
-    !    - the upper right bound is to the (r)ight of (x), and (a)bove (y)
-    !    - the lower left bound is to the (l)eft of (x), and (b)elow (y)
-    !    - the lower right bound is to the (r)ight of (x), and (b)elow (y)
+    !    - the upper left bound is (l)ess than (x), and (l)ess than (y)
+    !    - the upper right bound is (g)reater than (x), and (l)ess than (y)
+    !    - the lower left bound is (l)ess than (x), and (g)reater than (y)
+    !    - the lower right bound is (g)reater than (x), and (g)reater than (y)
     !               
     !               
-    !                              left       x         right
+    !                              lesser      x       greater
     !                         (-) ----------------------------------------(+)
-    !                above     | VAL(l,a)   VAL(x,a)   VAL(r,a)     _ _           
-    !                          |                                     |   (y-above)
-    !                  y       | VAL(l,y)  *VAL(x,y)*  VAL(r,y)     _|_              
+    !               lesser     | VAL(l,l)   VAL(x,l)   VAL(g,l)     _ _           
+    !                          |                                     |   (y-lesserY)
+    !                  y       | VAL(l,y)  *VAL(x,y)*  VAL(g,y)     _|_              
     !                          |           
-    !                below     | VAL(l,b)   VAL(x,b)   VAL(r,b)           
+    !               greater    | VAL(l,g)   VAL(x,g)   VAL(g,g)           
     !                          |
-    !                          |  |--(x-left)--|
+    !                          | |--(x-lesserX)--|
     !                          |
     !                         (+)
     !               
@@ -71,20 +71,20 @@ subroutine twoway_interp(y, x, table, Yrows, nYrows, Xcols, nXcols, VALxy)
     real(sp) :: min_dif                                          !   the smallest difference between: (x) and the closest column header value, or (y) and the closest row header value
     real(sp) :: dif                                              !   the difference between: (x) and any iterable column header value, or (y) and any iterable row header value
     
-    integer :: left                                              !   index of column to the (left) of (x) in the 2d interpolation table     
-    integer :: right                                             !   index of column to the (right) of (x) in the 2d interpolation table 
-    integer :: above                                             !   index of row (above) (y) in the 2d interpolation table 
-    integer :: below                                             !   index of row (below) (y) in the 2d interpolation table 
-    real(sp) :: r                                                !   column header value to the (r)ight of (x) in the X-dimension
-    real(sp) :: l                                                !   column header value to the (l)eft of (x) in the X-dimension
-    real(sp) :: a                                                !   row header value (a)bove (y) in the Y-dimension
-    real(sp) :: b                                                !   row header value (b)elow (y) in the Y-dimension
-    real(sp) :: VALla                                            !   table lookup value for interpolation boundary to the (l)eft of (x)  & (a)bove (y)
-    real(sp) :: VALra                                            !   table lookup value for interpolation boundary to the (r)ight of (x) & (a)bove (y)
-    real(sp) :: VALlb                                            !   table lookup value for interpolation boundary to the (l)eft of (x)  & (b)elow (y)   
-    real(sp) :: VALrb                                            !   table lookup value for interpolation boundary to the (r)ight of (x) & (b)elow (y)   
-    real(sp) :: VALxa                          	                 !   VAL(x,a) = interpolated value at (x), at the upper boundary (a)bove (y) 
-    real(sp) :: VALxb                                            !   VAL(x,b) = interpolated value at (x), at the lower boundary (b)elow (y)
+    integer :: ilesserX                                          !   index of column with header value less than (x) in the 2d interpolation table     
+    integer :: igreaterX                                         !   index of column with header value greater than (x) in the 2d interpolation table 
+    integer :: ilesserY                                          !   index of row with header value less than (y) in the 2d interpolation table     
+    integer :: igreaterY                                         !   index of row with header value greater than (x) in the 2d interpolation table
+    real(sp) :: lesserX                                          !   column header value less than (x) in the X-dimension
+    real(sp) :: greaterX                                         !   column  header value greater than (x) in the X-dimension
+    real(sp) :: lesserY                                          !   row header value less than (y) in the Y-dimension
+    real(sp) :: greaterY                                         !   row header value greater than (y) in the Y-dimension
+    real(sp) :: VALll                                            !   table lookup value for interpolation boundary lesser than (x)  & lesser than (y)
+    real(sp) :: VALgl                                            !   table lookup value for interpolation boundary greater than (x) & lesser than (y)
+    real(sp) :: VALlg                                            !   table lookup value for interpolation boundary lesser than (x)  & greater than (y)   
+    real(sp) :: VALgg                                            !   table lookup value for interpolation boundary greater than (x) & greater than (y)   
+    real(sp) :: VALxl                          	                 !   VAL(x,a) = interpolated value at (x), at the lesser Y-dimension boundary less than (y) 
+    real(sp) :: VALxg                                            !   VAL(x,b) = interpolated value at (x), at the greater Y-dimension boundary greater than (y)
     real(sp) :: x_int_wgt                                        !   interpolation weighting factor in the X-dimension
     real(sp) :: y_int_wgt                                        !   interpolation weighting factor in the Y-dimension
 
@@ -104,18 +104,18 @@ subroutine twoway_interp(y, x, table, Yrows, nYrows, Xcols, nXcols, VALxy)
     end do
 
     if ( Yrows(closest_index) > y )  then                        ! if the min_dif row header value is greater than y:
-        below = closest_index                                    !    - then the closest_index is below y when ascending the row header values from top to bottom
-        above = below - 1                                        !    - set index for row above by moving back up the table (which is -1 in index values) (above index is always -1 value less than below index)
+        igreaterY = closest_index                                !    - then the closest_index is greater than y when ascending the row header values from top to bottom
+        ilesserY = below - 1                                     !    - lesser index is always -1 value less than greater index
     elseif( Yrows(closest_index) < y ) then                      ! if the min_dif row header value is less than y
-        above = closest_index                                    !    - then the closest_index is above y when ascending the row header values from top to bottom
-        below = above + 1                                        !    - set index for row below by  moving down the table (which is +1 in index values) (below index is always +1 value greater than above index)
+        ilesserY = closest_index                                 !    - then the closest_index is less than y when ascending the row header values from top to bottom
+        igreaterY = above + 1                                    !    -  greater index is always +1 value more than lesser index
     else                                                         ! if the min_dif row header value is equal to y
-        below = closest_index                                    !    - then the closest_index is at y and set to below
-        above = below                                            !    - above and below are equal
+        igreaterY = closest_index                                !    - then the closest_index is at y and set to lesser index
+        ilesserY = igreaterY                                     !    - lesser and greater indices are equal
     end if 
 
 
-                                                                 ! Read X-dimension of input 2d interpolation table and determine which columns are to the right and to the left of the value of x and will be used as the bounds for interpolation in the X-dimension
+                                                                 ! Read X-dimension of input 2d interpolation table and determine which columns are greater and less than the value of x and will be used as the bounds for interpolation in the X-dimension
     closest_index = -9999                                        ! arbitary large negative initial value
     dif = 0                                                      ! set initial difference to zero
     min_dif = 9999                                               ! arbitary large initial value
@@ -129,41 +129,41 @@ subroutine twoway_interp(y, x, table, Yrows, nYrows, Xcols, nXcols, VALxy)
     end do
 
     if ( Xcols(closest_index) > x )  then                        ! if the min_dif column header value is greater than x:
-        right = closest_index                                    !    - then the closest_index is to the right of x when ascending the column header values from left to right
-        left = right - 1                                         !    - set index for column to the left by moving back one step (left index is always -1 value less than right index)
+        igreaterX = closest_index                                !    - then the closest_index is greater than x when ascending the column header values from left to right
+        ilesserX = igreaterX - 1                                 !    - lesser index is always -1 value less than greater index
     elseif( Xcols(closest_index) < x ) then                      ! if the min_dif column header value is less than x
-        left = closest_index                                     !    - then the closest_index is to the left of x when ascending the column header values from left to right
-        right = left + 1                                         !    - set index for column to the right by moving forward one index step (right index is always +1 value greater than left index)
+        ilesserX = closest_index                                 !    - then the closest_index is to the left of x when ascending the column header values from left to right
+        igreaterX = ilesserX + 1                                 !    - greater index is always +1 value more than lesser index
     else                                                         ! if the min_dif column header value is equal to x
-        left = closest_index                                     !    - then the closest_index is at x and set to left
-        right = left                                             !    - right and left are equal
+        ilesserX = closest_index                                 !    - then the closest_index is at x and set to lesser index
+        igreaterX = ilesserX                                     !    - lesser and greater indices are equal
     end if 
 
 
-    r = Xcols(right)                                             ! set column header value to the right of the interpolation bounds in X-dimension
-    l = Xcols(left)                                              ! set column header value to the left of the interpolation bounds in X-dimension
-    b = Yrows(below)                                             ! set row header value below the interpolation bounds in Y-dimension
-    a = Yrows(above)                                             ! set row header value above the interpolation bounds in Y-dimension
+    greaterX = Xcols(igreaterX)                                  ! set column header value that is the greater/upper of the interpolation bounds in X-dimension
+    lesserX = Xcols(ilesserX)                                    ! set column header value that is the lesser/lower of the interpolation bounds in X-dimension
+    greaterY = Yrows(igreaterY)                                  ! set row header value that is the greater/upper of the interpolation bounds in Y-dimension
+    lesserY = Yrows(ilesserY)                                    ! set row header value  that is the lesser/lower of the interpolation bounds in Y-dimension
     
-    VALla = table(left,above)                                    ! lookup value from table at the upper left interpolation bound to the left of and above x
-    VALra = table(right,above)                                   ! lookup value from table at the upper right interpolation bound to the right of and above x
-    VALlb = table(left,below)                                    ! lookup value from table at the lower left interpolation bound to the left of and below x
-    VALrb = table(right,below)                                   ! lookup value from table at the lower right interpolation bound to the right of and below x
+    VALll = table(lesserX,lesserY)                               ! lookup value from table at the upper left interpolation bound lesser than (x) and lesser than (y)
+    VALgl = table(greaterX,lesserY)                              ! lookup value from table at the upper right interpolation bound greater than (x) and lesser than (y)
+    VALlg = table(lesserX,greaterY)                              ! lookup value from table at the lower left interpolation bound lesser than (x) and greater than (y)
+    VALgg = table(greaterX,greaterY)                             ! lookup value from table at the lower right interpolation bound greater than (x) and greater than (y)
     
-    if (r==l) then                                               ! if the right and left bounding values for interpolation in the X-dimension are the same
+    if (greaterX==lesserX) then                                  ! if the right and left bounding values for interpolation in the X-dimension are the same
         x_int_wgt = 0.0                                          !    - set the X-dimensional interpolation weighting factor to zero
     else                                                         ! if the right and left bounding values for interpolation in the X-dimension are not the same
-        x_int_wgt = (x-l)/(r-l)                                  !     - scale the magnitude from left to right by the distance between the left bound and x
+        x_int_wgt = (x-lesserX)/(greaterX-lesserX)               !     - scale the magnitude from left to right by the distance between the left bound and x
     endif
 
-    if (a==b) then                                               ! if the below and above bounding values for interpolation in the Y-dimension are the same
+    if (greaterY==lesserY) then                                  ! if the below and above bounding values for interpolation in the Y-dimension are the same
         y_int_wgt = 0.0	                                         !    - set the Y-dimensional interpolation weighting factor to zero
     else                                                         ! if the below and above bounding values for interpolation in the Y-dimension are not the same
-        y_int_wgt = (y-a)/(b-a)                                  !     - scale the magnitude from above to below by the distance between the above bound and y
+        y_int_wgt = (y-lesserY)/(greaterY-lesserY)               !     - scale the magnitude from above to below by the distance between the above bound and y
     endif
 
-    VALxa = VALla + (VALra - VALla) * x_int_wgt                 ! interpolate in the X-dimension for the row above y: VAL(x,a)
-    VALxb = VALlb + (VALrb - VALlb) * x_int_wgt                 ! interpolate in the X-dimension for the row below y: VAL(x,b)
-    VALxy = VALxa + (VALxb - VALxa) * y_int_wgt                 ! interpolate in the Y-dimension between the above value at x [VAL(x,a)] and the below value [VAL(x,b)] at x
+    VALxl = VALll + (VALgl - VALll) * x_int_wgt                 ! interpolate in the X-dimension for the row index lesser than y: VAL(x,l)
+    VALxg = VALlg + (VALgg - VALlg) * x_int_wgt                 ! interpolate in the X-dimension for the row index greater than y: VAL(x,g)
+    VALxy = VALxl + (VALxl - VALxl) * y_int_wgt                 ! interpolate in the Y-dimension between the bounding values calculated at x, [VAL(x,l)] and [VAL(x,g)]
 
 end
