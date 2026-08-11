@@ -16,16 +16,16 @@ subroutine high_disp_est_nbg
     implicit none
 
     ! local variables
-    integer :: ig                           ! iterator over veg grid cells
-    integer :: ic                           ! iterator over veg grid coverages (columns)
-    real(sp) :: total_est_P                 ! sum of the establishment probabilites of all coverages in one veg grid cell; recalculated for each grid cell
-    integer :: dispersal_class              ! dispersal class of a coverage; weedy species are all Class 3
+    integer :: ig                                                           ! iterator over veg grid cells
+    integer :: ic                                                           ! iterator over veg grid coverages (columns)
+    real(sp) :: total_est_P                                                 ! sum of the establishment probabilites of all coverages in one veg grid cell; recalculated for each grid cell
+    integer :: dispersal_class                                              ! dispersal class of a coverage; weedy species are all Class 3
 
     do ig=1,ngrid
-        if (coverages(ig,bni) > 0) then       ! if there is new bareground, allow class 3 (weedy) to establish
-            total_est_P = 0.0                   ! reset the total establishment probability for each cell
+        if (coverages(ig,bni) > 0) then                                     ! if there is new bareground, allow class 3 (weedy) to establish
+            total_est_P = 0.0                                               ! reset the total establishment probability for each cell
             do ic=1,ncov
-                dispersal_class = cov_disp_class(ic)    ! only applies to class 3 (weedy) species
+                dispersal_class = cov_disp_class(ic)                        ! only applies to class 3 (weedy) species
                 if (dispersal_class == 3) then
                     total_est_P = total_est_P + establish_P(ig,ic)          ! sum the estalishment Ps of the weedy species 
                 endif
@@ -33,11 +33,11 @@ subroutine high_disp_est_nbg
             if (total_est_P > 0.0) then
                 do ic=1,ncov
                     dispersal_class = cov_disp_class(ic)
-                    if (dispersal_class == 3) then          
-                        coverages(ig,ic) = coverages(ig,ic) +  ((establish_P(ig,ic)/total_est_P)*coverages(ig,bni))         ! portion out the available new bareground based on realtive establishment P
+                    if (dispersal_class == 3) then                          ! portion out the available new bareground based on realtive establishment P
+                        coverages(ig,ic) = coverages(ig,ic) +  ((establish_P(ig,ic)/total_est_P)*coverages(ig,bni))         
                     endif
                 end do          
-                coverages(ig,bni) = 0.0               ! reset the new bareground 
+                coverages(ig,bni) = 0.0                                     ! reset the new bareground 
             end if
         endif
     end do

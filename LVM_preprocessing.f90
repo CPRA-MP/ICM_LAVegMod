@@ -173,7 +173,7 @@ subroutine preprocessing
     write(000,*) ' - reading in daily water level timeseries for use in tree establishment criteria'
     open(unit=106, file=trim(adjustL(hydro_daily_stage_file)))
     !!there is no header row!! read(106,*) dump_txt                                                                            ! dump header
-  
+    
     do nyr = 0,elapsed_year-1                                                                       ! loop through all elapsed years that are included in the daily timeseries ICM-Hydro output file
         if ( (start_year + nyr)/4.0 > floor((start_year + nyr)/4.0) )then                           ! check if year is leapyear
             yeardays = 365
@@ -221,7 +221,7 @@ subroutine preprocessing
             read(108,*) mort_Y_bins(y,ic),       &                                                  ! first column of mortality table is Y-variable value defining each mortality 'bin'
    &            mortality_tables(:,y,ic)                                                            ! read the rest of the columns into the mortality probability array for given y value and coverage type, ic
         end do
-        close(107)
+        close(108)
     end do
     
     

@@ -74,7 +74,7 @@ subroutine update_flotant
                     flt_thk_expansion = (exp_lkd(ig,flt_thk_indices(il))/exp_lkd_total_flt(ig))*coverages(ig,bfi)   !           - determine proportional area of bare_flt that will be converted to thk_flt
                     coverages(ig,flt_thk_indices(il)) = coverages(ig,flt_thk_indices(il))+ flt_thk_expansion        !           - update thick flotant with the portion of old_bare_flt that is newly established as thk_flt
                 end do
-                coverages(ig,bfi) = coverages(ig,bfi) - flt_thn_expansion - flt_thk_expansion                       ! 4 - remove the areas of think and thick flotant expansion from the bare flotant coverage - THIS SHOULD ALWAYS BE ZERO
+                coverages(ig,bfi) = max(0.0,coverages(ig,bfi) - flt_thn_expansion - flt_thk_expansion)              ! 4 - remove the areas of think and thick flotant expansion from the bare flotant coverage - THIS SHOULD ALWAYS BE ZERO
             end if 
         end if
     end do
