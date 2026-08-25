@@ -37,7 +37,7 @@ subroutine calc_dispersal_coverage
     
     write(year,'(I0)') start_year + elapsed_year - 1
     open(unit=666, file='veg/'//trim(adjustL(fnc_tag))//'_'//year//'_V_veg_high_disp_est_debug.csv')
-    write(666,'A') 'grid,numerator,denominator,sal_av_yr,wlv_smr'    
+    write(666,'(A)') 'grid,numerator,denominator,sal_av_yr,wlv_smr'    
 
 
     do ig=1,ngrid
