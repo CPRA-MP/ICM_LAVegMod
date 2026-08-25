@@ -34,7 +34,7 @@ subroutine calc_dispersal_coverage
     disp_cov = 0.0                                                              ! initialize array before first use
     
     
-    
+
     open(unit=666, file='veg/'//trim(adjustL(fnc_tag))//'_'//trim(adjustL(fileflag))//'_'//year//'_V_veg_high_disp_est_debug.csv')
     write(666,'A') 'grid,numerator,denominator,sal_av_yr,wlv_smr'    
 
@@ -79,28 +79,28 @@ subroutine calc_dispersal_coverage
     close(666)
 
 
-    open(unit=666, file='veg/'//trim(adjustL(fnc_tag))//'_'//trim(adjustL(fileflag))//'_'//year//'_V_veg_high_disp_est_exp_lkd.csv'
+    open(unit=666, file='veg/'//trim(adjustL(fnc_tag))//'_'//trim(adjustL(fileflag))//'_'//year//'_V_veg_high_disp_est_exp_lkd.csv')
     write(666,2222) 'exp_lkd_total',trim(adjustL(veg_coverage_file_header))
     do ig = 1,ngrid
         write(666,4444) ig,exp_lkd(ig,:),exp_lkd_total(ig)
     end do
     close(666)
 
-    open(unit=666, file='veg/'//trim(adjustL(fnc_tag))//'_'//trim(adjustL(fileflag))//'_'//year//'_V_veg_high_disp_est_est_p.csv'
+    open(unit=666, file='veg/'//trim(adjustL(fnc_tag))//'_'//trim(adjustL(fileflag))//'_'//year//'_V_veg_high_disp_est_est_p.csv')
     write(666,'(A)') trim(adjustL(veg_coverage_file_header))
     do ig = 1,ngrid
         write(666,5555) ig,establish_P(ig,:)
     end do
     close(666)
 
-    open(unit=666, file='veg/'//trim(adjustL(fnc_tag))//'_'//trim(adjustL(fileflag))//'_'//year//'_V_veg_high_disp_est_mort_p.csv'
+    open(unit=666, file='veg/'//trim(adjustL(fnc_tag))//'_'//trim(adjustL(fileflag))//'_'//year//'_V_veg_high_disp_est_mort_p.csv')
     write(666,'(A)') trim(adjustL(veg_coverage_file_header))
     do ig = 1,ngrid
         write(666,5555) ig,mortality_P(ig,:)
     end do
     close(666)
 
-    open(unit=666, file='veg/'//trim(adjustL(fnc_tag))//'_'//trim(adjustL(fileflag))//'_'//year//'_V_veg_high_disp_est_disp_cov.csv'
+    open(unit=666, file='veg/'//trim(adjustL(fnc_tag))//'_'//trim(adjustL(fileflag))//'_'//year//'_V_veg_high_disp_est_disp_cov.csv')
     write(666,'(A)') trim(adjustL(veg_coverage_file_header))
     do ig = 1,ngrid
         write(666,5555) ig,disp_cov(ig,:)
