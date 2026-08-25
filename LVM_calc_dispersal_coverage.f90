@@ -30,11 +30,12 @@ subroutine calc_dispersal_coverage
     integer :: inb                                                              ! iterator over the list of neighbor cells (near or nearest neighbor)
     integer :: neighbor                                                         ! the grid cell ID of the current neighbor 
     integer :: dispersal_class                                                  ! the dispersal class to which the current coverage belongs
-
+    character*4 :: year                     ! calendar year of model run
+    
     disp_cov = 0.0                                                              ! initialize array before first use
     
     
-
+    write(year,'(I0)') start_year + elapsed_year - 1
     open(unit=666, file='veg/'//trim(adjustL(fnc_tag))//'_'//year//'_V_veg_high_disp_est_debug.csv')
     write(666,'A') 'grid,numerator,denominator,sal_av_yr,wlv_smr'    
 
