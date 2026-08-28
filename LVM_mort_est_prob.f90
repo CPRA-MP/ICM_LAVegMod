@@ -66,13 +66,13 @@ subroutine mort_est_prob
                         endif      
                         call oneway_interp(var1, mortality_tables(:,:,ic), mort_Y_bins(:,ic), n_Y_bins, mortality_P(ig,ic))
 
-
-                        var1 = max(min(grid_elev(ig),maxY),minY)                                                                        ! apply low/high pass filter to limit variable1 to be set to extreme values located in the input table
-                        call oneway_interp(var1, establish_tables(1,:,ic), est_Y_bins(:,ic), n_Y_bins, establish_P(ig,ic))
-
                         minY = minval(mort_Y_bins(:,ic))
                         maxY = maxval(mort_Y_bins(:,ic))
-                        var1 = max(min(grid_elev(ig),maxY),minY)                                                                        ! apply low/high pass filter to limit variable1 to be set to extreme values located in the input table
+                        if (grid_comp(ig) > 0) then
+                            var1 = max(min(grid_elev(ig)-stg_av_yr(grid_comp(ig)),maxY),minY)                                           ! apply low/high pass filter to limit variable1 to be set to extreme values located in the input table
+                        else
+                            var1 = minY
+                        endif                                                                          ! apply low/high pass filter to limit variable1 to be set to extreme values located in the input table
                         call oneway_interp(var1, mortality_tables(1,:,ic), mort_Y_bins(:,ic), n_Y_bins, mortality_P(ig,ic))
                         
                     elseif (cover_group == 4 .or. cover_group == 5 .or. cover_group >= 9) then                                          ! For swamp forest, thick and thin floating marsh, emergent wetland (fresh, intermediate, brackish, and saline) (coverage groups 4-5, 9-13), calculate establishment probability from wlv and annual salinity
