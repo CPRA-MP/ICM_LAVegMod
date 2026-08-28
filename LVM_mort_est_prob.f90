@@ -46,17 +46,27 @@ subroutine mort_est_prob
             if (grid_comp(ig)<= ncomp) then                                                                                             ! check that grid cell has an allowable ICM-Hydro compartment ID
                 do ic = 1, ncov                                                                                                         ! Loop through every coverage (column)
                     cover_group = cov_grp(ic)                                                                                           ! Identify which coverage group this coverage (column) belongs to
-                    if (cover_group == 8 .or. cover_group == 14) then                                                                   ! For bottomland hardwood forest and barrier island species (coverage group 8 and 14), calculate establishment probability from elevation 
+                    if (cover_group == 8 .or. cover_group == 14) then                                                                   ! For bottomland hardwood forest and barrier island species (coverage group 8 and 14), calculate establishment probability from elevation above mean water level
                                                                                                                                         !   - oneway_interp(variable1,table,variable1bins, var1bin_n, yint)
                         minY = minval(est_Y_bins(:,ic))
                         maxY = maxval(est_Y_bins(:,ic))
-                        var1 = max(min(grid_elev(ig),maxY),minY)                                                                        ! apply low/high pass filter to limit variable1 to be set to extreme values located in the input table
+                        if (grid_comp(ig) > 0) then
+                            var1 = max(min(grid_elev(ig)-stg_av_yr(grid_comp(ig)),maxY),minY)                                           ! apply low/high pass filter to limit variable1 to be set to extreme values located in the input table
+                        else
+                            var1 = minY
+                        endif
                         call oneway_interp(var1, establish_tables(:,:,ic), est_Y_bins(:,ic), n_Y_bins, establish_P(ig,ic))
 
                         minY = minval(mort_Y_bins(:,ic))
                         maxY = maxval(mort_Y_bins(:,ic))
-                        var1 = max(min(grid_elev(ig),maxY),minY)                                                                        ! apply low/high pass filter to limit variable1 to be set to extreme values located in the input table
+                        if (grid_comp(ig) > 0) then
+                            var1 = max(min(grid_elev(ig)-stg_av_yr(grid_comp(ig)),maxY),minY)                                           ! apply low/high pass filter to limit variable1 to be set to extreme values located in the input table
+                        else
+                            var1 = minY
+                        endif      
                         call oneway_interp(var1, mortality_tables(:,:,ic), mort_Y_bins(:,ic), n_Y_bins, mortality_P(ig,ic))
+
+
                         
                     elseif (cover_group == 4 .or. cover_group == 5 .or. cover_group >= 9) then                                          ! For swamp forest, thick and thin floating marsh, emergent wetland (fresh, intermediate, brackish, and saline) (coverage groups 4-5, 9-13), calculate establishment probability from wlv and annual salinity
                                                                                                                                         !   - twoway_interp(variable1, variable2, table, variable1bins, var1bin_n, variable2bins, var2bin_n, yint)
@@ -92,14 +102,26 @@ subroutine mort_est_prob
     end do
 
 
-    ! Zero-out establish_P for swampforest model without the tree establishment condition 
+    ! Zero-out establish_P for swampforest and bottomland hardwood without the tree establishment condition 
     do ic=1,ncov
         cover_group = cov_grp(ic)                                                                                                       ! Identify which coverage group this coverage (column) belongs to
-        if (cover_group == 9) then                                                                                                      ! Cover group 9 is swamp forest
+        if (cover_group == 9 .or. cover_group == 8) then                                                                                                      ! Cover group 9 is swamp forest
             establish_P(:,ic) = establish_P(:,ic) * tree_establishment                                                                  ! tree establishment is a 1D array of size ngrid (1 if conditions met; 0 if not)
-        endif
+        end if
     end do
 
+    ! Zero-out establish_P for bottomland hardwood with salinity greater than 1 ppt; increase mortality_P to 100% (1.0) if salinity is greater than 1 ppt
+    do ig=1,ngrid
+        do ic=1,ncov
+            cover_group = cov_grp(ic)                                                                                                       ! Identify which coverage group this coverage (column) belongs to
+            if (cover_group == 8) then  
+                if (sal_av_yr(grid_comp(ig)) > 1.0) then                                                                                    ! Check if the salinity threshold was crossed. Bottomland hardwood does not have salinty in the est/mort tables, so this criteria is necessary
+                    mortality_P(ig,ic) = 1.0                                                                                                ! Removes all bottomland hardwood species coverage from that cell
+                    establish_P(ig,ic) = 0.0                                                                                                ! Stops any establishement of bottomland hardwood species in that cell 
+                end if                                                          
+            end if
+        end do
+    end do
 
 
 
