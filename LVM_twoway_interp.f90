@@ -23,7 +23,7 @@ subroutine twoway_interp(y, x, table, Yrows, nYrows, Xcols, nXcols, VALxy)
     ! This subroutine interpolates the establishment or mortality probability based on two inputs. For each grid cell, it is iteratively called across all species and interpolates one species' establishment/mortality table at a time. 
     ! This subroutine is called for any LAVegMod cover group that uses two variables to define the probability of mortality and establishment.
     ! For MP23 and MP29, the cover groups that use two variables are: swamp forest, thick and thin floating marsh, and emergent wetland (fresh, intermediate, brackish, and saline). 
-    ! For MP23 and MP29, the est and mort probabilities of those species are a function of mean annual salinity (sal_av_yr) and water level variabilty (wlv_smr). 
+    ! For MP23 and MP29, the est and mort probabilities of those species are a function of mean annual salinity (sal_av_yr) and water level variabilty (wlv_yr). 
     ! 
     ! The logic/pseudocode for this 2-dimensional interpolation is based on the structure of the MP29 establishment and mortality tables that are ordered:
     !    - in ascending order in the X-dimension from left to right, and

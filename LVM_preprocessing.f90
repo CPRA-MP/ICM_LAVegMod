@@ -110,7 +110,6 @@ subroutine preprocessing
     stg_mx_yr = 0.0                                                                                 ! initialize data array to zero before reading in
     stg_av_yr = 0.0                                                                                 ! initialize data array to zero before reading in
     stg_av_smr = 0.0                                                                                ! initialize data array to zero before reading in
-    wlv_smr = 0.0                                                                                   ! initialize data array to zero before reading in
     sal_av_yr = 0.0                                                                                 ! initialize data array to zero before reading in
     sal_av_yr = 0.0                                                                                 ! initialize data array to zero before reading in
     sal_mx_14d_yr = 0.0                                                                             ! initialize data array to zero before reading in
@@ -126,7 +125,7 @@ subroutine preprocessing
    &         stg_mx_yr(i),                  &
    &         stg_av_yr(i),                  &
    &         stg_av_smr(i),                 &
-   &         wlv_smr(i),                    &
+   &         dump_flt,                    &
    &         sal_av_yr(i),                  &
    &         sal_av_smr(i),                 &
    &         sal_mx_14d_yr(i),              &
@@ -168,11 +167,17 @@ subroutine preprocessing
 
     ! read in daily water level timeseries from ICM-Hydro (used for tree establishment criteria)
     stage_daily = 0                                                                                 ! initialize data array to zero before reading in
-
-    write(*,'(A)') ' - reading in daily water level timeseries for use in tree establishment criteria'
-    write(000,*) ' - reading in daily water level timeseries for use in tree establishment criteria'
+    trg_daily = 0                                                                                   ! initialize data array to zero before reading in
+    write(*,'(A)') ' - reading in daily timeseries data from ICM-Hydro output'
+    write(000,*) ' - reading in daily timeseries data from ICM-Hydro output'
     open(unit=106, file=trim(adjustL(hydro_daily_stage_file)))
-    !!there is no header row!! read(106,*) dump_txt                                                                            ! dump header
+    open(unit=1066, file=trim(adjustL(hydro_daily_tiderange_file)))
+    !no header!read(106,*) dump_txt        ! dump header    
+    !no header!read(1066,*) dump_txt        ! dump header    
+
+    stage_daily = 0.0                                                                               ! initialize data array to zero before reading in
+    trg_daily = 0.0                                                                                 ! initialize data array to zero before reading in
+    wlv_yr = 0.0                                                                                    ! initialize data array to zero before reading in
     
     do nyr = 0,elapsed_year-1                                                                       ! loop through all elapsed years that are included in the daily timeseries ICM-Hydro output file
         if ( (start_year + nyr)/4.0 > floor((start_year + nyr)/4.0) )then                           ! check if year is leapyear
@@ -183,12 +188,27 @@ subroutine preprocessing
         do nd = 1,yeardays                                                                          ! loop through days of each year up to and including the current model year, which will equal 'elapsedyear'
             if (nyr == elapsed_year-1) then                                                         ! if loop's current year is elapsedyear, then read daily timeseries into array
                 read(106,*) stage_daily(nd,:)                                                       ! stage_daily(simday,ncomp)
+                read(1066,*) trg_daily(nd,:)                                                        ! trg_daily(simday,ncomp)
             else                                                                                    ! else current loop is not on elapseyear, so skip over line in daily timeseries file
                 read(106,*) dump_txt
+                read(1066,*) dump_txt
             endif
         end do
     end do
     close(106)
+    close(1066)
+    
+    
+    ! Set water level variability for use in ICM-LAVegMod from tidal range
+    ! Relationship to convert from tidal range to WLV used by Veg was determined by:
+    !  - calculating WLV from hourly stage standard deviation from 2006-2018 at all CRMS sites (same method used to build CRMS input tables according to Scott D-S in 2017)
+    !  - comparing to the mean tidal range at each CRMS site
+    !  - R-squared from above regression = 0.7674
+    !  - hourly stdv WLV = 0.2647*mean tidal range + 0.0659      Rsq=0.7674
+    !
+    ! data for the following WLV=f(TRG) analysis is in the CPRA "ICM_pre-processing/tidal" Github repo
+    
+    wlv_yr = 0.0659 + 0.2647*SUM(trg_daily,DIM=1)/yeardays
     
     ! read species establishment probability tables
     est_X_bins = 0.0                                                                                ! initialize data array to zero before reading in

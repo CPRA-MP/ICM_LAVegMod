@@ -33,6 +33,7 @@ subroutine set_io
     read(001,*) hydro_comp_out_file 
     read(001,*) morph_grid_out_file
     read(001,*) hydro_daily_stage_file
+    read(001,*) hydro_daily_tiderange_file
     
     ! filenaming convention
     read(001,*) fnc_tag
