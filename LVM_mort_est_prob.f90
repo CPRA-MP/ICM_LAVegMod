@@ -122,9 +122,11 @@ subroutine mort_est_prob
         do ic=1,ncov
             cover_group = cov_grp(ic)                                                                                                       ! Identify which coverage group this coverage (column) belongs to
             if (cover_group == 8) then  
-                if (sal_av_yr(grid_comp(ig)) > 1.0) then                                                                                    ! Check if the salinity threshold was crossed. Bottomland hardwood does not have salinty in the est/mort tables, so this criteria is necessary
-                    mortality_P(ig,ic) = 1.0                                                                                                ! Removes all bottomland hardwood species coverage from that cell
-                    establish_P(ig,ic) = 0.0                                                                                                ! Stops any establishement of bottomland hardwood species in that cell 
+                if (grid_comp(ig) > 0) then                                                                                                 ! check that grid cell has an allowable ICM-Hydro compartment ID
+                    if (sal_av_yr(grid_comp(ig)) > 1.0) then                                                                                ! Check if the salinity threshold was crossed. Bottomland hardwood does not have salinty in the est/mort tables, so this criteria is necessary
+                        mortality_P(ig,ic) = 1.0                                                                                            ! Removes all bottomland hardwood species coverage from that cell
+                        establish_P(ig,ic) = 0.0                                                                                            ! Stops any establishement of bottomland hardwood species in that cell 
+                    end if
                 end if                                                          
             end if
         end do
