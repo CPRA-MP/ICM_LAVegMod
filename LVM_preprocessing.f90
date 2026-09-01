@@ -166,8 +166,6 @@ subroutine preprocessing
 
 
     ! read in daily water level timeseries from ICM-Hydro (used for tree establishment criteria)
-    stage_daily = 0                                                                                 ! initialize data array to zero before reading in
-    trg_daily = 0                                                                                   ! initialize data array to zero before reading in
     write(*,'(A)') ' - reading in daily timeseries data from ICM-Hydro output'
     write(000,*) ' - reading in daily timeseries data from ICM-Hydro output'
     open(unit=106, file=trim(adjustL(hydro_daily_stage_file)))
