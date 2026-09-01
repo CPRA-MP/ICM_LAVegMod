@@ -91,9 +91,9 @@ subroutine tree_establishment_conditions
     thresholdlength = lastday - firstday + 1
     
     ! Allocate temporary array to be of length equal to number of grid cells - these are deallocated at end of this subroutine
-    allocate(grid_dep_daily(ngrid,simdays))
+    allocate(grid_eff_dep_daily(ngrid,simdays))
     allocate(drypast_flag(thresholdlength))
-    allocate(dryfuture_flag(thresholdlength))
+    allocate(shallowfuture_flag(thresholdlength))
     allocate(tree_est_flag(thresholdlength))
 
 
@@ -120,7 +120,7 @@ subroutine tree_establishment_conditions
                         drypast_flag(jjj) = drypast_flag(jjj)*0                                 ! if any day of the past 2 weeks was wet set drypast_flag to 0
                     endif
                 
-                    if (grid_eff_dep_daily(g,jj+dd) <= -0.14) then                              ! loop over next two weeks and determine if any future day is shallower than 14 cm, or dry
+                    if (grid_eff_dep_daily(g,jj+dd) <= 0.14) then                              ! loop over next two weeks and determine if any future day is shallower than 14 cm, or dry
                         shallowfuture_flag(jjj) = shallowfuture_flag(jjj)*1
                     else
                         shallowfuture_flag(jjj) = shallowfuture_flag(jjj)*0                     ! if any day of the next 2 weeks is flooded by more than 14 cm, shallowfuture_flag is set to 0
