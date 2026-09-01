@@ -150,11 +150,10 @@ subroutine tree_establishment_conditions
         close(903)
     endif
     
-   
     
-    deallocate(grid_dep_daily)
+    deallocate(grid_eff_dep_daily)
     deallocate(drypast_flag)
-    deallocate(dryfuture_flag)
+    deallocate(shallowfuture_flag)
     deallocate(tree_est_flag)
     
 3458    format(I0,',',I0)
