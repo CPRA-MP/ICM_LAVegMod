@@ -143,7 +143,7 @@ grid cells.
 white, grey areas are upland or NOTMOD, brown areas are unvegetated
 wetland or bareground, and greens are vegetated
 wetland.](https://github.com/CPRA-MP/ICM_LAVegMod/blob/ICM_LAVegMod_scg/ICM-LAVegMod_Figs/C8_ICM-LAVegMod_Fig2.png)
-/
+\
 
 <caption>
 
