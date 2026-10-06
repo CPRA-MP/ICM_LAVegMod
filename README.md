@@ -4,6 +4,7 @@ Madeline R. Foster-Martinez, Eric D. White, Elizabeth R. Jarrell, Denise
 J. Reed, Jenneke M. Visser
 
 Suggested Citation: 
+
 Foster-Martinez, M., White, E., Jarrell, E., Reed, D., & Visser, J. (2023). 2023 Coastal Master Plan: Attachment C8: Modeling Wetland Vegetation and Morphology: ICM-LAVegMod and ICM-Morph. Version 2. (p. 59). Baton Rouge, Louisiana: Coastal Protection and Restoration Authority.
 
 ## Contents
