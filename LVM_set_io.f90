@@ -25,6 +25,9 @@ subroutine set_io
     read(001,*) near_neighbors_dist
     read(001,*) max_neighbors
     read(001,*) coverage_attribute_file
+    read(001,*) prob_table_type
+    read(001,*) mort_est_shift
+    read(001,*) n_ptile
     read(001,*) n_X_bins
     read(001,*) n_Y_bins
     
@@ -39,6 +42,7 @@ subroutine set_io
     read(001,*) fnc_tag
     
     read(001,*) write_intermediate_files
+    
     
     fnc_tag =trim(adjustL(fnc_tag))
     mterm = fnc_tag(1:6)

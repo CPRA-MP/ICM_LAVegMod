@@ -30,7 +30,32 @@ subroutine preprocessing
     open(unit=100, file=trim(adjustL(coverage_attribute_file)))
     read(100,'(A)') dump_txt                                                                        ! dump column header row 
     do i = 1,ncov
-        read(100,*) cov_symbol(i), dump_txt, dump_txt, dump_txt, dump_txt, cov_grp(i), cov_disp_class(i), FFIBS(i)
+        read(100,*) cov_symbol(i),  &                                                               ! species coverage symbol
+   &        dump_txt,               &                                                               ! ignore species name
+   &        dump_txt,               &                                                               ! ignore legacy coverage model
+   &        dump_txt,               &                                                               ! ignore habitat type name
+   &        dump_txt,               &                                                               ! ignore legacy model name
+   &        cov_grp(i),             &                                                               ! coverage group ID
+   &        cov_disp_class(i)       &                                                               ! dispersal group ID
+   &        FFIBS(i),               &                                                               ! species FFIBS score
+   &        sal_p00(i),             &                                                               ! 0th percentile salinity for species mortality - absolute minimum salinity for species 
+   &        sal_p01(i),             &                                                               ! 1st percentile salinity for species mortality - near but non-zero minimum for species 
+   &        sal_p05(i),             &                                                               ! 5th percentile salinity for species mortality
+   &        sal_p25(i),             &                                                               ! 25th percentile salinity for species mortality
+   &        sal_p50(i),             &                                                               ! 50th percentile salinity for species mortality
+   &        sal_p75(i),             &                                                               ! 75th percentile salinity for species mortality
+   &        sal_p95(i),             &                                                               ! 95th percentile salinity for species mortality
+   &        sal_p99(i),             &                                                               ! 99th percentile salinity for species mortality - near but non-one maximum value for species
+   &        sal_p100(i),            &                                                               ! 100th percentile salinity for species mortality - absolute maximum salinity for species
+   &        wlv_p00(i),             &                                                               ! 0th percentile water level variability for species mortality - absolute minimum salinity for species  
+   &        wlv_p01(i),             &                                                               ! 1st percentile water level variability for species mortality - near but non-zero minimum salinity for species  
+   &        wlv_p05(i),             &                                                               ! 5th percentile water level variability for species mortality 
+   &        wlv_p25(i),             &                                                               ! 25th percentile water level variability for species mortality 
+   &        wlv_p50(i),             &                                                               ! 50th percentile water level variability for species mortality  
+   &        wlv_p75(i),             &                                                               ! 75th percentile water level variability for species mortality 
+   &        wlv_p95(i),             &                                                               ! 95th percentile water level variability for species mortality 
+   &        wlv_p99(i),             &                                                               ! 99th percentile water level variability for species mortality - near but non-one maximum value for species 
+   &        wlv_p100(i)                                                                             ! 100th percentile salinity for water level variability mortality - absolute maximum for species 
     end do
     close(100)
     
@@ -213,6 +238,8 @@ subroutine preprocessing
     est_Y_bins = 0.0                                                                                ! initialize data array to zero before reading in
     establish_tables = 0.0                                                                          ! initialize data array to zero before reading in
     
+    
+    
     write(*,'(A)') ' - reading in probability of establishment tables'
     write(000,*) ' - reading in probability of establishment tables'
     do ic = 1,ncov
@@ -241,8 +268,20 @@ subroutine preprocessing
         end do
         close(108)
     end do
+
+    write(*,'(A)') ' - reading in universal probability of mortality table'
+    write(000,*)  ' - reading in universal probability of mortality table'
     
+    open(unit=109, file=trim(adjustL('veg/tables/mortality_UNIVERSAL.csv' )
+        read(109,*) dump_txt,univ_ptile_X_bins(:)                                                   ! first row of establisment table is the X-variable values defining each establishment 'bin'
+        do y = 1,n_ptiles
+            read(109,*) univ_ptile_Y_bins(y),    &                                                  ! first column of establishment table is Y-variable value defining each establishment 'bin'
+   &            universal_mortality_table(:,y)                                                     ! read the rest of the columns into the establishment probability array for given y value and coverage type, ic
+        end do
+        close(109)
+    end do
     
+
 1234    format(A,<ncov>(',',A))
 
     return

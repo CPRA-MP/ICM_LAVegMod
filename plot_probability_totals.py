@@ -42,9 +42,10 @@ for row in coverages:
                     total_mort[r][c] = 1
 
 fig,ax= plt.subplots()
-ax.pcolor(wlv,sal,total_est)
+ax.pcolor(wlv,sal,total_est,cmap='Blues')#Greys
 ax.set_xlim(0,0.5)
 ax.set_ylim(0,35)
 ax.set_xlabel('Water level variability (m)')
 ax.set_ylabel('Salinity (ppt)')
 fig.suptitle('Non-zero Probability of Establishment: %s' % coverage_type)
+plt.show()

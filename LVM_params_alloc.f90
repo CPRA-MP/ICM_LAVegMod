@@ -32,6 +32,26 @@ subroutine params_alloc
     allocate(cov_grp(ncov))
     allocate(cov_disp_class(ncov))
     allocate(FFIBS(ncov))
+    allocate(sal_p00(ncov))
+    allocate(sal_p01(ncov))
+    allocate(sal_p05(ncov))
+    allocate(sal_p25(ncov))
+    allocate(sal_p50(ncov))
+    allocate(sal_p75(ncov))
+    allocate(sal_p95(ncov))
+    allocate(sal_p99(ncov))
+    allocate(sal_p100(ncov))
+    allocate(wlv_p00(ncov))
+    allocate(wlv_p01(ncov))
+    allocate(wlv_p05(ncov))
+    allocate(wlv_p25(ncov))
+    allocate(wlv_p50(ncov))
+    allocate(wlv_p75(ncov))
+    allocate(wlv_p95(ncov))
+    allocate(wlv_p99(ncov))
+    allocate(wlv_p100(ncov))
+    
+    
     allocate(flt_thn_indices(ncov))
     allocate(flt_thk_indices(ncov))
     
@@ -66,6 +86,10 @@ subroutine params_alloc
     allocate(mort_X_bins(n_X_bins,ncov))
     allocate(mort_Y_bins(n_Y_bins,ncov))
     allocate(mortality_tables(n_X_bins,n_Y_bins,ncov))
+    allocate(univ_ptile_X_bins(n_ptile))
+    allocate(univ_ptile_Y_bins(n_ptile))
+    allocate(universal_mortality_table(n_ptile,n_ptile))
+    
     
     ! these variables are 1D arrays [i] where the ith dimension represents the grid cell ID 
     allocate(FFIBS_score(ngrid))

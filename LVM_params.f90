@@ -24,6 +24,9 @@ module params
     integer :: nearest_neighbors_dist                               ! distance in which a neighboring grid cell is considered a nearest neighbor (meters) *must be smaller magnitude than "near_neighbor_dist"*
     integer :: near_neighbors_dist                                  ! distance in which a neighboring grid cell is considered a near neighbor (meters) *must be larger magnitude than "nearest_neighbor_dist"*
     integer :: max_neighbors                                        ! maximum number of grid cells that will be allowed in the near and nearest neighbor lists
+    integer :: prob_table_type                                      ! define which approach to use for est/mort probabilities; (1) use the universal probability of mortality table and the 'mort_est_shift' variable to algorithmically adjust species-level probabilities; (2) use the individual species-level establishement and mortality tables
+    real(sp) mort_est_shift                                         ! shift on salinity percentiles to convert from the mortality to the establishment percentiles - default to -0.05; can be between -0.5 and +0.5; establishment conditions are more stringent so something that was a 75th percentile condition becomes a 60th percentile condition (if set to -0.05)
+    integer :: n_ptile                                              ! number of bins defining the percentiles included in the universal mortality probability table
     integer :: n_X_bins                                             ! number of bins definiing the X-axis of the establishment and mortability input tables
     integer :: n_Y_bins                                             ! number of bins definiing the Y-axis of the establishment and mortability input tables
     
@@ -81,6 +84,26 @@ module params
                                                                     !       cov_disp_class =  2; near disperal - species can disperse only from "near and nearest neighboring" areas (distances are assigned in SET_IO from "veg/LAVegMod_input_params.csv")
                                                                     !       cov_disp_class =  3; always available - "weedy" species that are assumed always available for establishment/infinite dispersal distance
     real(sp),dimension(:),allocatable ::  FFIBS                     ! FFIBS score assigned to each respective coverage type
+    
+    real(sp),dimension(:),allocatable :: sal_p00                    ! 0th percentile salinity for species mortality - absolute minimum salinity for species 
+    real(sp),dimension(:),allocatable :: sal_p01                    ! 1st percentile salinity for species mortality - near but non-zero minimum for species 
+    real(sp),dimension(:),allocatable :: sal_p05                    ! 5th percentile salinity for species mortality
+    real(sp),dimension(:),allocatable :: sal_p25                    ! 25th percentile salinity for species mortality
+    real(sp),dimension(:),allocatable :: sal_p50                    ! 50th percentile salinity for species mortality
+    real(sp),dimension(:),allocatable :: sal_p75                    ! 75th percentile salinity for species mortality
+    real(sp),dimension(:),allocatable :: sal_p95                    ! 95th percentile salinity for species mortality
+    real(sp),dimension(:),allocatable :: sal_p99                    ! 99th percentile salinity for species mortality - near but non-one maximum value for species
+    real(sp),dimension(:),allocatable :: sal_p100                   ! 100th percentile salinity for species mortality - absolute maximum salinity for species
+    real(sp),dimension(:),allocatable :: wlv_p00                    ! 0th percentile water level variability for species mortality - absolute minimum salinity for species  
+    real(sp),dimension(:),allocatable :: wlv_p01                    ! 1st percentile water level variability for species mortality - near but non-zero minimum salinity for species  
+    real(sp),dimension(:),allocatable :: wlv_p05                    ! 5th percentile water level variability for species mortality 
+    real(sp),dimension(:),allocatable :: wlv_p25                    ! 25th percentile water level variability for species mortality 
+    real(sp),dimension(:),allocatable :: wlv_p50                    ! 50th percentile water level variability for species mortality  
+    real(sp),dimension(:),allocatable :: wlv_p75                    ! 75th percentile water level variability for species mortality 
+    real(sp),dimension(:),allocatable :: wlv_p95                    ! 95th percentile water level variability for species mortality 
+    real(sp),dimension(:),allocatable :: wlv_p99                    ! 99th percentile water level variability for species mortality - near but non-one maximum value for species 
+    real(sp),dimension(:),allocatable :: wlv_p100                   ! 100th percentile salinity for water level variability mortality - absolute maximum for species 
+    
     integer :: wti                                                  ! index in coverages(ngrid,ncov) for water coverage group
     integer :: nmi                                                  ! index in coverages(ngrid,ncov) for NotMod coverage group
     integer :: boi                                                  ! index in coverages(ngrid,ncov) for old bareground coverage group
@@ -125,6 +148,11 @@ module params
     real(sp),dimension(:,:),allocatable :: mort_X_bins              ! array holding the values used to define the X-axis of each species mortality tables - the first dimension is the location in the X-axis, the second dimension is the coverage index, ic
     real(sp),dimension(:,:),allocatable :: mort_Y_bins              ! array holding the values used to define the Y-axis of each species mortality tables - the first dimension is the location in the X-axis, the second dimension is the coverage index, ic
     real(sp),dimension(:,:,:),allocatable :: mortality_tables       ! 2-dimensional mortality probablity table for each species - first dimension is X value of table, second dimension is Y value, third dimension is the coverage index, ic
+    
+    real(sp),dimension(:),allocatable :: univ_ptile_X_bins              ! array holding the values used to define the percentiles on the X-axis of the universal mortality tables - the first dimension is the location in the X-axis
+    real(sp),dimension(:),allocatable :: univ_ptile_Y_bins              ! array holding the values used to define the percentiles on the Y-axis of the universal mortality tables - the first dimension is the location in the Y-axis
+    real(sp),dimension(:,:),allocatable :: universal_mortality_table   ! 2-dimensional mortality probablity table - universal for all species based on percentiles - first dimension is X value of table, second dimension is Y value
+    
     
     ! these variables are 1D arrays [i] where the ith dimension represents the grid cell ID 
     real(sp),dimension(:),allocatable :: FFIBS_score              ! weighted FFIBS score of ICM-LAVegMod grid cell - used for accretion
