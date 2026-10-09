@@ -124,10 +124,10 @@ subroutine mort_est_prob
                             if (cover_group == 4 .or. cover_group == 5) then								! If flotant, set WLV to median so that WLV is not a factor in the probability of mortality/establishment of flotant marsh
                                 wlv_ptile = 0.5
                             else                                                                                                        ! If not flotant, convert annual wlv into a percentile via interpolation
-				call oneway_interp = (wlv_yr(grid_comp(ig)),wlv_niche(ic),niche_ptiles,n_niche_ptiles,wlv_ptile)	! Calculate percentile for the year's WLV based on the input WLV niche percentile values for the species
+				call oneway_interp(wlv_yr(grid_comp(ig)),wlv_niche(ic),niche_ptiles,n_niche_ptiles,wlv_ptile)	! Calculate percentile for the year's WLV based on the input WLV niche percentile values for the species
                             endif
                             
-                            call oneway_interp = (sal_av_yr(grid_comp(ig)),sal_niche(ic),niche_ptiles,n_niche_ptiles,sal_ptile)		! Calculate percentile for the year's salinity based on the input salinity niche percentile values for the species
+                            call oneway_interp(sal_av_yr(grid_comp(ig)),sal_niche(ic),niche_ptiles,n_niche_ptiles,sal_ptile)		! Calculate percentile for the year's salinity based on the input salinity niche percentile values for the species
 
                             sal_ptile_est = max(0.0, min(1.0,sal_ptile + mort_est_shift) )						! Shift the salinity percentile used in mortality lookup for use in determining establishment probability
                             
