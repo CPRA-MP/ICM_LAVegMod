@@ -28,9 +28,15 @@ subroutine set_io
     read(001,*) prob_table_type
     read(001,*) mort_est_shift
     read(001,*) n_ptile
+    n_niche_ptiles = 9    
+
     read(001,*) n_X_bins
     read(001,*) n_Y_bins
     
+
+
+
+
     ! input files that change for each model year
     read(001,*) veg_in_file,dump_txt        ! we can have this set automatically via the elapsed_year variable internal to the code instead of having it written to an input file
     read(001,*) hydro_comp_out_file 

@@ -24,9 +24,14 @@ subroutine preprocessing
     ! read ICM-LAVegMod model attributes for each coverage type
     write(*,'(A)') ' - reading in model attributes for coverage types'
     write(000,*) ' - reading in model attributes for coverage types'
-    cov_grp = 0
+    
+cov_grp = 0
     cov_disp_class = 0
     FFIBS = 0
+    sal_niche = 0.0
+    wlv_niche = 0.0
+    niche_ptiles = 0.0
+
     open(unit=100, file=trim(adjustL(coverage_attribute_file)))
     read(100,'(A)') dump_txt                                                                        ! dump column header row 
     do i = 1,ncov
@@ -38,27 +43,39 @@ subroutine preprocessing
    &        cov_grp(i),             &                                                               ! coverage group ID
    &        cov_disp_class(i)       &                                                               ! dispersal group ID
    &        FFIBS(i),               &                                                               ! species FFIBS score
-   &        sal_p00(i),             &                                                               ! 0th percentile salinity for species mortality - absolute minimum salinity for species 
-   &        sal_p01(i),             &                                                               ! 1st percentile salinity for species mortality - near but non-zero minimum for species 
-   &        sal_p05(i),             &                                                               ! 5th percentile salinity for species mortality
-   &        sal_p25(i),             &                                                               ! 25th percentile salinity for species mortality
-   &        sal_p50(i),             &                                                               ! 50th percentile salinity for species mortality
-   &        sal_p75(i),             &                                                               ! 75th percentile salinity for species mortality
-   &        sal_p95(i),             &                                                               ! 95th percentile salinity for species mortality
-   &        sal_p99(i),             &                                                               ! 99th percentile salinity for species mortality - near but non-one maximum value for species
-   &        sal_p100(i),            &                                                               ! 100th percentile salinity for species mortality - absolute maximum salinity for species
-   &        wlv_p00(i),             &                                                               ! 0th percentile water level variability for species mortality - absolute minimum salinity for species  
-   &        wlv_p01(i),             &                                                               ! 1st percentile water level variability for species mortality - near but non-zero minimum salinity for species  
-   &        wlv_p05(i),             &                                                               ! 5th percentile water level variability for species mortality 
-   &        wlv_p25(i),             &                                                               ! 25th percentile water level variability for species mortality 
-   &        wlv_p50(i),             &                                                               ! 50th percentile water level variability for species mortality  
-   &        wlv_p75(i),             &                                                               ! 75th percentile water level variability for species mortality 
-   &        wlv_p95(i),             &                                                               ! 95th percentile water level variability for species mortality 
-   &        wlv_p99(i),             &                                                               ! 99th percentile water level variability for species mortality - near but non-one maximum value for species 
-   &        wlv_p100(i)                                                                             ! 100th percentile salinity for water level variability mortality - absolute maximum for species 
+   &        sal_niche(i,1),         &                                                               ! 0th percentile salinity defining niche for species mortality - absolute minimum salinity for species 
+   &        sal_niche(i,2),         &                                                               ! 1st percentile salinity defining niche for species mortality - near but non-zero minimum for species 
+   &        sal_niche(i,3),         &                                                               ! 5th percentile salinity defining niche for species mortality
+   &        sal_niche(i,4),         &                                                               ! 25th percentile salinity defining niche for species mortality
+   &        sal_niche(i,5),         &                                                               ! 50th percentile salinity defining niche for species mortality
+   &        sal_niche(i,6),         &                                                               ! 75th percentile salinity defining niche for species mortality
+   &        sal_niche(i,7),         &                                                               ! 95th percentile salinity defining niche for species mortality
+   &        sal_niche(i,8),         &                                                               ! 99th percentile salinity defining niche for species mortality - near but non-one maximum value for species
+   &        sal_niche(i,9),         &                                                               ! 100th percentile salinity defining niche for species mortality - absolute maximum salinity for species
+   &        wlv_niche(i,1),         &                                                               ! 0th percentile water level variability defining niche for species mortality - absolute minimum for species  
+   &        wlv_niche(i,2),         &                                                               ! 1st percentile water level variability defining niche for species mortality - near but non-zero minimum salinity for species  
+   &        wlv_niche(i,3),         &                                                               ! 5th percentile water level variability defining niche for species mortality 
+   &        wlv_niche(i,4),         &                                                               ! 25th percentile water level variability defining niche for species mortality 
+   &        wlv_niche(i,5),         &                                                               ! 50th percentile water level variability defining niche for species mortality  
+   &        wlv_niche(i,6),         &                                                               ! 75th percentile water level variability defining niche for species mortality 
+   &        wlv_niche(i,7),         &                                                               ! 95th percentile water level variability defining niche for species mortality 
+   &        wlv_niche(i,8),         &                                                               ! 99th percentile water level variability defining niche for species mortality - near but non-one maximum value for species 
+   &        wlv_niche(i,9)                                                                           ! 100th percentile water level variability defining niche for water level variability mortality - absolute maximum for species 
     end do
     close(100)
-    
+
+
+    ! percentile values used in "coverage_attributes.csv" that define the salinity/wlv niches for species mortality
+    niche_ptiles(1) = 0.00
+    niche_ptiles(2) = 0.01
+    niche_ptiles(3) = 0.05
+    niche_ptiles(4) = 0.25
+    niche_ptiles(5) = 0.50
+    niche_ptiles(6) = 0.75
+    niche_ptiles(7) = 0.95
+    niche_ptiles(8) = 0.99
+    niche_ptiles(9) = 1.00
+
     ! process coverage groups and save indices for specifc coverage groups
     flt_thn_cnt = 0                                                                                 ! initialize counter for finding thin mat flotant coverages
     flt_thn_indices = 0                                                                             ! initialize array to store coverage group index of FLOTANT coverage types in coverages(ngrid,ncov)
