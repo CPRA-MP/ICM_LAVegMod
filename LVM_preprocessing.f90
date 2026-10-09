@@ -41,7 +41,7 @@ cov_grp = 0
    &        dump_txt,               &                                                               ! ignore habitat type name
    &        dump_txt,               &                                                               ! ignore legacy model name
    &        cov_grp(i),             &                                                               ! coverage group ID
-   &        cov_disp_class(i)       &                                                               ! dispersal group ID
+   &        cov_disp_class(i),      &                                                               ! dispersal group ID
    &        FFIBS(i),               &                                                               ! species FFIBS score
    &        sal_niche(i,1),         &                                                               ! 0th percentile salinity defining niche for species mortality - absolute minimum salinity for species 
    &        sal_niche(i,2),         &                                                               ! 1st percentile salinity defining niche for species mortality - near but non-zero minimum for species 
