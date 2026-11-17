@@ -1,7 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-UT = np.genfromtxt('C:/Eric/git/ICM_LAVegMod/tables/mortality_UNIVERSAL.csv',skip_header=1,usecols=range(1,24),dtype='float',delimiter=',')
+#UT = np.genfromtxt('C:/Eric/git/ICM_LAVegMod/tables/mortality_UNIVERSAL.csv',skip_header=1,usecols=range(1,24),dtype='float',delimiter=',')
+#ptype = 'mortality'
+
+UT = np.genfromtxt('C:/Eric/git/ICM_LAVegMod/tables/establishment_UNIVERSAL_shiftone.csv',skip_header=1,usecols=range(1,24),dtype='float',delimiter=',')
+ptype = 'establishment'
 
 sals = []           # this will be the array of SAL values representing the percentiles in the original input UNIVERSAL table 
 wlvs = []           # this will be the array of WLV values representing the percentiles in the original input UNIVERSAL table
@@ -33,7 +37,7 @@ ax0.set_xlim(0,0.5)
 ax0.set_ylim(0,35)
 ax0.set_xlabel('Water level variability (m)')
 ax0.set_ylabel('Salinity (ppt)')
-fig0.suptitle('Probability of Mortality: All species')
+fig0.suptitle('Probability of %s: All species'% (ptype))
 
 
 for nc in range(0,len(covs)):
@@ -56,13 +60,15 @@ for nc in range(0,len(covs)):
         ax0.pcolor(wlvs,sals,UT,cmap='coolwarm')#Greys
         ax.set_xlim(0,0.5)
         ax.set_ylim(0,35)
+        ax.minorticks_on()
+        ax.grid(True,which='both',linestyle='-',color='darkgray',alpha=0.5)
         ax.set_xlabel('Water level variability (m)')
         ax.set_ylabel('Salinity (ppt)')
-        fig.suptitle('Probability of Mortality: %s' % cov)
-        plt.savefig('./tables/new/mortality_%s.png' % cov)
+        fig.suptitle('Probability of %s: %s' % (ptype,cov))
+        plt.savefig('./tables/new/%s_%s.png' % (ptype,cov))
 
-    with open('./tables/new/mortality_%s.csv' % cov,mode='w') as oc:
-        line = 'mortality_%s' % cov
+    with open('./tables/new/%s_%s.csv' % (ptype,cov),mode='w') as oc:
+        line = '%s_%s' % (ptype,cov)
         for wlv in wlvs:
             line = '%s,%0.3f' % (line,wlv)
         oc.write('%s\n' % line)
