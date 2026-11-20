@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 #UT = np.genfromtxt('C:/Eric/git/ICM_LAVegMod/tables/mortality_UNIVERSAL.csv',skip_header=1,usecols=range(1,24),dtype='float',delimiter=',')
 #ptype = 'mortality'
 
-UT = np.genfromtxt('C:/Eric/git/ICM_LAVegMod/tables/establishment_UNIVERSAL_shiftone.csv',skip_header=1,usecols=range(1,24),dtype='float',delimiter=',')
+UT = np.genfromtxt('C:/Eric/git/ICM_LAVegMod/tables/establishment_UNIVERSAL.csv',skip_header=1,usecols=range(1,24),dtype='float',delimiter=',')
 ptype = 'establishment'
 
 sals = []           # this will be the array of SAL values representing the percentiles in the original input UNIVERSAL table 
