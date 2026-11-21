@@ -28,7 +28,7 @@ PAVA,Paspalum,EmergentWetlandModel,Intermediate,veg_col_ewi,11,2,2.75,0,0.14,0.4
 PHAU7,RouseauCane,EmergentWetlandModel,Intermediate,veg_col_ewi,11,3,2.75,0,0.07,0.19,0.27,0.9,1.94,6.12,18.21,18.21,0.01,0.02,0.04,0.06,0.12,0.16,0.21,0.33,0.5,-
 POPU5,Smartweed,EmergentWetlandModel,Intermediate,veg_col_ewi,11,3,1.5,0,0,0.08,0.17,0.26,0.68,2.02,9.03,9.03,0.01,0.02,0.06,0.11,0.13,0.16,0.2,0.33,0.5,-
 SALA,Bulltongue,EmergentWetlandModel,Intermediate,veg_col_ewi,11,2,1.5,0,0.01,0.1,0.18,0.28,0.63,1.63,9.46,10.68,0.01,0.02,0.04,0.08,0.11,0.15,0.2,0.33,0.5,-
-SCCA11,Bullwhip,EmergentWetlandModel,Intermediate,veg_col_ewi,11,2,2.75,0,0.1,0.17,0.53,1.22,2.27,5.48,12.32,20.14,0.01,0.02,0.03,0.05,0.07,0.07,0.17,0.33,0.5,-
+SCCA11,Bullwhip,EmergentWetlandModel,Intermediate,veg_col_ewi,11,2,2.75,0,0.1,0.17,0.53,1.22,2.27,5.48,12.32,20.14,0.01,0.02,0.03,0.05,0.07,0.072,0.17,0.33,0.5,extra precision added to 75th ptile to differentiate between the 50th and 75th when
 TYDO,Cattail,EmergentWetlandModel,Intermediate,veg_col_ewi,11,3,2.75,0,0.01,0.13,0.21,0.57,1.61,4.62,13.81,22.18,0.01,0.02,0.03,0.05,0.09,0.12,0.17,0.33,0.5,-
 SCAM6,ThreeCorner,EmergentWetlandModel,Brackish,veg_col_ewb,12,2,7.15,0,0.07,0.23,1.11,2.39,4.13,7.6,17.88,22.82,0.01,0.02,0.04,0.09,0.13,0.16,0.22,0.33,0.5,-
 SCRO5,LeafyTreecorner,EmergentWetlandModel,Brackish,veg_col_ewb,12,2,11.5,0,0.11,0.94,2.46,5.1,9.35,17.39,21.03,30.45,0.01,0.02,0.03,0.05,0.1,0.15,0.21,0.33,0.5,-
