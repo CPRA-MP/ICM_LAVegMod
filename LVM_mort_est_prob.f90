@@ -38,11 +38,11 @@ subroutine mort_est_prob
     real(sp) :: var1                                                                                                                    ! filtered value of varialbe1 passed into oneway_interp to boound the variable by the extreme min/max values in the establishment/mortality input tables
     real(sp) :: wlv_ptile                                                                                                               ! interpolated value representing the calculated WLV percentile for the given species - used in the universal mortality table
     real(sp) :: sal_ptile                                                                                                               ! interpolated value representing the calculated SAL percentile for the given species  - used in the universal mortality table
-    real(sp) :: sal_ptile_est														! shifted salinity percentile to pass in to the mortality table to return the corresponding establishment conditions
-    real(sp) :: mortP_for_establish											                ! temp value to store the probability of mortality which will be transformed into the probabilty of establishment
+    real(sp) :: sal_ptile_est                                                                                                           ! shifted salinity percentile to pass in to the mortality table to return the corresponding establishment conditions
+    real(sp) :: mortP_for_establish                                                                                                      ! temp value to store the probability of mortality which will be transformed into the probabilty of establishment
     establish_P = 0                                                                                                                     ! initialize with all 0s; for coverages that do not calculate an establishment probability, the value will remain 0 (nothing will establish)
     mortality_P = 0                                                                                                                     ! initialize with all 0s; for coverages that do not calculate a mortality probability, the value will remain 0 (nothing will die)
-	
+
     do ig = 1,ngrid                                                                                                                     ! Loop through every grid cell
         if (grid_comp(ig) > 0) then                                                                                                     ! check that grid cell has an allowable ICM-Hydro compartment ID
             if (grid_comp(ig)<= ncomp) then                                                                                             ! check that grid cell has an allowable ICM-Hydro compartment ID
@@ -80,7 +80,7 @@ subroutine mort_est_prob
                                                                                                                                         !        -  0% mortality within the inner-quartile range
                                                                                                                                         !        - linearly increasing mortality from 25th/75th percentiles, until reaching 
                                                                                                                                         !        - 80% mortality at the 5th/95th percentiles
-																	!        - linearly increasing mortality from the 5th/95th percentiles, until reaching		
+                                                                                                                                        !        - linearly increasing mortality from the 5th/95th percentiles, until reaching		
                                                                                                                                         !        - 97.5% mortality at the 1st/99th percentiles, and
                                                                                                                                         !        - 100% mortality at the 0th/100th percentils
                                                                                                                                         !
@@ -121,34 +121,35 @@ subroutine mort_est_prob
                                                                                                                                         !     The magnitude in which to shift between mortality and establishment as shown above is defined with the input parameter: 'mort_est_shift' 
                                                                                                                                         !
 
-                            if (cover_group == 4 .or. cover_group == 5) then								! If flotant, set WLV to median so that WLV is not a factor in the probability of mortality/establishment of flotant marsh
+                            if (cover_group == 4 .or. cover_group == 5) then                                                            ! If flotant, set WLV to median so that WLV is not a factor in the probability of mortality/establishment of flotant marsh
                                 wlv_ptile = 0.5
                             else                                                                                                        ! If not flotant, convert annual wlv into a percentile via interpolation
-				call oneway_interp(wlv_yr(grid_comp(ig)),wlv_niche(ic,:),niche_ptiles,n_niche_ptiles,wlv_ptile)	! Calculate percentile for the year's WLV based on the input WLV niche percentile values for the species
+                                call oneway_interp(wlv_yr(grid_comp(ig)),niche_ptiles,wlv_niche(ic,:),n_niche_ptiles,wlv_ptile)         ! Calculate percentile for the year's WLV based on the input WLV niche percentile values for the species
                             endif
                             
-                            call oneway_interp(sal_av_yr(grid_comp(ig)),sal_niche(ic,:),niche_ptiles,n_niche_ptiles,sal_ptile)		! Calculate percentile for the year's salinity based on the input salinity niche percentile values for the species
+                            call oneway_interp(sal_av_yr(grid_comp(ig)),niche_ptiles,sal_niche(ic,:),n_niche_ptiles,sal_ptile)          ! Calculate percentile for the year's salinity based on the input salinity niche percentile values for the species
 
-                            sal_ptile_est = max(0.0, min(1.0,sal_ptile + mort_est_shift) )						! Shift the salinity percentile used in mortality lookup for use in determining establishment probability
+                            sal_ptile_est = max(0.0, min(1.0,sal_ptile + mort_est_shift) )                                              ! Shift the salinity percentile used in mortality lookup for use in determining establishment probability
                             
                             call twoway_interp(sal_ptile, wlv_ptile, universal_mortality_table, univ_ptile_Y_bins, n_ptile, univ_ptile_X_bins, n_ptile, mortality_P(ig,ic)) 
                             call twoway_interp(sal_ptile_est, wlv_ptile, universal_mortality_table, univ_ptile_Y_bins, n_ptile, univ_ptile_X_bins, n_ptile, mortP_for_establish)
                             
                             establish_P(ig,ic) = max(0.0001,1.0 - mortP_for_establish)                                                  ! establishment = (1.0-mortality), after applying the establishment percentile shift
                                                                                                                                         ! do not let establishment equal true zero since this is about relative competition for establishment cover if no species have good establishment criteria, all species will have ability to compete equally
-
+                            
+                            
                         elseif (prob_table_type == 2) then                                                                              ! Use species-specific probability tables based on sal and wlv values instead of universal table logic above
 
                             call twoway_interp(sal_av_yr(grid_comp(ig)), wlv_yr(grid_comp(ig)), mortality_tables(:,:,ic), mort_Y_bins(:,ic), n_Y_bins, mort_X_bins(:,ic), n_X_bins, mortality_P(ig,ic))
                             call twoway_interp(sal_av_yr(grid_comp(ig)), wlv_yr(grid_comp(ig)), establish_tables(:,:,ic), est_Y_bins(:,ic), n_Y_bins, est_X_bins(:,ic), n_X_bins, establish_P(ig,ic))
 
-			endif
+                        endif
                                                                                                                                         ! For water, not mod, new bareground, old bareground, bareground flotant, dead flotant (coverage groups 0-3, 6-7), do nothing
                     endif
-                end do 
+                end do          ! HERE IS THE END OF THE DO LOOP OVER COVERAGE TYPES WITHIN EACH GRID CELL
             end if
         end if
-    end do
+    end do                      ! HERE IS THE END OF THE DO LOOP OVER GRID CELLS
 
     ! Zero-out establish_P for barrier island species not in barrier island cells and keep it in barrier island cells
     do ic=1,ncov
