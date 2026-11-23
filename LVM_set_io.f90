@@ -26,10 +26,8 @@ subroutine set_io
     read(001,*) max_neighbors
     read(001,*) coverage_attribute_file
     read(001,*) prob_table_type
-    read(001,*) mort_est_shift
+    read(001,*) n_niche_ptiles
     read(001,*) n_ptile
-    n_niche_ptiles = 9    
-
     read(001,*) n_X_bins
     read(001,*) n_Y_bins
     

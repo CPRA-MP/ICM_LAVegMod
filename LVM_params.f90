@@ -25,12 +25,10 @@ module params
     integer :: near_neighbors_dist                                  ! distance in which a neighboring grid cell is considered a near neighbor (meters) *must be larger magnitude than "nearest_neighbor_dist"*
     integer :: max_neighbors                                        ! maximum number of grid cells that will be allowed in the near and nearest neighbor lists
     integer :: prob_table_type                                      ! define which approach to use for est/mort probabilities; (1) use the universal probability of mortality table and the 'mort_est_shift' variable to algorithmically adjust species-level probabilities; (2) use the individual species-level establishement and mortality tables
-    integer :: n_niche_ptiles                                       ! number of percentiles used to define the sal/wlv niches for species mortality
- 
-    real(sp) mort_est_shift                                         ! shift on salinity percentiles to convert from the mortality to the establishment percentiles - default to -0.05; can be between -0.5 and +0.5; establishment conditions are more stringent so something that was a 75th percentile condition becomes a 60th percentile condition (if set to -0.05)
-    integer :: n_ptile                                              ! number of bins defining the percentiles included in the universal mortality probability table
-    integer :: n_X_bins                                             ! number of bins definiing the X-axis of the establishment and mortability input tables
-    integer :: n_Y_bins                                             ! number of bins definiing the Y-axis of the establishment and mortability input tables
+    integer :: n_niche_ptiles                                       ! number of percentile bins defining the species-level salinity and WLV niche ranges (must correspond to the number of columns provided in 'coverage_attribute_file'
+    integer :: n_ptile                                              ! number of bins defining the percentiles included in the universal mortality and establishment probability tables (with axes units of percentile)
+    integer :: n_X_bins                                             ! number of bins definiing the X-axis of the establishment and mortability input tables (with axes units in ppt and meters)
+    integer :: n_Y_bins                                             ! number of bins definiing the Y-axis of the establishment and mortability input tables (with axes units in ppt and meters)
     
     ! input files in subroutine: SET_IO
     character*fn_len :: coverage_attribute_file                     ! file name, with relative path, to csv with model attributes for each coverage type - this file row-order must match the column-order of veg_in_file, below
@@ -129,26 +127,26 @@ module params
     integer,dimension(:),allocatable ::  barrier_island             ! flag indicating whether the grid cell is located in a barrier island domain or not (1 if island; 0 if not)
     
     ! define variables read in for establishment and mortability tables in subroutine: PREPROCESSING
-    real(sp),dimension(:,:),allocatable :: est_X_bins               ! array holding the values used to define the X-axis of each species establishent tables - the first dimension is the location in the X-axis, the second dimension is the coverage index, ic
-    real(sp),dimension(:,:),allocatable :: est_Y_bins               ! array holding the values used to define the Y-axis of each species establishent tables - the first dimension is the location in the X-axis, the second dimension is the coverage index, ic
-    real(sp),dimension(:,:,:),allocatable :: establish_tables       ! 2-dimensional establishment probablity table for each species - first dimension is X value of table, second dimension is Y value, third dimension is the coverage index, ic
-    real(sp),dimension(:,:),allocatable :: mort_X_bins              ! array holding the values used to define the X-axis of each species mortality tables - the first dimension is the location in the X-axis, the second dimension is the coverage index, ic
-    real(sp),dimension(:,:),allocatable :: mort_Y_bins              ! array holding the values used to define the Y-axis of each species mortality tables - the first dimension is the location in the X-axis, the second dimension is the coverage index, ic
-    real(sp),dimension(:,:,:),allocatable :: mortality_tables       ! 2-dimensional mortality probablity table for each species - first dimension is X value of table, second dimension is Y value, third dimension is the coverage index, ic
+    real(sp),dimension(:,:),allocatable :: est_X_bins                       ! array holding the values used to define the X-axis of each species establishent tables - the first dimension is the location in the X-axis, the second dimension is the coverage index, ic
+    real(sp),dimension(:,:),allocatable :: est_Y_bins                       ! array holding the values used to define the Y-axis of each species establishent tables - the first dimension is the location in the X-axis, the second dimension is the coverage index, ic
+    real(sp),dimension(:,:,:),allocatable :: establish_tables               ! 2-dimensional establishment probablity table for each species (axes units are ppt and meters) - first dimension is X value of table, second dimension is Y value, third dimension is the coverage index, ic
+    real(sp),dimension(:,:),allocatable :: mort_X_bins                      ! array holding the values used to define the X-axis of each species mortality tables - the first dimension is the location in the X-axis, the second dimension is the coverage index, ic
+    real(sp),dimension(:,:),allocatable :: mort_Y_bins                      ! array holding the values used to define the Y-axis of each species mortality tables - the first dimension is the location in the X-axis, the second dimension is the coverage index, ic
+    real(sp),dimension(:,:,:),allocatable :: mortality_tables               ! 2-dimensional mortality probablity table for each species (axes units are ppt and meters) - first dimension is X value of table, second dimension is Y value, third dimension is the coverage index, ic
     
-    real(sp),dimension(:),allocatable :: univ_ptile_X_bins              ! array holding the values used to define the percentiles on the X-axis of the universal mortality tables - the first dimension is the location in the X-axis
-    real(sp),dimension(:),allocatable :: univ_ptile_Y_bins              ! array holding the values used to define the percentiles on the Y-axis of the universal mortality tables - the first dimension is the location in the Y-axis
-    real(sp),dimension(:,:),allocatable :: universal_mortality_table   ! 2-dimensional mortality probablity table - universal for all species based on percentiles - first dimension is X value of table, second dimension is Y value
-    
+    real(sp),dimension(:),allocatable :: univ_ptile_X_bins                  ! array holding the values used to define the percentiles on the X-axis of the universal mortality tables - the first dimension is the location in the X-axis
+    real(sp),dimension(:),allocatable :: univ_ptile_Y_bins                  ! array holding the values used to define the percentiles on the Y-axis of the universal mortality tables - the first dimension is the location in the Y-axis
+    real(sp),dimension(:,:),allocatable :: universal_mortality_table        ! 2-dimensional mortality probablity table - universal for all emergent marsh (and swamp forest) species (axes units are on percentiles) - first dimension is X value of table, second dimension is Y value
+    real(sp),dimension(:,:),allocatable :: universal_establishment_table    ! 2-dimensional establishment probablity table - universal for all emergent marsh (and swamp forest) species (axes units are on percentiles) - first dimension is X value of table, second dimension is Y value
     
     ! these variables are 1D arrays [i] where the ith dimension represents the grid cell ID 
-    real(sp),dimension(:),allocatable :: FFIBS_score              ! weighted FFIBS score of ICM-LAVegMod grid cell - used for accretion
-    real(sp),dimension(:),allocatable :: pct_vglnd_BLHF           ! percent of vegetated land that is bottomland hardwood forest
-    real(sp),dimension(:),allocatable :: pct_vglnd_SWF            ! percent of vegetated land that is swamp forest
-    real(sp),dimension(:),allocatable :: pct_vglnd_FM             ! percent of vegetated land that is fresh (attached) marsh
-    real(sp),dimension(:),allocatable :: pct_vglnd_IM             ! percent of vegetated land that is intermediate marsh
-    real(sp),dimension(:),allocatable :: pct_vglnd_BM             ! percent of vegetated land that is brackish marsh
-    real(sp),dimension(:),allocatable :: pct_vglnd_SM             ! percent of vegetated land that is saline marsh
+    real(sp),dimension(:),allocatable :: FFIBS_score                        ! weighted FFIBS score of ICM-LAVegMod grid cell - used for accretion
+    real(sp),dimension(:),allocatable :: pct_vglnd_BLHF                     ! percent of vegetated land that is bottomland hardwood forest
+    real(sp),dimension(:),allocatable :: pct_vglnd_SWF                      ! percent of vegetated land that is swamp forest
+    real(sp),dimension(:),allocatable :: pct_vglnd_FM                       ! percent of vegetated land that is fresh (attached) marsh
+    real(sp),dimension(:),allocatable :: pct_vglnd_IM                       ! percent of vegetated land that is intermediate marsh
+    real(sp),dimension(:),allocatable :: pct_vglnd_BM                       ! percent of vegetated land that is brackish marsh
+    real(sp),dimension(:),allocatable :: pct_vglnd_SM                       ! percent of vegetated land that is saline marsh
 
     ! define variables read in or calculated from files in subroutine: NEIGHBORS
     integer,dimension(:,:),allocatable ::  nearest_neighbors        ! list of grid cell IDs that are the nearest neighbors to each grid cell

@@ -286,10 +286,10 @@ cov_grp = 0
         close(108)
     end do
 
-    write(*,'(A)') ' - reading in universal probability of mortality table'
-    write(000,*)  ' - reading in universal probability of mortality table'
+    write(*,'(A)') ' - reading in universal probability of mortality table for emergent marsh'
+    write(000,*)  ' - reading in universal probability of mortality table for emergent marsh'
     
-    open(unit=109, file=trim(adjustL('veg/tables/mortality_UNIVERSAL.csv' )))
+    open(unit=109, file=trim(adjustL('veg/tables/mortality_EMERGENT.csv' )))
     read(109,*) dump_txt,univ_ptile_X_bins(:)                                                   ! first row of establisment table is the X-variable values defining each establishment 'bin'
     do y = 1,n_ptile
         read(109,*) univ_ptile_Y_bins(y),    &                                                  ! first column of establishment table is Y-variable value defining each establishment 'bin'
@@ -297,6 +297,17 @@ cov_grp = 0
     end do
     close(109)
 
+    write(*,'(A)') ' - reading in universal probability of establishement table for emergent marsh'
+    write(000,*)  ' - reading in universal probability of establishment table for emergent marsh'
+    
+    open(unit=110, file=trim(adjustL('veg/tables/establishment_EMERGENT.csv' )))
+    read(110,*) dump_txt,univ_ptile_X_bins(:)                                                   ! first row of establisment table is the X-variable values defining each establishment 'bin'
+    do y = 1,n_ptile
+        read(110,*) univ_ptile_Y_bins(y),    &                                                  ! first column of establishment table is Y-variable value defining each establishment 'bin'
+   &        universal_establishment_table(:,y)                                                     ! read the rest of the columns into the establishment probability array for given y value and coverage type, ic
+    end do
+    close(110)
+    
     
 
 1234    format(A,<ncov>(',',A))

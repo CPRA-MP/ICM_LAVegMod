@@ -73,7 +73,7 @@ subroutine params_alloc
     allocate(univ_ptile_X_bins(n_ptile))
     allocate(univ_ptile_Y_bins(n_ptile))
     allocate(universal_mortality_table(n_ptile,n_ptile))
-    
+    allocate(universal_establishment_table(n_ptile,n_ptile))    
     
     ! these variables are 1D arrays [i] where the ith dimension represents the grid cell ID 
     allocate(FFIBS_score(ngrid))
