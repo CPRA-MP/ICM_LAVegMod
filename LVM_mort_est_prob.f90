@@ -118,7 +118,7 @@ subroutine mort_est_prob
                             sal_ptile = min(1.0,max(0.0,sal_ptile))
                             
                             call twoway_interp(sal_ptile, wlv_ptile, universal_mortality_table, univ_ptile_Y_bins, n_ptile, univ_ptile_X_bins, n_ptile, mortality_P(ig,ic)) 
-                            call twoway_interp(sal_ptile, wlv_ptile, universal_establish_table, univ_ptile_Y_bins, n_ptile, univ_ptile_X_bins, n_ptile, establish_P(ig,ic))
+                            call twoway_interp(sal_ptile, wlv_ptile, universal_establishment_table, univ_ptile_Y_bins, n_ptile, univ_ptile_X_bins, n_ptile, establish_P(ig,ic))
                             
 
                         elseif (prob_table_type == 2) then                                                                              ! Use species-specific probability tables based on sal and wlv values instead of universal table logic above
